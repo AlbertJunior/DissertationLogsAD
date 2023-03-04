@@ -29,6 +29,15 @@ from logadempirical.logdeep.models.cnn import TextCNN
 from logadempirical.neural_log.transformers import NeuralLog
 
 
+def mean_selection(losses):
+    mean = losses.mean()
+    stddev = losses.std()
+    limit = 1.5 * stddev
+    lower_limit = (losses >= (mean - limit))
+    upper_limit = (losses <= (mean + limit))
+    return torch.where(torch.logical_and(lower_limit, upper_limit))[0]
+
+
 class Trainer():
     def __init__(self, options):
         self.model_name = options['model_name']
@@ -186,7 +195,7 @@ class Trainer():
         else:
             raise NotImplementedError
 
-        self.criterion = nn.CrossEntropyLoss()
+        self.criterion = nn.CrossEntropyLoss(reduction="none")
         self.time_criterion = nn.MSELoss()
 
         self.start_epoch = 0
@@ -243,7 +252,7 @@ class Trainer():
         self.log['train']['epoch'].append(epoch)
         start = time.strftime("%H:%M:%S")
         lr = self.optimizer.state_dict()['param_groups'][0]['lr']
-        print("\nStarting epoch: %d | phase: train | ⏰: %s | Learning rate: %f" %
+        print("\nStarting EPOCH: %d | phase: train | ⏰: %s | Learning rate: %f" %
               (epoch, start, lr))
         self.log['train']['lr'].append(lr)
         self.log['train']['time'].append(start)
@@ -275,6 +284,7 @@ class Trainer():
                 label = label.view(-1).to(self.device)
                 label = label - 1
                 loss = self.criterion(output, label)
+                loss = loss[mean_selection(loss)].mean()
 
                 predicted = output.argmax(dim=1).cpu().numpy()
                 label = np.array([y.cpu() for y in label])
@@ -317,7 +327,7 @@ class Trainer():
                 else:
                     label = label.view(-1).to(self.device)
                     label = label - 1
-                    loss = 0 if not self.is_logkey else self.criterion(output, label)
+                    loss = 0 if not self.is_logkey else self.criterion(output, label).mean()
 
                     predicted = torch.max(output.softmax(dim=-1), 1).indices.cpu().numpy()
                     label = np.array([y.cpu() for y in label])
@@ -446,8 +456,8 @@ class Trainer():
                 n_val_epoch += 1
                 print("======== Their approach ===========")
                 predicter.predict_semi_supervised()
-                print("======== My contribution ===========")
-                predicter.predict_semi_supervised_ramona()
+                # print("======== My contribution ===========")
+                # predicter.predict_semi_supervised_ramona()
             self.save_log()
 
 

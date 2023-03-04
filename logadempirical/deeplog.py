@@ -27,7 +27,7 @@ def run_deeplog(options):
     predicter = Predicter(options)
     Trainer(options).start_train(predicter)
 
-    print("======== Their approach ===========")
+    print("=========================== Their approach ============================")
     Predicter(options).predict_semi_supervised()
-    print("======== My contribution ===========")
-    Predicter(options).predict_semi_supervised_ramona()
+    # print("======== My contribution ===========")
+    # Predicter(options).predict_semi_supervised_ramona()

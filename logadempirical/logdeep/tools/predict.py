@@ -302,7 +302,7 @@ class Predicter():
         start_time = time.time()
         test_normal_results, num_normal = self.semi_supervised_helper(model, test_normal, vocab, 'test_normal')
         test_abnormal_results, num_abnormal = self.semi_supervised_helper(model, test_abnormal, vocab, 'test_abnormal')
-        print("NORMAL TEST SEQUENCES")
+        print("------------------------NORMAL TEST SEQUENCES----------------------------")
         TH, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold(test_normal_results, num_normal,
                                                                 test_abnormal_results, num_abnormal,
                                                                 threshold_range=self.num_candidates)
@@ -330,7 +330,7 @@ class Predicter():
 
 
 
-        print("UNIQUE TEST SEQUENCES")
+        print("--------------------------UNIQUE TEST SEQUENCES------------------------------------")
         TH, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold_unique(test_normal_results, num_normal,
                                                                 test_abnormal_results, num_abnormal,
                                                                 threshold_range=self.num_candidates)
