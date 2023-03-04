@@ -1,0 +1,730 @@
+/Volumes/workplace/disertatie/LogADEmpirical/venv/bin/python /Volumes/workplace/disertatie/LogADEmpirical/main_run.py --folder=hdfs/ --log_file=HDFS.log --dataset_name=hdfs --model_name=deeplog --window_type=session --sample=sliding_window --is_logkey --train_size=0.1 --train_ratio=1 --valid_ratio=0.1 --test_ratio=1 --max_epoch=100 --n_warm_up_epoch=0 --n_epochs_stop=10 --batch_size=1024 --num_candidates=20 --history_size=10 --lr=0.001 --accumulation_step=5 --session_level=hour --window_size=60 --step_size=60 --output_dir=dataset/ --max_epoch=60
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertModel: ['cls.predictions.decoder.weight', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.bias', 'cls.predictions.transform.LayerNorm.bias', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias']
+- This IS expected if you are initializing BertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Save options parameters
+vocab size 15
+save vocab in dataset/hdfs/deeplog_vocab.pkl
+Loading vocab
+15
+Loading train dataset
+
+Length train 557
+number of sessions 5579
+number of seqs 53091
+Find 53091 train logs, 5309 validation logs
+Checkpoint not found
+
+Starting epoch: 0 | phase: train | ⏰: 15:33:31 | Learning rate: 0.000031
+Train loss: 2.71582724 - Train acc: 0.02: 100%|██████████| 52/52 [00:18<00:00,  2.76it/s]
+Log saved
+
+Starting epoch: 1 | phase: train | ⏰: 15:33:50 | Learning rate: 0.000063
+Train loss: 2.69697362 - Train acc: 0.11: 100%|██████████| 52/52 [00:18<00:00,  2.78it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 1 | phase: valid | ⏰: 15:34:09
+: 100%|██████████| 6/6 [00:00<00:00, 10.20it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 2.683335463205973 Validation accuracy: 0.23111697118101338
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 2 | phase: train | ⏰: 15:34:10 | Learning rate: 0.000125
+Train loss: 2.65661370 - Train acc: 0.23: 100%|██████████| 52/52 [00:18<00:00,  2.84it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 2 | phase: valid | ⏰: 15:34:28
+: 100%|██████████| 6/6 [00:00<00:00, 10.51it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 2.623729666074117 Validation accuracy: 0.23092861179129778
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 3 | phase: train | ⏰: 15:34:29 | Learning rate: 0.000250
+Train loss: 2.52804537 - Train acc: 0.28: 100%|██████████| 52/52 [00:18<00:00,  2.82it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 3 | phase: valid | ⏰: 15:34:47
+: 100%|██████████| 6/6 [00:00<00:00, 10.48it/s]
+
+Validation loss: 2.3779244820276895 Validation accuracy: 0.26483330194010174
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 4 | phase: train | ⏰: 15:34:48 | Learning rate: 0.000500
+Train loss: 2.05514879 - Train acc: 0.26: 100%|██████████| 52/52 [00:18<00:00,  2.79it/s]
+
+Starting epoch: 4 | phase: valid | ⏰: 15:35:06
+: 100%|██████████| 6/6 [00:00<00:00, 10.47it/s]
+
+Validation loss: 1.863309919834137 Validation accuracy: 0.25503861367489167
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 5 | phase: train | ⏰: 15:35:07 | Learning rate: 0.001000
+Train loss: 1.76487153 - Train acc: 0.40: 100%|██████████| 52/52 [00:18<00:00,  2.85it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 5 | phase: valid | ⏰: 15:35:25
+: 100%|██████████| 6/6 [00:00<00:00, 10.24it/s]
+
+Validation loss: 1.6358778476715088 Validation accuracy: 0.46920323978150313
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 6 | phase: train | ⏰: 15:35:26 | Learning rate: 0.001000
+Train loss: 1.51721567 - Train acc: 0.55: 100%|██████████| 52/52 [00:18<00:00,  2.81it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 6 | phase: valid | ⏰: 15:35:44
+: 100%|██████████| 6/6 [00:00<00:00, 10.36it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 1.362060268719991 Validation accuracy: 0.6165002825390846
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 7 | phase: train | ⏰: 15:35:45 | Learning rate: 0.001000
+Train loss: 1.21982665 - Train acc: 0.66: 100%|██████████| 52/52 [00:18<00:00,  2.81it/s]
+
+Starting epoch: 7 | phase: valid | ⏰: 15:36:03
+: 100%|██████████| 6/6 [00:00<00:00, 10.54it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 1.0758839050928752 Validation accuracy: 0.7184027123752119
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 8 | phase: train | ⏰: 15:36:04 | Learning rate: 0.001000
+Train loss: 0.95816222 - Train acc: 0.72: 100%|██████████| 52/52 [00:18<00:00,  2.79it/s]
+
+Starting epoch: 8 | phase: valid | ⏰: 15:36:22
+: 100%|██████████| 6/6 [00:00<00:00, 10.36it/s]
+
+Validation loss: 0.826089988152186 Validation accuracy: 0.7387455264644942
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 9 | phase: train | ⏰: 15:36:23 | Learning rate: 0.001000
+Train loss: 0.76708005 - Train acc: 0.75: 100%|██████████| 52/52 [00:18<00:00,  2.81it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 9 | phase: valid | ⏰: 15:36:42
+: 100%|██████████| 6/6 [00:00<00:00, 10.55it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.6802602807680765 Validation accuracy: 0.7801845922019213
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 10 | phase: train | ⏰: 15:36:42 | Learning rate: 0.001000
+Train loss: 0.65267088 - Train acc: 0.77: 100%|██████████| 52/52 [00:18<00:00,  2.81it/s]
+
+Starting epoch: 10 | phase: valid | ⏰: 15:37:01
+: 100%|██████████| 6/6 [00:00<00:00, 10.19it/s]
+
+Validation loss: 0.6198572715123495 Validation accuracy: 0.7766057637973253
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 11 | phase: train | ⏰: 15:37:01 | Learning rate: 0.001000
+Train loss: 0.60145229 - Train acc: 0.78: 100%|██████████| 52/52 [00:18<00:00,  2.79it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 11 | phase: valid | ⏰: 15:37:20
+: 100%|██████████| 6/6 [00:00<00:00, 10.37it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.5387814740339915 Validation accuracy: 0.8182331889244678
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 12 | phase: train | ⏰: 15:37:21 | Learning rate: 0.001000
+Train loss: 0.53712941 - Train acc: 0.80: 100%|██████████| 52/52 [00:18<00:00,  2.79it/s]
+
+Starting epoch: 12 | phase: valid | ⏰: 15:37:39
+: 100%|██████████| 6/6 [00:00<00:00, 10.26it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.494210551182429 Validation accuracy: 0.8176681107553212
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 13 | phase: train | ⏰: 15:37:40 | Learning rate: 0.001000
+Train loss: 0.49685481 - Train acc: 0.81: 100%|██████████| 52/52 [00:18<00:00,  2.76it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 13 | phase: valid | ⏰: 15:37:59
+: 100%|██████████| 6/6 [00:00<00:00, 10.29it/s]
+
+Validation loss: 0.4705826938152313 Validation accuracy: 0.8250141269542287
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 14 | phase: train | ⏰: 15:37:59 | Learning rate: 0.001000
+Train loss: 0.46662493 - Train acc: 0.82: 100%|██████████| 52/52 [00:19<00:00,  2.72it/s]
+
+Starting epoch: 14 | phase: valid | ⏰: 15:38:18
+: 100%|██████████| 6/6 [00:00<00:00, 10.09it/s]
+
+Validation loss: 0.44111818075180054 Validation accuracy: 0.8268977208513845
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 15 | phase: train | ⏰: 15:38:19 | Learning rate: 0.001000
+Train loss: 0.44449760 - Train acc: 0.82: 100%|██████████| 52/52 [00:37<00:00,  1.39it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 15 | phase: valid | ⏰: 15:38:56
+: 100%|██████████| 6/6 [00:00<00:00,  6.63it/s]
+
+Validation loss: 0.42542130251725513 Validation accuracy: 0.8334902994914296
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 16 | phase: train | ⏰: 15:38:57 | Learning rate: 0.001000
+Train loss: 0.43185723 - Train acc: 0.83: 100%|██████████| 52/52 [00:28<00:00,  1.85it/s]
+
+Starting epoch: 16 | phase: valid | ⏰: 15:39:25
+
+Validation loss: 0.41716210544109344 Validation accuracy: 0.8325485025428517
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 17 | phase: train | ⏰: 15:39:26 | Learning rate: 0.001000
+: 100%|██████████| 6/6 [00:00<00:00,  6.73it/s]
+Train loss: 0.41938989 - Train acc: 0.83: 100%|██████████| 52/52 [00:35<00:00,  1.44it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 17 | phase: valid | ⏰: 15:40:02
+: 100%|██████████| 6/6 [00:00<00:00,  8.44it/s]
+
+Validation loss: 0.4021812826395035 Validation accuracy: 0.8357506121680166
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 18 | phase: train | ⏰: 15:40:03 | Learning rate: 0.001000
+Train loss: 0.40778689 - Train acc: 0.84: 100%|██████████| 52/52 [00:19<00:00,  2.69it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 18 | phase: valid | ⏰: 15:40:22
+: 100%|██████████| 6/6 [00:00<00:00,  9.49it/s]
+
+Validation loss: 0.3929565449555715 Validation accuracy: 0.8519495196835563
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 19 | phase: train | ⏰: 15:40:23 | Learning rate: 0.001000
+Train loss: 0.39965779 - Train acc: 0.84: 100%|██████████| 52/52 [00:18<00:00,  2.77it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 19 | phase: valid | ⏰: 15:40:42
+: 100%|██████████| 6/6 [00:00<00:00, 10.88it/s]
+
+Validation loss: 0.3882134010394414 Validation accuracy: 0.853833113580712
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 20 | phase: train | ⏰: 15:40:42 | Learning rate: 0.001000
+Train loss: 0.39292980 - Train acc: 0.84: 100%|██████████| 52/52 [00:18<00:00,  2.87it/s]
+
+Starting epoch: 20 | phase: valid | ⏰: 15:41:01
+: 100%|██████████| 6/6 [00:00<00:00, 10.46it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.38029827177524567 Validation accuracy: 0.84667545677152
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 21 | phase: train | ⏰: 15:41:01 | Learning rate: 0.001000
+Train loss: 0.38852292 - Train acc: 0.85: 100%|██████████| 52/52 [00:18<00:00,  2.76it/s]
+
+Starting epoch: 21 | phase: valid | ⏰: 15:41:20
+: 100%|██████████| 6/6 [00:00<00:00, 10.30it/s]
+
+Validation loss: 0.3768777052561442 Validation accuracy: 0.8545865511395743
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 22 | phase: train | ⏰: 15:41:21 | Learning rate: 0.001000
+Train loss: 0.38126624 - Train acc: 0.85: 100%|██████████| 52/52 [00:18<00:00,  2.88it/s]
+
+Starting epoch: 22 | phase: valid | ⏰: 15:41:39
+: 100%|██████████| 6/6 [00:00<00:00, 10.29it/s]
+
+Validation loss: 0.3688984562953313 Validation accuracy: 0.8704087398756828
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 23 | phase: train | ⏰: 15:41:39 | Learning rate: 0.001000
+Train loss: 0.37577297 - Train acc: 0.87: 100%|██████████| 52/52 [00:18<00:00,  2.86it/s]
+
+Starting epoch: 23 | phase: valid | ⏰: 15:41:57
+: 100%|██████████| 6/6 [00:00<00:00, 10.41it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.36362121999263763 Validation accuracy: 0.8760595215671502
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 24 | phase: train | ⏰: 15:41:58 | Learning rate: 0.001000
+Train loss: 0.36954787 - Train acc: 0.87: 100%|██████████| 52/52 [00:18<00:00,  2.88it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 24 | phase: valid | ⏰: 15:42:16
+: 100%|██████████| 6/6 [00:00<00:00, 10.31it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.3586030453443527 Validation accuracy: 0.8781314748540214
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 25 | phase: train | ⏰: 15:42:17 | Learning rate: 0.001000
+Train loss: 0.36572719 - Train acc: 0.87: 100%|██████████| 52/52 [00:17<00:00,  2.90it/s]
+
+Starting epoch: 25 | phase: valid | ⏰: 15:42:35
+: 100%|██████████| 6/6 [00:00<00:00, 10.44it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.3561360488335292 Validation accuracy: 0.8762478809568657
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 26 | phase: train | ⏰: 15:42:35 | Learning rate: 0.001000
+Train loss: 0.36036059 - Train acc: 0.87: 100%|██████████| 52/52 [00:17<00:00,  2.92it/s]
+
+Starting epoch: 26 | phase: valid | ⏰: 15:42:53
+: 100%|██████████| 6/6 [00:00<00:00, 10.25it/s]
+
+Validation loss: 0.3490791966517766 Validation accuracy: 0.8803917875306084
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 27 | phase: train | ⏰: 15:42:53 | Learning rate: 0.001000
+Train loss: 0.35745887 - Train acc: 0.87: 100%|██████████| 52/52 [00:17<00:00,  2.90it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 27 | phase: valid | ⏰: 15:43:11
+: 100%|██████████| 6/6 [00:00<00:00, 10.46it/s]
+
+Validation loss: 0.3456842551628749 Validation accuracy: 0.8792616311923149
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 28 | phase: train | ⏰: 15:43:12 | Learning rate: 0.001000
+Train loss: 0.35039154 - Train acc: 0.87: 100%|██████████| 52/52 [00:18<00:00,  2.82it/s]
+
+Starting epoch: 28 | phase: valid | ⏰: 15:43:30
+: 100%|██████████| 6/6 [00:00<00:00, 10.44it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.339904526869456 Validation accuracy: 0.8813335844791863
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 29 | phase: train | ⏰: 15:43:31 | Learning rate: 0.001000
+Train loss: 0.34479842 - Train acc: 0.87: 100%|██████████| 52/52 [00:19<00:00,  2.73it/s]
+
+Starting epoch: 29 | phase: valid | ⏰: 15:43:50
+: 100%|██████████| 6/6 [00:00<00:00, 10.33it/s]
+
+Validation loss: 0.3328440288702647 Validation accuracy: 0.8826521002071953
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 30 | phase: train | ⏰: 15:43:51 | Learning rate: 0.001000
+Train loss: 0.33987400 - Train acc: 0.88: 100%|██████████| 52/52 [00:18<00:00,  2.86it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 30 | phase: valid | ⏰: 15:44:09
+: 100%|██████████| 6/6 [00:00<00:00,  9.65it/s]
+
+Validation loss: 0.33089794715245563 Validation accuracy: 0.8817103032586174
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 31 | phase: train | ⏰: 15:44:10 | Learning rate: 0.001000
+Train loss: 0.33590756 - Train acc: 0.88: 100%|██████████| 52/52 [00:18<00:00,  2.78it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 31 | phase: valid | ⏰: 15:44:28
+: 100%|██████████| 6/6 [00:00<00:00, 10.35it/s]
+
+Validation loss: 0.32604987919330597 Validation accuracy: 0.8826521002071953
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 32 | phase: train | ⏰: 15:44:29 | Learning rate: 0.001000
+Train loss: 0.33128678 - Train acc: 0.88: 100%|██████████| 52/52 [00:18<00:00,  2.84it/s]
+
+Starting epoch: 32 | phase: valid | ⏰: 15:44:47
+: 100%|██████████| 6/6 [00:00<00:00, 10.11it/s]
+
+Validation loss: 0.3225450813770294 Validation accuracy: 0.8824637408174798
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 33 | phase: train | ⏰: 15:44:48 | Learning rate: 0.001000
+Train loss: 0.32695295 - Train acc: 0.88: 100%|██████████| 52/52 [00:20<00:00,  2.52it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 33 | phase: valid | ⏰: 15:45:08
+: 100%|██████████| 6/6 [00:00<00:00,  9.54it/s]
+
+Validation loss: 0.31984812021255493 Validation accuracy: 0.8873610849500848
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 34 | phase: train | ⏰: 15:45:09 | Learning rate: 0.001000
+Train loss: 0.32230259 - Train acc: 0.88: 100%|██████████| 52/52 [00:18<00:00,  2.79it/s]
+
+Starting epoch: 34 | phase: valid | ⏰: 15:45:28
+: 100%|██████████| 6/6 [00:00<00:00, 11.94it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.31192806859811145 Validation accuracy: 0.8828404595969109
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 35 | phase: train | ⏰: 15:45:28 | Learning rate: 0.001000
+Train loss: 0.31680384 - Train acc: 0.88: 100%|██████████| 52/52 [00:17<00:00,  3.01it/s]
+
+Starting epoch: 35 | phase: valid | ⏰: 15:45:45
+: 100%|██████████| 6/6 [00:00<00:00, 10.40it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.3049014111359914 Validation accuracy: 0.8854774910529289
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 36 | phase: train | ⏰: 15:45:46 | Learning rate: 0.001000
+Train loss: 0.31045900 - Train acc: 0.88: 100%|██████████| 52/52 [00:17<00:00,  2.92it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 36 | phase: valid | ⏰: 15:46:04
+: 100%|██████████| 6/6 [00:00<00:00, 10.19it/s]
+
+Validation loss: 0.30060889820257825 Validation accuracy: 0.8928235072518365
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 37 | phase: train | ⏰: 15:46:04 | Learning rate: 0.001000
+Train loss: 0.30584553 - Train acc: 0.88: 100%|██████████| 52/52 [00:19<00:00,  2.74it/s]
+
+Starting epoch: 37 | phase: valid | ⏰: 15:46:23
+: 100%|██████████| 6/6 [00:00<00:00,  9.90it/s]
+
+Validation loss: 0.2963038583596547 Validation accuracy: 0.8918817103032586
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 38 | phase: train | ⏰: 15:46:24 | Learning rate: 0.001000
+Train loss: 0.30128554 - Train acc: 0.88: 100%|██████████| 52/52 [00:18<00:00,  2.87it/s]
+
+Starting epoch: 38 | phase: valid | ⏰: 15:46:42
+: 100%|██████████| 6/6 [00:00<00:00, 10.49it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.29088171819845837 Validation accuracy: 0.8907515539649652
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 39 | phase: train | ⏰: 15:46:43 | Learning rate: 0.001000
+Train loss: 0.29762300 - Train acc: 0.88: 100%|██████████| 52/52 [00:18<00:00,  2.82it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 39 | phase: valid | ⏰: 15:47:01
+: 100%|██████████| 6/6 [00:00<00:00, 11.09it/s]
+
+Validation loss: 0.28967687984307605 Validation accuracy: 0.8941420229798456
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 40 | phase: train | ⏰: 15:47:02 | Learning rate: 0.001000
+Train loss: 0.29367686 - Train acc: 0.89: 100%|██████████| 52/52 [00:17<00:00,  2.91it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 40 | phase: valid | ⏰: 15:47:20
+: 100%|██████████| 6/6 [00:00<00:00,  9.25it/s]
+
+Validation loss: 0.2847449332475662 Validation accuracy: 0.8896213976266717
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 41 | phase: train | ⏰: 15:47:20 | Learning rate: 0.001000
+Train loss: 0.29177324 - Train acc: 0.89: 100%|██████████| 52/52 [00:18<00:00,  2.83it/s]
+
+Starting epoch: 41 | phase: valid | ⏰: 15:47:39
+: 100%|██████████| 6/6 [00:00<00:00,  9.17it/s]
+
+Validation loss: 0.2941047002871831 Validation accuracy: 0.8913166321341118
+Log saved
+
+Starting epoch: 42 | phase: train | ⏰: 15:47:39 | Learning rate: 0.001000
+Train loss: 0.29096743 - Train acc: 0.89: 100%|██████████| 52/52 [00:18<00:00,  2.84it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 42 | phase: valid | ⏰: 15:47:58
+: 100%|██████████| 6/6 [00:00<00:00, 10.47it/s]
+
+Validation loss: 0.2758711452285449 Validation accuracy: 0.8971557732152948
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 43 | phase: train | ⏰: 15:47:58 | Learning rate: 0.001000
+Train loss: 0.28534122 - Train acc: 0.89: 100%|██████████| 52/52 [00:18<00:00,  2.85it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 43 | phase: valid | ⏰: 15:48:16
+: 100%|██████████| 6/6 [00:00<00:00, 10.73it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.2765289172530174 Validation accuracy: 0.8915049915238275
+Log saved
+
+Starting epoch: 44 | phase: train | ⏰: 15:48:17 | Learning rate: 0.001000
+Train loss: 0.28236077 - Train acc: 0.89: 100%|██████████| 52/52 [00:17<00:00,  3.00it/s]
+
+Starting epoch: 44 | phase: valid | ⏰: 15:48:34
+: 100%|██████████| 6/6 [00:00<00:00, 10.73it/s]
+
+Validation loss: 0.2727843299508095 Validation accuracy: 0.8943303823695611
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 45 | phase: train | ⏰: 15:48:35 | Learning rate: 0.001000
+Train loss: 0.27781112 - Train acc: 0.89: 100%|██████████| 52/52 [00:17<00:00,  2.97it/s]
+
+Starting epoch: 45 | phase: valid | ⏰: 15:48:52
+: 100%|██████████| 6/6 [00:00<00:00, 10.70it/s]
+
+Validation loss: 0.2666357383131981 Validation accuracy: 0.9009229610096063
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 46 | phase: train | ⏰: 15:48:53 | Learning rate: 0.001000
+Train loss: 0.27245782 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  3.04it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 46 | phase: valid | ⏰: 15:49:10
+: 100%|██████████| 6/6 [00:00<00:00, 10.57it/s]
+
+Validation loss: 0.26573581000169116 Validation accuracy: 0.8982859295535882
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 47 | phase: train | ⏰: 15:49:11 | Learning rate: 0.001000
+Train loss: 0.26873178 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  3.06it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 47 | phase: valid | ⏰: 15:49:28
+: 100%|██████████| 6/6 [00:00<00:00, 10.72it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.260717677573363 Validation accuracy: 0.9039367112450556
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 48 | phase: train | ⏰: 15:49:28 | Learning rate: 0.001000
+Train loss: 0.26615570 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  3.00it/s]
+
+Starting epoch: 48 | phase: valid | ⏰: 15:49:45
+: 100%|██████████| 6/6 [00:00<00:00, 10.88it/s]
+
+Validation loss: 0.26072487483421963 Validation accuracy: 0.902429836127331
+Log saved
+
+Starting epoch: 49 | phase: train | ⏰: 15:49:46 | Learning rate: 0.001000
+Train loss: 0.26211976 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  2.95it/s]
+
+Starting epoch: 49 | phase: valid | ⏰: 15:50:04
+: 100%|██████████| 6/6 [00:00<00:00, 10.45it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.2562750031550725 Validation accuracy: 0.9045017894142023
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 50 | phase: train | ⏰: 15:50:04 | Learning rate: 0.000100
+Train loss: 0.25981559 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  2.96it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 50 | phase: valid | ⏰: 15:50:22
+: 100%|██████████| 6/6 [00:00<00:00, 10.78it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.2549220596750577 Validation accuracy: 0.9045017894142023
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 51 | phase: train | ⏰: 15:50:22 | Learning rate: 0.000100
+Train loss: 0.25923091 - Train acc: 0.90: 100%|██████████| 52/52 [00:16<00:00,  3.11it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 51 | phase: valid | ⏰: 15:50:39
+: 100%|██████████| 6/6 [00:00<00:00, 11.04it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.2544226770599683 Validation accuracy: 0.9046901488039178
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 52 | phase: train | ⏰: 15:50:40 | Learning rate: 0.000100
+Train loss: 0.25909846 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  2.99it/s]
+
+Starting epoch: 52 | phase: valid | ⏰: 15:50:57
+: 100%|██████████| 6/6 [00:00<00:00, 10.96it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.2539543906847636 Validation accuracy: 0.9061970239216425
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 53 | phase: train | ⏰: 15:50:58 | Learning rate: 0.000100
+Train loss: 0.25880843 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  3.04it/s]
+
+Starting epoch: 53 | phase: valid | ⏰: 15:51:15
+: 100%|██████████| 6/6 [00:00<00:00, 10.87it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.25401054819424945 Validation accuracy: 0.907327180259936
+Log saved
+
+Starting epoch: 54 | phase: train | ⏰: 15:51:15 | Learning rate: 0.000100
+Train loss: 0.25828427 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  3.02it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 54 | phase: valid | ⏰: 15:51:33
+: 100%|██████████| 6/6 [00:00<00:00, 11.06it/s]
+
+Validation loss: 0.253685141603152 Validation accuracy: 0.9067621020907892
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 55 | phase: train | ⏰: 15:51:33 | Learning rate: 0.000100
+Train loss: 0.25801800 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  3.03it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 55 | phase: valid | ⏰: 15:51:50
+: 100%|██████████| 6/6 [00:00<00:00, 10.99it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Validation loss: 0.2533031056324641 Validation accuracy: 0.9056319457524957
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 56 | phase: train | ⏰: 15:51:51 | Learning rate: 0.000100
+Train loss: 0.25780285 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  3.02it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 56 | phase: valid | ⏰: 15:52:08
+: 100%|██████████| 6/6 [00:00<00:00, 10.37it/s]
+
+Validation loss: 0.25321418792009354 Validation accuracy: 0.906008664531927
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 57 | phase: train | ⏰: 15:52:09 | Learning rate: 0.000100
+Train loss: 0.25727521 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  3.00it/s]
+
+Starting epoch: 57 | phase: valid | ⏰: 15:52:26
+: 100%|██████████| 6/6 [00:00<00:00, 11.01it/s]
+
+Validation loss: 0.25280209134022397 Validation accuracy: 0.9080806178187982
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 58 | phase: train | ⏰: 15:52:26 | Learning rate: 0.000100
+Train loss: 0.25727678 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  3.01it/s]
+:   0%|          | 0/6 [00:00<?, ?it/s]
+Starting epoch: 58 | phase: valid | ⏰: 15:52:44
+: 100%|██████████| 6/6 [00:00<00:00, 10.72it/s]
+
+Validation loss: 0.25284342219432193 Validation accuracy: 0.9075155396496515
+Log saved
+
+Starting epoch: 59 | phase: train | ⏰: 15:52:44 | Learning rate: 0.000100
+Train loss: 0.25703363 - Train acc: 0.90: 100%|██████████| 52/52 [00:17<00:00,  2.97it/s]
+
+Starting epoch: 59 | phase: valid | ⏰: 15:53:02
+: 100%|██████████| 6/6 [00:00<00:00, 12.82it/s]
+
+Validation loss: 0.2523773933450381 Validation accuracy: 0.9078922584290827
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+plot done
+======== Their approach ===========
+15
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 569311
+Lens test
+14149 4099
+: 100%|██████████| 456/456 [00:37<00:00, 12.02it/s]
+: 100%|██████████| 155/155 [00:10<00:00, 14.98it/s]
+Ce a dat pe validare
+14 3789 3022 78.26660548353792 81.86836263274735
+
+Best threshold 13
+Confusion matrix
+TP: 13645, TN: 548855, FP: 3789, FN: 3022, FNR: 0.18131637367252654, FPR: 0.006856131614565615
+Precision: 78.267%, Recall: 81.868%, F1-measure: 80.027%, Specificity: 0.993, Lead time: 13.795
+elapsed_time: 263.3583948612213
+======== My contribution ===========
+15
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 569311
+Percentage 0.001
+Lens valid
+14 4
+Lens test
+14135 4095
+: 100%|██████████| 1/1 [00:00<00:00, 18.16it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 68.48it/s]
+: 100%|██████████| 455/455 [00:40<00:00, 11.33it/s]
+: 100%|██████████| 155/155 [00:09<00:00, 16.27it/s]
+Ce a dat pe validare
+14 3 0 62.5 100.0
+
+Ce a dat pe test
+14 3786 3022 78.2738436818547 81.86292161805305
+
+Best threshold 13
+Confusion matrix
+TP: 13640, TN: 548827, FP: 3786, FN: 3022, FNR: 0.18137078381946944, FPR: 0.006851087469893036
+Precision: 78.274%, Recall: 81.863%, F1-measure: 80.028%, Specificity: 0.993, Lead time: 13.795
+elapsed_time: 227.69370579719543
+Percentage 0.002
+Lens valid
+28 8
+Lens test
+14121 4091
+: 100%|██████████| 1/1 [00:00<00:00, 13.07it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 42.73it/s]
+: 100%|██████████| 455/455 [00:31<00:00, 14.40it/s]
+: 100%|██████████| 155/155 [00:10<00:00, 15.04it/s]
+Ce a dat pe validare
+14 6 0 60.0 100.0
+
+Ce a dat pe test
+14 3783 3022 78.2823353809059 81.85856645455637
+
+Best threshold 13
+Confusion matrix
+TP: 13636, TN: 548744, FP: 3783, FN: 3022, FNR: 0.1814143354544363, FPR: 0.006846724232480947
+Precision: 78.282%, Recall: 81.859%, F1-measure: 80.031%, Specificity: 0.993, Lead time: 13.796
+elapsed_time: 3657.995795249939
+Percentage 0.005
+Lens valid
+70 20
+Lens test
+14079 4079
+: 100%|██████████| 3/3 [00:00<00:00, 20.83it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 15.45it/s]
+: 100%|██████████| 454/454 [39:37<00:00,  5.24s/it]
+: 100%|██████████| 154/154 [00:09<00:00, 16.05it/s]
+Ce a dat pe validare
+21 0 8 100.0 78.94736842105263
+
+Ce a dat pe test
+21 245 5730 97.80150753768844 65.54212520295869
+
+Best threshold 20
+Confusion matrix
+TP: 10899, TN: 549054, FP: 245, FN: 5730, FNR: 0.34457874797041316, FPR: 0.00044602302206994736
+Precision: 97.802%, Recall: 65.542%, F1-measure: 78.486%, Specificity: 1.000, Lead time: 22.386
+elapsed_time: 8881.261554718018
+Percentage 0.01
+Lens valid
+141 40
+Lens test
+14008 4059
+: 100%|██████████| 5/5 [00:00<00:00, 16.29it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 18.25it/s]
+: 100%|██████████| 451/451 [00:29<00:00, 15.53it/s]
+: 100%|██████████| 154/154 [00:09<00:00, 16.00it/s]
+Ce a dat pe validare
+21 0 14 100.0 79.71014492753623
+
+Ce a dat pe test
+21 245 5724 97.79656443924813 65.51391733943849
+
+Best threshold 20
+Confusion matrix
+TP: 10874, TN: 545639, FP: 245, FN: 5724, FNR: 0.3448608266056151, FPR: 0.00044881330099435043
+Precision: 97.797%, Recall: 65.514%, F1-measure: 78.464%, Specificity: 1.000, Lead time: 22.377
+elapsed_time: 55.564456939697266
+Percentage 0.1
+Lens valid
+1414 409
+Lens test
+12735 3690
+: 100%|██████████| 45/45 [00:02<00:00, 15.67it/s]
+: 100%|██████████| 15/15 [00:00<00:00, 17.39it/s]
+: 100%|██████████| 411/411 [00:25<00:00, 16.20it/s]
+: 100%|██████████| 140/140 [00:12<00:00, 11.59it/s]
+Ce a dat pe validare
+14 208 5 91.12627986348123 99.76646426903316
+
+Ce a dat pe test
+14 3581 3017 76.26905235255136 79.23034558722291
+
+Best threshold 13
+Confusion matrix
+TP: 11509, TN: 524120, FP: 3581, FN: 3017, FNR: 0.2076965441277709, FPR: 0.006786039821793023
+Precision: 76.269%, Recall: 79.230%, F1-measure: 77.722%, Specificity: 0.993, Lead time: 13.765
+elapsed_time: 61.39564275741577
+
+Process finished with exit code 0

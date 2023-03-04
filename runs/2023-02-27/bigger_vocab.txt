@@ -1,0 +1,304 @@
+/Volumes/workplace/disertatie/LogADEmpirical/venv/bin/python /Volumes/workplace/disertatie/LogADEmpirical/main_run.py --folder=hdfs/ --log_file=HDFS.log --dataset_name=hdfs --model_name=deeplog --window_type=session --sample=sliding_window --is_logkey --train_size=0.1 --train_ratio=1 --valid_ratio=0.1 --test_ratio=1 --n_warm_up_epoch=0 --n_epochs_stop=10 --batch_size=1024 --num_candidates=20 --history_size=10 --lr=0.01 --accumulation_step=5 --session_level=hour --window_size=300 --step_size=60 --output_dir=dataset/ --max_epoch=15
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertModel: ['cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.decoder.weight']
+- This IS expected if you are initializing BertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Save options parameters
+vocab size 41
+save vocab in dataset/hdfs/deeplog_vocab.pkl
+Loading vocab
+41
+Loading train dataset
+
+Length train 5577
+number of sessions 55770
+number of seqs 530922
+Find 477830 train logs, 53092 validation logs
+Checkpoint not found
+
+Starting epoch: 0 | phase: train | ⏰: 11:33:13 | Learning rate: 0.000313
+Train loss: 2.25817521 - Train acc: 0.31: 100%|██████████| 467/467 [02:44<00:00,  2.85it/s]
+Log saved
+
+Starting epoch: 1 | phase: train | ⏰: 11:35:57 | Learning rate: 0.000625
+Train loss: 1.39122488 - Train acc: 0.61: 100%|██████████| 467/467 [02:49<00:00,  2.76it/s]
+
+Starting epoch: 1 | phase: valid | ⏰: 11:38:46
+: 100%|██████████| 52/52 [00:06<00:00,  8.50it/s]
+
+Validation loss: 0.8563740941194388 Validation accuracy: 0.7373803962932268
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 2 | phase: train | ⏰: 11:38:52 | Learning rate: 0.001250
+Train loss: 0.73083176 - Train acc: 0.74: 100%|██████████| 467/467 [02:39<00:00,  2.93it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 2 | phase: valid | ⏰: 11:41:32
+: 100%|██████████| 52/52 [00:05<00:00,  8.70it/s]
+
+Validation loss: 0.4918998944071623 Validation accuracy: 0.8153205756046109
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 3 | phase: train | ⏰: 11:41:38 | Learning rate: 0.002500
+Train loss: 0.44274122 - Train acc: 0.83: 100%|██████████| 467/467 [02:38<00:00,  2.94it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 3 | phase: valid | ⏰: 11:44:17
+: 100%|██████████| 52/52 [00:06<00:00,  7.66it/s]
+:   0%|          | 0/467 [00:00<?, ?it/s]
+Validation loss: 0.32455069399797 Validation accuracy: 0.8784562645973027
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 4 | phase: train | ⏰: 11:44:24 | Learning rate: 0.005000
+Train loss: 0.64077307 - Train acc: 0.80: 100%|██████████| 467/467 [02:37<00:00,  2.97it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 4 | phase: valid | ⏰: 11:47:01
+: 100%|██████████| 52/52 [00:05<00:00,  9.14it/s]
+
+Validation loss: 0.3242880856761566 Validation accuracy: 0.8725796730204174
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 5 | phase: train | ⏰: 11:47:06 | Learning rate: 0.010000
+Train loss: 0.36356354 - Train acc: 0.86: 100%|██████████| 467/467 [02:42<00:00,  2.87it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 5 | phase: valid | ⏰: 11:49:49
+: 100%|██████████| 52/52 [00:05<00:00,  9.12it/s]
+
+Validation loss: 0.28946721439178175 Validation accuracy: 0.8816394183681158
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 6 | phase: train | ⏰: 11:49:55 | Learning rate: 0.010000
+Train loss: 0.26761051 - Train acc: 0.89: 100%|██████████| 467/467 [02:37<00:00,  2.97it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 6 | phase: valid | ⏰: 11:52:32
+: 100%|██████████| 52/52 [00:05<00:00,  9.14it/s]
+:   0%|          | 0/467 [00:00<?, ?it/s]
+Validation loss: 0.24594923653281653 Validation accuracy: 0.9062193927522038
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 7 | phase: train | ⏰: 11:52:37 | Learning rate: 0.010000
+Train loss: 0.22965870 - Train acc: 0.91: 100%|██████████| 467/467 [02:51<00:00,  2.72it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 7 | phase: valid | ⏰: 11:55:29
+: 100%|██████████| 52/52 [00:05<00:00,  9.05it/s]
+
+Validation loss: 0.21805095156797996 Validation accuracy: 0.9156558426881639
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+:   0%|          | 0/467 [00:00<?, ?it/s]Log saved
+
+Starting epoch: 8 | phase: train | ⏰: 11:55:35 | Learning rate: 0.010000
+Train loss: 0.21356806 - Train acc: 0.92: 100%|██████████| 467/467 [02:39<00:00,  2.93it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 8 | phase: valid | ⏰: 11:58:14
+: 100%|██████████| 52/52 [00:05<00:00,  9.08it/s]
+
+Validation loss: 0.20941347915392655 Validation accuracy: 0.9186883146236721
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 9 | phase: train | ⏰: 11:58:20 | Learning rate: 0.010000
+Train loss: 0.20754841 - Train acc: 0.92: 100%|██████████| 467/467 [03:07<00:00,  2.49it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 9 | phase: valid | ⏰: 12:01:28
+: 100%|██████████| 52/52 [00:06<00:00,  8.35it/s]
+
+Validation loss: 0.2064699659553858 Validation accuracy: 0.9203081443531982
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 10 | phase: train | ⏰: 12:01:34 | Learning rate: 0.010000
+Train loss: 0.20382520 - Train acc: 0.92: 100%|██████████| 467/467 [02:40<00:00,  2.91it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 10 | phase: valid | ⏰: 12:04:15
+: 100%|██████████| 52/52 [00:06<00:00,  8.19it/s]
+
+Validation loss: 0.20384521725086066 Validation accuracy: 0.9189896782942816
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 11 | phase: train | ⏰: 12:04:21 | Learning rate: 0.010000
+Train loss: 0.20219027 - Train acc: 0.92: 100%|██████████| 467/467 [02:37<00:00,  2.97it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 11 | phase: valid | ⏰: 12:06:58
+: 100%|██████████| 52/52 [00:05<00:00,  8.79it/s]
+:   0%|          | 0/467 [00:00<?, ?it/s]
+Validation loss: 0.20254784163374168 Validation accuracy: 0.9190273487531078
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 12 | phase: train | ⏰: 12:07:04 | Learning rate: 0.010000
+Train loss: 0.20012506 - Train acc: 0.92: 100%|██████████| 467/467 [02:38<00:00,  2.96it/s]
+
+Starting epoch: 12 | phase: valid | ⏰: 12:09:42
+: 100%|██████████| 52/52 [00:06<00:00,  7.72it/s]
+
+Validation loss: 0.2016229758468958 Validation accuracy: 0.9200444511414149
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 13 | phase: train | ⏰: 12:09:49 | Learning rate: 0.010000
+Train loss: 0.19845407 - Train acc: 0.92: 100%|██████████| 467/467 [02:37<00:00,  2.96it/s]
+
+Starting epoch: 13 | phase: valid | ⏰: 12:12:27
+: 100%|██████████| 52/52 [00:05<00:00,  9.00it/s]
+
+Validation loss: 0.19902702420949936 Validation accuracy: 0.9203646500414375
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 14 | phase: train | ⏰: 12:12:33 | Learning rate: 0.010000
+Train loss: 0.19714528 - Train acc: 0.92: 100%|██████████| 467/467 [02:36<00:00,  2.99it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 14 | phase: valid | ⏰: 12:15:09
+: 100%|██████████| 52/52 [00:05<00:00,  8.87it/s]
+
+Validation loss: 0.1988259109740074 Validation accuracy: 0.9190085135236947
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+plot done
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13445 3789
+: 100%|██████████| 445/445 [00:49<00:00,  9.03it/s]
+: 100%|██████████| 144/144 [00:12<00:00, 11.54it/s]
+Ce a dat pe validare
+6 470 4342 95.81478183437221 71.24884121308436
+
+Best threshold 5
+Confusion matrix
+TP: 10760, TN: 501983, FP: 470, FN: 4342, FNR: 0.2875115878691564, FPR: 0.0009354108742509249
+Precision: 95.815%, Recall: 71.249%, F1-measure: 81.726%, Specificity: 0.999, Lead time: 13.419
+elapsed_time: 301.3017432689667
+======== My contribution ===========
+41
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13432 3786
+: 100%|██████████| 1/1 [00:00<00:00, 22.81it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 79.62it/s]
+: 100%|██████████| 444/444 [00:42<00:00, 10.43it/s]
+: 100%|██████████| 144/144 [00:12<00:00, 11.49it/s]
+Ce a dat pe validare
+12 0 1 100.0 66.66666666666667
+
+Ce a dat pe test
+12 96 7299 98.78419452887537 51.659050268229684
+
+Best threshold 11
+Confusion matrix
+TP: 7800, TN: 502266, FP: 96, FN: 7299, FNR: 0.48340949731770316, FPR: 0.0001910972565600105
+Precision: 98.784%, Recall: 51.659%, F1-measure: 67.841%, Specificity: 1.000, Lead time: 14.914
+elapsed_time: 206.20658588409424
+*** Percentage *** 0.005
+Lens valid
+67 18
+Lens test
+13378 3771
+: 100%|██████████| 3/3 [00:00<00:00, 21.46it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 18.19it/s]
+: 100%|██████████| 443/443 [00:32<00:00, 13.64it/s]
+: 100%|██████████| 143/143 [00:08<00:00, 16.07it/s]
+Ce a dat pe validare
+7 0 82 100.0 13.68421052631579
+
+Ce a dat pe test
+7 323 4514 97.01368343195266 69.9207036716199
+
+Best threshold 6
+Confusion matrix
+TP: 10493, TN: 501213, FP: 323, FN: 4514, FNR: 0.3007929632838009, FPR: 0.000644021565750016
+Precision: 97.014%, Recall: 69.921%, F1-measure: 81.269%, Specificity: 0.999, Lead time: 14.116
+elapsed_time: 61.269675970077515
+*** Percentage *** 0.01
+Lens valid
+134 37
+Lens test
+13311 3752
+: 100%|██████████| 5/5 [00:00<00:00, 17.31it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 21.42it/s]
+: 100%|██████████| 441/441 [00:30<00:00, 14.59it/s]
+: 100%|██████████| 143/143 [00:08<00:00, 16.22it/s]
+Ce a dat pe validare
+5 5 91 85.71428571428571 24.793388429752067
+
+Ce a dat pe test
+5 807 4087 93.10315357661739 72.7187771176824
+
+Best threshold 4
+Confusion matrix
+TP: 10894, TN: 500196, FP: 807, FN: 4087, FNR: 0.272812228823176, FPR: 0.00161076879779163
+Precision: 93.103%, Recall: 72.719%, F1-measure: 81.658%, Specificity: 0.998, Lead time: 13.119
+elapsed_time: 56.89515399932861
+*** Percentage *** 0.1
+Lens valid
+1344 378
+Lens test
+12101 3411
+: 100%|██████████| 44/44 [00:02<00:00, 15.83it/s]
+: 100%|██████████| 15/15 [00:00<00:00, 16.67it/s]
+: 100%|██████████| 401/401 [00:25<00:00, 15.89it/s]
+: 100%|██████████| 130/130 [00:07<00:00, 16.72it/s]
+Ce a dat pe validare
+6 51 312 96.78233438485805 83.09859154929578
+
+Ce a dat pe test
+6 419 4030 95.65578019699326 69.59867229933614
+
+Best threshold 5
+Confusion matrix
+TP: 9226, TN: 459154, FP: 419, FN: 4030, FNR: 0.3040132770066385, FPR: 0.000911715875388676
+Precision: 95.656%, Recall: 69.599%, F1-measure: 80.573%, Specificity: 0.999, Lead time: 13.423
+elapsed_time: 61.95802927017212
+*** Percentage *** 0.25
+Lens valid
+3361 947
+Lens test
+10084 2842
+: 100%|██████████| 113/113 [00:07<00:00, 16.00it/s]
+: 100%|██████████| 36/36 [00:02<00:00, 15.70it/s]
+: 100%|██████████| 332/332 [00:20<00:00, 15.98it/s]
+: 100%|██████████| 108/108 [00:06<00:00, 16.57it/s]
+Ce a dat pe validare
+6 109 1485 97.01451657080251 70.45951859956236
+
+Ce a dat pe test
+6 361 2857 95.23683863306505 71.64267990074441
+
+Best threshold 5
+Confusion matrix
+TP: 7218, TN: 409680, FP: 361, FN: 2857, FNR: 0.28357320099255584, FPR: 0.0008803997649015587
+Precision: 95.237%, Recall: 71.643%, F1-measure: 81.772%, Specificity: 0.999, Lead time: 13.413
+elapsed_time: 76.62318587303162
+*** Percentage *** 0.5
+Lens valid
+6722 1894
+Lens test
+6723 1895
+: 100%|██████████| 224/224 [00:15<00:00, 14.58it/s]
+: 100%|██████████| 72/72 [00:05<00:00, 13.43it/s]
+: 100%|██████████| 221/221 [00:14<00:00, 15.64it/s]
+: 100%|██████████| 73/73 [00:04<00:00, 16.03it/s]
+Ce a dat pe validare
+6 238 2565 96.97547337654086 74.84307571596705
+
+Ce a dat pe test
+6 232 1777 93.09729247247843 63.77904606604158
+
+Best threshold 5
+Confusion matrix
+TP: 3129, TN: 341621, FP: 232, FN: 1777, FNR: 0.36220953933958416, FPR: 0.0006786542753756732
+Precision: 93.097%, Recall: 63.779%, F1-measure: 75.699%, Specificity: 0.999, Lead time: 13.399
+elapsed_time: 99.96012997627258
+
+Process finished with exit code 0

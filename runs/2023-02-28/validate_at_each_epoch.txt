@@ -1,0 +1,1861 @@
+/Volumes/workplace/disertatie/LogADEmpirical/venv/bin/python /Volumes/workplace/disertatie/LogADEmpirical/main_run.py --folder=hdfs/ --log_file=HDFS.log --dataset_name=hdfs --model_name=deeplog --window_type=session --sample=sliding_window --is_logkey --train_size=0.1 --train_ratio=1 --valid_ratio=0.1 --test_ratio=1 --n_warm_up_epoch=0 --n_epochs_stop=10 --batch_size=1024 --num_candidates=20 --history_size=10 --lr=0.01 --accumulation_step=5 --session_level=hour --window_size=300 --step_size=60 --output_dir=dataset/ --max_epoch=15 --is_process
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertModel: ['cls.predictions.bias', 'cls.seq_relationship.weight', 'cls.predictions.decoder.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.LayerNorm.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.bias']
+- This IS expected if you are initializing BertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Loading ./dataset/hdfs/HDFS.log_structured.csv
+575061it [00:00, 995871.00it/s]
+R.A.: Schimbare train_window test_window
+11175629it [00:58, 191556.63it/s]
+575061
+57506
+517555
+Save options parameters
+vocab size 34
+save vocab in dataset/hdfs/deeplog_vocab.pkl
+Loading vocab
+34
+Loading train dataset
+
+Length train 5585
+number of sessions 55853
+number of seqs 532480
+Train loss: 3.50920485 - Train acc: 0.08:   4%|▍         | 19/468 [00:14<05:48,  1.29it/s]Find 479232 train logs, 53248 validation logs
+Checkpoint not found
+
+Starting epoch: 0 | phase: train | ⏰: 19:04:28 | Learning rate: 0.000313
+Train loss: 2.19023486 - Train acc: 0.32: 100%|██████████| 468/468 [04:15<00:00,  1.83it/s]
+Log saved
+
+Starting epoch: 1 | phase: train | ⏰: 19:08:44 | Learning rate: 0.000625
+Train loss: 1.04225826 - Train acc: 0.70: 100%|██████████| 468/468 [02:50<00:00,  2.75it/s]
+: 100%|██████████| 52/52 [00:06<00:00,  8.46it/s]
+Train loss: 0.59651328 - Train acc: 0.78:   7%|▋         | 34/468 [00:12<02:38,  2.74it/s]
+Starting epoch: 1 | phase: valid | ⏰: 19:11:34
+
+Validation loss: 0.6305085466458247 Validation accuracy: 0.7676344651442307
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 2 | phase: train | ⏰: 19:11:40 | Learning rate: 0.001250
+Train loss: 0.49521378 - Train acc: 0.82: 100%|██████████| 468/468 [02:51<00:00,  2.73it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 2 | phase: valid | ⏰: 19:14:32
+: 100%|██████████| 52/52 [00:05<00:00,  8.92it/s]
+
+Validation loss: 0.3982264921069145 Validation accuracy: 0.8438439002403846
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 3 | phase: train | ⏰: 19:14:38 | Learning rate: 0.002500
+Train loss: 0.40539198 - Train acc: 0.85: 100%|██████████| 468/468 [02:55<00:00,  2.66it/s]
+
+Starting epoch: 3 | phase: valid | ⏰: 19:17:34
+
+Validation loss: 0.3295738582427685 Validation accuracy: 0.8751314603365384
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+
+Starting epoch: 4 | phase: train | ⏰: 19:17:40 | Learning rate: 0.005000
+: 100%|██████████| 52/52 [00:05<00:00,  8.95it/s]
+Train loss: 0.30033044 - Train acc: 0.88: 100%|██████████| 468/468 [02:50<00:00,  2.74it/s]
+: 100%|██████████| 52/52 [00:05<00:00,  9.10it/s]
+
+Starting epoch: 4 | phase: valid | ⏰: 19:20:30
+
+Validation loss: 0.2726864447960487 Validation accuracy: 0.8971041165865384
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:52<00:00,  8.47it/s]
+: 100%|██████████| 145/145 [00:12<00:00, 11.98it/s]
+Ce a dat pe validare
+9 1767 100 89.5145976738666 99.34145538360224
+
+Best threshold 8
+Confusion matrix
+TP: 15085, TN: 500603, FP: 1767, FN: 100, FNR: 0.006585446163977609, FPR: 0.0035173278659155604
+Precision: 89.515%, Recall: 99.341%, F1-measure: 94.172%, Specificity: 0.996, Lead time: 14.828
+elapsed_time: 442.02781987190247
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 1/1 [00:00<00:00, 22.22it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 66.08it/s]
+: 100%|██████████| 444/444 [00:45<00:00,  9.69it/s]
+Ce a dat pe validare
+: 100%|██████████| 145/145 [00:15<00:00,  9.43it/s]
+11 0 0 100.0 100.0
+
+: 100%|██████████| 3/3 [00:00<00:00, 20.18it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 17.95it/s]
+Ce a dat pe test
+11 1359 1723 90.82810285482891 88.65028654238851
+
+Best threshold 10
+Confusion matrix
+TP: 13458, TN: 500933, FP: 1359, FN: 1723, FNR: 0.11349713457611488, FPR: 0.0027055975408726398
+Precision: 90.828%, Recall: 88.650%, F1-measure: 89.726%, Specificity: 0.997, Lead time: 16.127
+elapsed_time: 272.7956039905548
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 442/442 [00:40<00:00, 10.84it/s]
+: 100%|██████████| 145/145 [00:12<00:00, 11.46it/s]
+Ce a dat pe validare
+10 6 0 90.47619047619048 100.0
+
+Ce a dat pe test
+10 1552 695 90.29089771660932 95.40586991010048
+
+Best threshold 9
+Confusion matrix
+TP: 14433, TN: 500281, FP: 1552, FN: 695, FNR: 0.045941300898995244, FPR: 0.00309266230000817
+Precision: 90.291%, Recall: 95.406%, F1-measure: 92.778%, Specificity: 0.997, Lead time: 15.742
+elapsed_time: 76.19341611862183
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 5/5 [00:00<00:00, 16.08it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 15.40it/s]
+: 100%|██████████| 440/440 [00:33<00:00, 13.22it/s]
+Ce a dat pe validare
+: 100%|██████████| 144/144 [00:09<00:00, 15.11it/s]
+10 8 2 92.15686274509804 97.91666666666667
+
+Ce a dat pe test
+10 1550 693 90.2796939671391 95.40725031479886
+
+Best threshold 9
+Confusion matrix
+TP: 14396, TN: 499695, FP: 1550, FN: 693, FNR: 0.0459274968520114, FPR: 0.0030923001725703
+Precision: 90.280%, Recall: 95.407%, F1-measure: 92.773%, Specificity: 0.997, Lead time: 15.735
+elapsed_time: 65.11155200004578
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 44/44 [00:03<00:00, 13.77it/s]
+: 100%|██████████| 15/15 [00:00<00:00, 15.21it/s]
+: 100%|██████████| 401/401 [00:30<00:00, 13.30it/s]
+Ce a dat pe validare
+: 100%|██████████| 131/131 [00:08<00:00, 15.36it/s]
+9 116 5 92.45283018867924 99.64936886395512
+
+Ce a dat pe test
+9 1651 95 89.21971922951354 99.30954284468348
+
+Best threshold 8
+Confusion matrix
+TP: 13664, TN: 396619, FP: 1651, FN: 95, FNR: 0.006904571553165201, FPR: 0.00414542898033997
+Precision: 89.220%, Recall: 99.310%, F1-measure: 93.995%, Specificity: 0.996, Lead time: 14.806
+elapsed_time: 71.77658486366272
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 111/111 [00:08<00:00, 12.93it/s]
+: 100%|██████████| 36/36 [00:02<00:00, 15.31it/s]
+: 100%|██████████| 333/333 [00:22<00:00, 14.63it/s]
+: 100%|██████████| 110/110 [00:07<00:00, 15.64it/s]
+Ce a dat pe validare
+9 520 20 90.17755950132225 99.5828118481435
+
+Ce a dat pe test
+9 1247 80 89.21093614812251 99.23010297372727
+
+Best threshold 8
+Confusion matrix
+TP: 10311, TN: 298810, FP: 1247, FN: 80, FNR: 0.00769897026272736, FPR: 0.004155877050027162
+Precision: 89.211%, Recall: 99.230%, F1-measure: 93.954%, Specificity: 0.996, Lead time: 14.813
+elapsed_time: 88.17293167114258
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 222/222 [00:19<00:00, 11.10it/s]
+: 100%|██████████| 73/73 [00:06<00:00, 10.57it/s]
+: 100%|██████████| 223/223 [00:15<00:00, 14.01it/s]
+: 100%|██████████| 73/73 [00:05<00:00, 12.75it/s]
+Ce a dat pe validare
+9 934 49 89.6176078257003 99.39588213537172
+
+Ce a dat pe test
+9 833 51 89.39663951120163 99.27905004240883
+
+Best threshold 8
+Confusion matrix
+TP: 7023, TN: 182754, FP: 833, FN: 51, FNR: 0.00720949957591179, FPR: 0.004537358309684237
+Precision: 89.397%, Recall: 99.279%, F1-measure: 94.079%, Specificity: 0.995, Lead time: 14.621
+elapsed_time: 114.24245882034302
+
+Starting epoch: 5 | phase: train | ⏰: 19:39:45 | Learning rate: 0.010000
+Train loss: 0.23823485 - Train acc: 0.91: 100%|██████████| 468/468 [02:41<00:00,  2.89it/s]
+: 100%|██████████| 52/52 [00:05<00:00,  8.84it/s]
+
+Starting epoch: 5 | phase: valid | ⏰: 19:42:27
+
+Validation loss: 0.22910840006975028 Validation accuracy: 0.9115084134615384
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:53<00:00,  8.29it/s]
+: 100%|██████████| 145/145 [00:15<00:00,  9.46it/s]
+Ce a dat pe validare
+7 1652 4081 87.04923173408592 73.12479420480737
+
+Best threshold 6
+Confusion matrix
+TP: 11104, TN: 500718, FP: 1652, FN: 4081, FNR: 0.26875205795192625, FPR: 0.003288412922746183
+Precision: 87.049%, Recall: 73.125%, F1-measure: 79.482%, Specificity: 0.997, Lead time: 14.557
+elapsed_time: 405.9537138938904
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 1/1 [00:00<00:00,  5.09it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 26.88it/s]
+: 100%|██████████| 444/444 [00:57<00:00,  7.66it/s]
+: 100%|██████████| 145/145 [00:14<00:00, 10.19it/s]
+Ce a dat pe validare
+11 0 6 100.0 14.285714285714286
+
+Ce a dat pe test
+11 734 6967 91.79429849077697 54.09803663196732
+
+Best threshold 10
+Confusion matrix
+TP: 8211, TN: 501562, FP: 734, FN: 6967, FNR: 0.4590196336803268, FPR: 0.0014612897574338636
+Precision: 91.794%, Recall: 54.098%, F1-measure: 68.076%, Specificity: 0.999, Lead time: 16.374
+elapsed_time: 41198.854874134064
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 3/3 [00:00<00:00, 14.07it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 17.23it/s]
+: 100%|██████████| 442/442 [00:33<00:00, 13.35it/s]
+: 100%|██████████| 145/145 [00:12<00:00, 11.87it/s]
+Ce a dat pe validare
+10 2 9 88.23529411764706 62.5
+
+Ce a dat pe test
+10 800 5486 92.36276849642005 63.81505177758723
+
+Best threshold 9
+Confusion matrix
+TP: 9675, TN: 500372, FP: 800, FN: 5486, FNR: 0.3618494822241277, FPR: 0.0015962583703798296
+Precision: 92.363%, Recall: 63.815%, F1-measure: 75.480%, Specificity: 0.998, Lead time: 15.619
+elapsed_time: 67.47993898391724
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 5/5 [00:00<00:00, 13.11it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 19.73it/s]
+: 100%|██████████| 440/440 [00:32<00:00, 13.48it/s]
+: 100%|██████████| 144/144 [00:09<00:00, 15.08it/s]
+Ce a dat pe validare
+10 5 18 85.71428571428571 62.5
+
+Ce a dat pe test
+10 797 5477 92.37831117911446 63.817136817070754
+
+Best threshold 9
+Confusion matrix
+TP: 9660, TN: 499898, FP: 797, FN: 5477, FNR: 0.3618286318292925, FPR: 0.0015917874154924654
+Precision: 92.378%, Recall: 63.817%, F1-measure: 75.486%, Specificity: 0.998, Lead time: 15.619
+elapsed_time: 60.548338174819946
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 45/45 [00:02<00:00, 16.76it/s]
+: 100%|██████████| 15/15 [00:00<00:00, 17.59it/s]
+: 100%|██████████| 399/399 [00:29<00:00, 13.50it/s]
+: 100%|██████████| 131/131 [00:08<00:00, 15.15it/s]
+Ce a dat pe validare
+10 54 716 98.37545126353791 82.03712995484194
+
+Ce a dat pe test
+10 748 4779 89.56473214285714 57.326547013126174
+
+Best threshold 9
+Confusion matrix
+TP: 6420, TN: 488301, FP: 748, FN: 4779, FNR: 0.4267345298687383, FPR: 0.0015294990890483368
+Precision: 89.565%, Recall: 57.327%, F1-measure: 69.908%, Specificity: 0.998, Lead time: 15.628
+elapsed_time: 69.54747915267944
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 112/112 [00:06<00:00, 16.17it/s]
+: 100%|██████████| 36/36 [00:02<00:00, 15.36it/s]
+: 100%|██████████| 332/332 [00:21<00:00, 15.57it/s]
+: 100%|██████████| 110/110 [00:06<00:00, 16.70it/s]
+Ce a dat pe validare
+7 371 1052 93.70759837177748 84.00486544017029
+
+Ce a dat pe test
+7 1281 3029 81.3265306122449 64.81180297397769
+
+Best threshold 6
+Confusion matrix
+TP: 5579, TN: 462294, FP: 1281, FN: 3029, FNR: 0.35188197026022305, FPR: 0.0027633069082672705
+Precision: 81.327%, Recall: 64.812%, F1-measure: 72.136%, Specificity: 0.997, Lead time: 14.608
+elapsed_time: 75.2890477180481
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 223/223 [00:14<00:00, 15.06it/s]
+: 100%|██████████| 73/73 [00:06<00:00, 11.73it/s]
+: 100%|██████████| 222/222 [00:15<00:00, 13.89it/s]
+: 100%|██████████| 73/73 [00:04<00:00, 15.61it/s]
+Ce a dat pe validare
+7 830 1623 91.16080937167199 84.06167141313955
+
+Ce a dat pe test
+7 822 2458 75.57932263814617 50.85965613754498
+
+Best threshold 6
+Confusion matrix
+TP: 2544, TN: 290561, FP: 822, FN: 2458, FNR: 0.49140343862455016, FPR: 0.0028210293668470706
+Precision: 75.579%, Recall: 50.860%, F1-measure: 60.803%, Specificity: 0.997, Lead time: 14.623
+elapsed_time: 106.0868239402771
+
+Starting epoch: 6 | phase: train | ⏰: 09:22:35 | Learning rate: 0.010000
+Train loss: 0.21366437 - Train acc: 0.92: 100%|██████████| 468/468 [02:36<00:00,  2.99it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 6 | phase: valid | ⏰: 09:25:11
+: 100%|██████████| 52/52 [00:06<00:00,  8.64it/s]
+
+Validation loss: 0.21302412421657488 Validation accuracy: 0.9169734074519231
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:59<00:00,  7.41it/s]
+: 100%|██████████| 145/145 [00:17<00:00,  8.20it/s]
+Ce a dat pe validare
+6 1097 4083 91.00745962783834 73.11162331247942
+
+Best threshold 5
+Confusion matrix
+TP: 11102, TN: 501273, FP: 1097, FN: 4083, FNR: 0.2688837668752058, FPR: 0.002183649501363537
+Precision: 91.007%, Recall: 73.112%, F1-measure: 81.084%, Specificity: 0.998, Lead time: 13.877
+elapsed_time: 392.6703429222107
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 1/1 [00:00<00:00, 17.12it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 81.89it/s]
+: 100%|██████████| 444/444 [00:45<00:00,  9.86it/s]
+: 100%|██████████| 145/145 [00:12<00:00, 11.58it/s]
+Ce a dat pe validare
+9 4 2 71.42857142857143 83.33333333333333
+
+Ce a dat pe test
+9 686 7135 92.13663457129756 52.97568048507217
+
+Best threshold 8
+Confusion matrix
+TP: 8038, TN: 501618, FP: 686, FN: 7135, FNR: 0.4702431951492783, FPR: 0.0013657068229598012
+Precision: 92.137%, Recall: 52.976%, F1-measure: 67.272%, Specificity: 0.999, Lead time: 15.655
+elapsed_time: 266.6548719406128
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 3/3 [00:00<00:00, 19.36it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 14.11it/s]
+: 100%|██████████| 442/442 [00:39<00:00, 11.27it/s]
+: 100%|██████████| 145/145 [00:13<00:00, 11.03it/s]
+Ce a dat pe validare
+6 8 25 75.0 48.97959183673469
+
+Ce a dat pe test
+6 1089 4058 91.04956028601956 73.18974630021141
+
+Best threshold 5
+Confusion matrix
+TP: 11078, TN: 500628, FP: 1089, FN: 4058, FNR: 0.26810253699788583, FPR: 0.0021705463438552015
+Precision: 91.050%, Recall: 73.190%, F1-measure: 81.149%, Specificity: 0.998, Lead time: 13.871
+elapsed_time: 74.81544280052185
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 5/5 [00:00<00:00, 12.38it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 16.48it/s]
+: 100%|██████████| 440/440 [00:38<00:00, 11.34it/s]
+: 100%|██████████| 144/144 [00:15<00:00,  9.47it/s]
+Ce a dat pe validare
+6 8 31 86.44067796610169 62.19512195121951
+
+Ce a dat pe test
+6 1089 4052 91.02965403624383 73.17089320002648
+
+Best threshold 5
+Confusion matrix
+TP: 11051, TN: 497118, FP: 1089, FN: 4052, FNR: 0.2682910679997352, FPR: 0.0021858384165617905
+Precision: 91.030%, Recall: 73.171%, F1-measure: 81.129%, Specificity: 0.998, Lead time: 13.874
+elapsed_time: 77.00733089447021
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 45/45 [00:03<00:00, 13.98it/s]
+: 100%|██████████| 16/16 [00:01<00:00, 14.54it/s]
+: 100%|██████████| 399/399 [00:30<00:00, 12.93it/s]
+: 100%|██████████| 130/130 [00:09<00:00, 13.64it/s]
+Ce a dat pe validare
+8 81 814 95.17569982132221 66.25207296849088
+
+Ce a dat pe test
+8 779 6004 89.67938526762056 52.99459798011431
+
+Best threshold 7
+Confusion matrix
+TP: 6769, TN: 432341, FP: 779, FN: 6004, FNR: 0.47005402019885695, FPR: 0.0017985777613594386
+Precision: 89.679%, Recall: 52.995%, F1-measure: 66.621%, Specificity: 0.998, Lead time: 15.462
+elapsed_time: 72.9953842163086
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 114/114 [00:08<00:00, 14.04it/s]
+: 100%|██████████| 37/37 [00:02<00:00, 13.99it/s]
+: 100%|██████████| 331/331 [00:25<00:00, 12.87it/s]
+: 100%|██████████| 109/109 [00:07<00:00, 13.86it/s]
+Ce a dat pe validare
+6 326 1175 93.98745850239764 81.26295646627332
+
+Ce a dat pe test
+6 771 2908 88.6232846392209 67.37715952434372
+
+Best threshold 5
+Confusion matrix
+TP: 6006, TN: 393994, FP: 771, FN: 2908, FNR: 0.32622840475656273, FPR: 0.001953060681671374
+Precision: 88.623%, Recall: 67.377%, F1-measure: 76.553%, Specificity: 0.998, Lead time: 13.864
+elapsed_time: 93.82716584205627
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 224/224 [00:15<00:00, 14.18it/s]
+: 100%|██████████| 73/73 [00:05<00:00, 14.00it/s]
+: 100%|██████████| 221/221 [00:15<00:00, 14.01it/s]
+: 100%|██████████| 72/72 [00:05<00:00, 14.30it/s]
+Ce a dat pe validare
+6 530 2184 93.35173105870547 77.31144816123
+
+Ce a dat pe test
+6 567 1899 86.5862313697658 65.83917970858067
+
+Best threshold 5
+Confusion matrix
+TP: 3660, TN: 246208, FP: 567, FN: 1899, FNR: 0.3416082029141932, FPR: 0.0022976395501975483
+Precision: 86.586%, Recall: 65.839%, F1-measure: 74.801%, Specificity: 0.998, Lead time: 13.827
+elapsed_time: 117.99361205101013
+
+Starting epoch: 7 | phase: train | ⏰: 09:43:50 | Learning rate: 0.010000
+Train loss: 0.20524068 - Train acc: 0.92: 100%|██████████| 468/468 [02:50<00:00,  2.74it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 7 | phase: valid | ⏰: 09:46:41
+: 100%|██████████| 52/52 [00:06<00:00,  8.60it/s]
+
+Validation loss: 0.20953239873051643 Validation accuracy: 0.9173302283653846
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:43<00:00, 10.10it/s]
+: 100%|██████████| 145/145 [00:12<00:00, 11.69it/s]
+Ce a dat pe validare
+5 1123 5244 89.84996384671005 65.46592031610142
+
+Best threshold 4
+Confusion matrix
+TP: 9941, TN: 501247, FP: 1123, FN: 5244, FNR: 0.34534079683898583, FPR: 0.0022354041841670482
+Precision: 89.850%, Recall: 65.466%, F1-measure: 75.744%, Specificity: 0.998, Lead time: 12.778
+elapsed_time: 392.5122139453888
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 1/1 [00:00<00:00, 19.64it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 43.03it/s]
+: 100%|██████████| 444/444 [00:52<00:00,  8.45it/s]
+: 100%|██████████| 145/145 [00:14<00:00,  9.91it/s]
+Ce a dat pe validare
+8 0 0 100.0 100.0
+
+Ce a dat pe test
+8 603 8259 91.98671096345515 45.59646927079903
+
+Best threshold 7
+Confusion matrix
+TP: 6922, TN: 501368, FP: 603, FN: 8259, FNR: 0.5440353072920098, FPR: 0.001201264614888111
+Precision: 91.987%, Recall: 45.596%, F1-measure: 60.971%, Specificity: 0.999, Lead time: 14.220
+elapsed_time: 255.4345407485962
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 3/3 [00:00<00:00, 19.73it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 13.38it/s]
+: 100%|██████████| 442/442 [00:40<00:00, 10.87it/s]
+: 100%|██████████| 145/145 [00:12<00:00, 11.80it/s]
+Ce a dat pe validare
+2 285 0 39.49044585987261 100.0
+
+Ce a dat pe test
+2 96561 213 13.279208240904559 98.5799053270218
+
+Best threshold 1
+Confusion matrix
+TP: 14786, TN: 405063, FP: 96561, FN: 213, FNR: 0.014200946729781986, FPR: 0.19249677048945027
+Precision: 13.279%, Recall: 98.580%, F1-measure: 23.406%, Specificity: 0.808, Lead time: 11.016
+elapsed_time: 75.86747694015503
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 5/5 [00:00<00:00, 12.43it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 18.61it/s]
+: 100%|██████████| 440/440 [00:35<00:00, 12.30it/s]
+: 100%|██████████| 144/144 [00:13<00:00, 10.47it/s]
+Ce a dat pe validare
+4 12 166 84.0 27.510917030567686
+
+Ce a dat pe test
+4 2474 4931 80.20641651332106 67.02995453329767
+
+Best threshold 3
+Confusion matrix
+TP: 10025, TN: 498257, FP: 2474, FN: 4931, FNR: 0.32970045466702325, FPR: 0.004940776584633266
+Precision: 80.206%, Recall: 67.030%, F1-measure: 73.029%, Specificity: 0.995, Lead time: 12.227
+elapsed_time: 72.19082498550415
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 44/44 [00:03<00:00, 13.67it/s]
+: 100%|██████████| 14/14 [00:01<00:00, 13.91it/s]
+: 100%|██████████| 401/401 [00:31<00:00, 12.93it/s]
+: 100%|██████████| 132/132 [00:08<00:00, 14.91it/s]
+Ce a dat pe validare
+3 2941 429 38.12329055333473 80.85676037483266
+
+Ce a dat pe test
+3 45987 1860 19.421422438716686 85.63040791100124
+
+Best threshold 2
+Confusion matrix
+TP: 11084, TN: 439151, FP: 45987, FN: 1860, FNR: 0.14369592088998764, FPR: 0.09479158507476224
+Precision: 19.421%, Recall: 85.630%, F1-measure: 31.662%, Specificity: 0.905, Lead time: 11.184
+elapsed_time: 70.10556483268738
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 112/112 [00:09<00:00, 11.84it/s]
+: 100%|██████████| 36/36 [00:02<00:00, 13.86it/s]
+: 100%|██████████| 333/333 [00:22<00:00, 14.78it/s]
+: 100%|██████████| 109/109 [00:06<00:00, 15.76it/s]
+Ce a dat pe validare
+5 259 2311 90.3896103896104 51.31662102380451
+
+Ce a dat pe test
+5 864 2933 89.67618592424424 71.90074726959188
+
+Best threshold 4
+Confusion matrix
+TP: 7505, TN: 368724, FP: 864, FN: 2933, FNR: 0.28099252730408125, FPR: 0.002337738238254489
+Precision: 89.676%, Recall: 71.901%, F1-measure: 79.811%, Specificity: 0.998, Lead time: 12.793
+elapsed_time: 83.13100862503052
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 221/221 [00:15<00:00, 14.07it/s]
+: 100%|██████████| 73/73 [00:05<00:00, 14.35it/s]
+: 100%|██████████| 224/224 [00:15<00:00, 14.33it/s]
+: 100%|██████████| 73/73 [00:05<00:00, 14.08it/s]
+Ce a dat pe validare
+5 546 3005 88.71201157742402 58.813048245614034
+
+Ce a dat pe test
+5 577 2239 90.73390075477758 71.6187095956395
+
+Best threshold 4
+Confusion matrix
+TP: 5650, TN: 292385, FP: 577, FN: 2239, FNR: 0.28381290404360504, FPR: 0.0019695387115052465
+Precision: 90.734%, Recall: 71.619%, F1-measure: 80.051%, Specificity: 0.998, Lead time: 12.824
+elapsed_time: 112.16066598892212
+
+Starting epoch: 8 | phase: train | ⏰: 10:04:49 | Learning rate: 0.010000
+Train loss: 0.20125181 - Train acc: 0.92: 100%|██████████| 468/468 [02:39<00:00,  2.93it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 8 | phase: valid | ⏰: 10:07:29
+: 100%|██████████| 52/52 [00:06<00:00,  8.31it/s]
+
+Validation loss: 0.20537763805343554 Validation accuracy: 0.9193209134615384
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:49<00:00,  9.04it/s]
+: 100%|██████████| 145/145 [00:11<00:00, 13.05it/s]
+Ce a dat pe validare
+5 988 5495 90.74733096085409 63.81297332894304
+
+Best threshold 4
+Confusion matrix
+TP: 9690, TN: 501382, FP: 988, FN: 5495, FNR: 0.36187026671056965, FPR: 0.0019666779465334315
+Precision: 90.747%, Recall: 63.813%, F1-measure: 74.933%, Specificity: 0.998, Lead time: 12.774
+elapsed_time: 360.83574509620667
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 1/1 [00:00<00:00, 23.11it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 59.03it/s]
+: 100%|██████████| 444/444 [00:53<00:00,  8.31it/s]
+: 100%|██████████| 145/145 [00:11<00:00, 12.64it/s]
+Ce a dat pe validare
+8 7 0 30.0 100.0
+
+Ce a dat pe test
+8 581 8503 91.99724517906336 43.99288631273877
+
+Best threshold 7
+Confusion matrix
+TP: 6679, TN: 500950, FP: 581, FN: 8503, FNR: 0.5600711368726123, FPR: 0.0011584528174728979
+Precision: 91.997%, Recall: 43.993%, F1-measure: 59.522%, Specificity: 0.999, Lead time: 14.179
+elapsed_time: 254.6068820953369
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 3/3 [00:00<00:00, 18.18it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 11.57it/s]
+: 100%|██████████| 442/442 [00:39<00:00, 11.18it/s]
+: 100%|██████████| 145/145 [00:11<00:00, 12.42it/s]
+Ce a dat pe validare
+4 28 8 57.57575757575758 82.6086956521739
+
+Ce a dat pe test
+4 2303 5093 81.35071665721921 66.35841204835194
+
+Best threshold 3
+Confusion matrix
+TP: 10046, TN: 498884, FP: 2303, FN: 5093, FNR: 0.3364158795164806, FPR: 0.0045950912533645125
+Precision: 81.351%, Recall: 66.358%, F1-measure: 73.094%, Specificity: 0.995, Lead time: 12.157
+elapsed_time: 75.23436999320984
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 6/6 [00:00<00:00, 14.63it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 16.81it/s]
+: 100%|██████████| 439/439 [00:32<00:00, 13.57it/s]
+: 100%|██████████| 144/144 [00:11<00:00, 12.08it/s]
+Ce a dat pe validare
+4 44 12 57.69230769230769 83.33333333333333
+
+Ce a dat pe test
+4 2287 5089 81.42311753716189 66.32700324224177
+
+Best threshold 3
+Confusion matrix
+TP: 10024, TN: 498615, FP: 2287, FN: 5089, FNR: 0.3367299675775822, FPR: 0.004565763362893341
+Precision: 81.423%, Recall: 66.327%, F1-measure: 73.104%, Specificity: 0.995, Lead time: 12.158
+elapsed_time: 62.99981117248535
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 45/45 [00:03<00:00, 11.61it/s]
+: 100%|██████████| 15/15 [00:01<00:00, 11.79it/s]
+: 100%|██████████| 399/399 [00:27<00:00, 14.42it/s]
+: 100%|██████████| 131/131 [00:09<00:00, 14.45it/s]
+Ce a dat pe validare
+5 111 1360 91.09149277688604 45.49098196392786
+
+Ce a dat pe test
+5 877 4135 90.70186598812553 67.41528762805359
+
+Best threshold 4
+Confusion matrix
+TP: 8555, TN: 481547, FP: 877, FN: 4135, FNR: 0.32584712371946417, FPR: 0.0018179029235693084
+Precision: 90.702%, Recall: 67.415%, F1-measure: 77.344%, Specificity: 0.998, Lead time: 12.729
+elapsed_time: 72.61623907089233
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 111/111 [00:09<00:00, 11.69it/s]
+: 100%|██████████| 37/37 [00:02<00:00, 16.21it/s]
+: 100%|██████████| 333/333 [00:19<00:00, 17.06it/s]
+: 100%|██████████| 109/109 [00:06<00:00, 18.06it/s]
+: 100%|██████████| 222/222 [00:12<00:00, 18.42it/s]
+Ce a dat pe validare
+5 220 1960 95.11978704525288 68.62996158770807
+
+Ce a dat pe test
+5 768 3535 87.55267423014587 60.44533959941815
+
+Best threshold 4
+Confusion matrix
+TP: 5402, TN: 412670, FP: 768, FN: 3535, FNR: 0.3955466040058185, FPR: 0.0018575941253585785
+Precision: 87.553%, Recall: 60.445%, F1-measure: 71.517%, Specificity: 0.998, Lead time: 12.760
+elapsed_time: 76.05563688278198
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 73/73 [00:05<00:00, 13.92it/s]
+: 100%|██████████| 223/223 [00:13<00:00, 16.33it/s]
+: 100%|██████████| 73/73 [00:03<00:00, 18.56it/s]
+Train loss: 0.19914731 - Train acc: 0.92:  22%|██▏       | 103/468 [00:32<01:52,  3.24it/s]Ce a dat pe validare
+5 435 3347 94.3579766536965 68.48992656750141
+
+Ce a dat pe test
+5 553 2148 81.36792452830188 52.92570677186062
+
+Best threshold 4
+Confusion matrix
+TP: 2415, TN: 184354, FP: 553, FN: 2148, FNR: 0.4707429322813938, FPR: 0.0029906926184514377
+Precision: 81.368%, Recall: 52.926%, F1-measure: 64.135%, Specificity: 0.997, Lead time: 12.727
+elapsed_time: 97.02428126335144
+
+Starting epoch: 9 | phase: train | ⏰: 10:24:30 | Learning rate: 0.010000
+Train loss: 0.19848408 - Train acc: 0.92: 100%|██████████| 468/468 [02:22<00:00,  3.28it/s]
+: 100%|██████████| 52/52 [00:05<00:00, 10.17it/s]
+
+Starting epoch: 9 | phase: valid | ⏰: 10:26:53
+
+Validation loss: 0.20307494499362433 Validation accuracy: 0.9193396935096154
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:40<00:00, 10.93it/s]
+: 100%|██████████| 145/145 [00:10<00:00, 13.71it/s]
+Ce a dat pe validare
+4 2386 4085 82.30757822927481 73.09845242015146
+
+Best threshold 3
+Confusion matrix
+TP: 11100, TN: 499984, FP: 2386, FN: 4085, FNR: 0.26901547579848534, FPR: 0.004749487429583773
+Precision: 82.308%, Recall: 73.098%, F1-measure: 77.430%, Specificity: 0.995, Lead time: 12.196
+elapsed_time: 372.17217683792114
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 1/1 [00:00<00:00,  8.89it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 79.98it/s]
+: 100%|██████████| 444/444 [00:50<00:00,  8.75it/s]
+: 100%|██████████| 145/145 [00:11<00:00, 12.88it/s]
+Ce a dat pe validare
+8 0 1 100.0 66.66666666666667
+
+Ce a dat pe test
+8 513 8746 92.61764282630594 42.39230667896193
+
+Best threshold 7
+Confusion matrix
+TP: 6436, TN: 501802, FP: 513, FN: 8746, FNR: 0.5760769332103807, FPR: 0.0010212715128952948
+Precision: 92.618%, Recall: 42.392%, F1-measure: 58.163%, Specificity: 0.999, Lead time: 14.180
+elapsed_time: 2994.8877630233765
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 3/3 [00:00<00:00, 13.97it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 12.65it/s]
+: 100%|██████████| 442/442 [00:35<00:00, 12.48it/s]
+: 100%|██████████| 145/145 [00:11<00:00, 12.40it/s]
+Ce a dat pe validare
+6 0 22 100.0 37.142857142857146
+
+Ce a dat pe test
+6 729 5526 92.958562735439 63.524752475247524
+
+Best threshold 5
+Confusion matrix
+TP: 9624, TN: 500921, FP: 729, FN: 5526, FNR: 0.36475247524752474, FPR: 0.0014532044253961925
+Precision: 92.959%, Recall: 63.525%, F1-measure: 75.473%, Specificity: 0.999, Lead time: 12.975
+elapsed_time: 71.64423489570618
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 5/5 [00:00<00:00, 14.27it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 18.45it/s]
+: 100%|██████████| 440/440 [00:34<00:00, 12.79it/s]
+: 100%|██████████| 144/144 [00:12<00:00, 11.30it/s]
+Ce a dat pe validare
+6 2 28 95.0 57.57575757575758
+
+Ce a dat pe test
+6 727 5520 92.95951965911291 63.48964878629539
+
+Best threshold 5
+Confusion matrix
+TP: 9599, TN: 500349, FP: 727, FN: 5520, FNR: 0.3651035121370461, FPR: 0.0014508777111655717
+Precision: 92.960%, Recall: 63.490%, F1-measure: 75.449%, Specificity: 0.999, Lead time: 12.974
+elapsed_time: 69.2622721195221
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 45/45 [00:03<00:00, 12.49it/s]
+: 100%|██████████| 15/15 [00:01<00:00, 14.43it/s]
+: 100%|██████████| 400/400 [00:27<00:00, 14.54it/s]
+: 100%|██████████| 131/131 [00:07<00:00, 16.86it/s]
+Ce a dat pe validare
+6 57 370 90.13840830449827 58.47362514029181
+
+Ce a dat pe test
+6 672 5178 93.13445034736412 63.77501049391353
+
+Best threshold 5
+Confusion matrix
+TP: 9116, TN: 398100, FP: 672, FN: 5178, FNR: 0.3622498950608647, FPR: 0.001685173482591556
+Precision: 93.134%, Recall: 63.775%, F1-measure: 75.708%, Specificity: 0.998, Lead time: 12.987
+elapsed_time: 64.51096510887146
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 110/110 [00:06<00:00, 17.59it/s]
+: 100%|██████████| 37/37 [00:02<00:00, 18.14it/s]
+: 100%|██████████| 335/335 [00:20<00:00, 16.19it/s]
+: 100%|██████████| 109/109 [00:06<00:00, 17.49it/s]
+Ce a dat pe validare
+4 757 1759 64.5930776426567 43.98089171974522
+
+Ce a dat pe test
+4 1629 2326 85.64504758547761 80.68908260689082
+
+Best threshold 3
+Confusion matrix
+TP: 9719, TN: 304949, FP: 1629, FN: 2326, FNR: 0.19310917393109173, FPR: 0.005313492814226722
+Precision: 85.645%, Recall: 80.689%, F1-measure: 83.093%, Specificity: 0.995, Lead time: 12.189
+elapsed_time: 73.54943609237671
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 220/220 [00:13<00:00, 16.56it/s]
+: 100%|██████████| 72/72 [00:04<00:00, 16.15it/s]
+: 100%|██████████| 224/224 [00:14<00:00, 15.13it/s]
+: 100%|██████████| 74/74 [00:04<00:00, 15.20it/s]
+Ce a dat pe validare
+6 352 3018 93.40453438261196 62.289141571910534
+
+Ce a dat pe test
+6 377 2530 92.50347981706105 64.77304372041215
+
+Best threshold 5
+Confusion matrix
+TP: 4652, TN: 202525, FP: 377, FN: 2530, FNR: 0.35226956279587857, FPR: 0.0018580398418941164
+Precision: 92.503%, Recall: 64.773%, F1-measure: 76.194%, Specificity: 0.998, Lead time: 12.981
+elapsed_time: 110.51920008659363
+
+Starting epoch: 10 | phase: train | ⏰: 11:29:55 | Learning rate: 0.010000
+Train loss: 0.19656860 - Train acc: 0.92: 100%|██████████| 468/468 [02:41<00:00,  2.89it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 10 | phase: valid | ⏰: 11:32:37
+: 100%|██████████| 52/52 [00:06<00:00,  8.25it/s]
+
+Validation loss: 0.2018708185507701 Validation accuracy: 0.9191518930288461
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:45<00:00,  9.68it/s]
+: 100%|██████████| 145/145 [00:15<00:00,  9.29it/s]
+Ce a dat pe validare
+4 2264 4338 82.73205705133094 71.43233454066512
+
+Best threshold 3
+Confusion matrix
+TP: 10847, TN: 500106, FP: 2264, FN: 4338, FNR: 0.2856766545933487, FPR: 0.0045066385333519116
+Precision: 82.732%, Recall: 71.432%, F1-measure: 76.668%, Specificity: 0.995, Lead time: 12.199
+elapsed_time: 336.2561388015747
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 1/1 [00:00<00:00, 18.17it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 83.75it/s]
+: 100%|██████████| 444/444 [00:45<00:00,  9.72it/s]
+: 100%|██████████| 145/145 [00:13<00:00, 11.11it/s]
+Ce a dat pe validare
+8 1 1 66.66666666666667 66.66666666666667
+
+Ce a dat pe test
+8 452 8027 94.058104377547 47.12817810565143
+
+Best threshold 7
+Confusion matrix
+TP: 7155, TN: 501696, FP: 452, FN: 8027, FNR: 0.5287182189434857, FPR: 0.0009001330285095231
+Precision: 94.058%, Recall: 47.128%, F1-measure: 62.793%, Specificity: 0.999, Lead time: 14.314
+elapsed_time: 238.2662878036499
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 3/3 [00:00<00:00, 18.67it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 11.96it/s]
+: 100%|██████████| 442/442 [00:35<00:00, 12.51it/s]
+: 100%|██████████| 145/145 [00:12<00:00, 11.60it/s]
+Ce a dat pe validare
+4 9 3 84.7457627118644 94.33962264150944
+
+Ce a dat pe test
+4 2255 4335 82.72295433650015 71.35210150674068
+
+Best threshold 3
+Confusion matrix
+TP: 10797, TN: 498881, FP: 2255, FN: 4335, FNR: 0.28647898493259316, FPR: 0.004499776507774337
+Precision: 82.723%, Recall: 71.352%, F1-measure: 76.618%, Specificity: 0.996, Lead time: 12.200
+elapsed_time: 72.84855079650879
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 5/5 [00:00<00:00, 15.24it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 18.92it/s]
+: 100%|██████████| 440/440 [00:33<00:00, 13.29it/s]
+: 100%|██████████| 144/144 [00:11<00:00, 12.29it/s]
+Ce a dat pe validare
+4 18 7 93.20754716981132 97.24409448818898
+
+Ce a dat pe test
+4 2246 4331 82.5159582749494 70.99323555019758
+
+Best threshold 3
+Confusion matrix
+TP: 10600, TN: 498685, FP: 2246, FN: 4331, FNR: 0.29006764449802425, FPR: 0.004483651441016826
+Precision: 82.516%, Recall: 70.993%, F1-measure: 76.322%, Specificity: 0.996, Lead time: 12.202
+elapsed_time: 67.20718502998352
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 45/45 [00:02<00:00, 15.08it/s]
+: 100%|██████████| 15/15 [00:00<00:00, 15.49it/s]
+: 100%|██████████| 400/400 [00:29<00:00, 13.77it/s]
+: 100%|██████████| 131/131 [00:08<00:00, 14.96it/s]
+Ce a dat pe validare
+4 194 288 83.36192109777015 77.14285714285714
+
+Ce a dat pe test
+4 2070 4050 82.67057346169946 70.91561938958708
+
+Best threshold 3
+Confusion matrix
+TP: 9875, TN: 416878, FP: 2070, FN: 4050, FNR: 0.29084380610412924, FPR: 0.004940947325205038
+Precision: 82.671%, Recall: 70.916%, F1-measure: 76.343%, Specificity: 0.995, Lead time: 12.190
+elapsed_time: 66.94432783126831
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 111/111 [00:06<00:00, 16.22it/s]
+: 100%|██████████| 36/36 [00:02<00:00, 16.14it/s]
+: 100%|██████████| 334/334 [00:20<00:00, 16.06it/s]
+: 100%|██████████| 110/110 [00:06<00:00, 15.92it/s]
+Ce a dat pe validare
+4 463 703 87.71557442292385 82.46445497630332
+
+Ce a dat pe test
+4 1801 3635 80.72147291800471 67.47494631352899
+
+Best threshold 3
+Confusion matrix
+TP: 7541, TN: 386123, FP: 1801, FN: 3635, FNR: 0.3252505368647101, FPR: 0.004642661964714738
+Precision: 80.721%, Recall: 67.475%, F1-measure: 73.506%, Specificity: 0.995, Lead time: 12.193
+elapsed_time: 81.38618803024292
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 222/222 [00:15<00:00, 14.25it/s]
+: 100%|██████████| 73/73 [00:04<00:00, 15.32it/s]
+: 100%|██████████| 223/223 [00:14<00:00, 15.23it/s]
+: 100%|██████████| 73/73 [00:04<00:00, 15.56it/s]
+Train loss: 0.19604716 - Train acc: 0.92:   9%|▉         | 43/468 [00:13<02:12,  3.20it/s]Ce a dat pe validare
+4 1031 1862 82.75919732441471 72.66187050359713
+
+Ce a dat pe test
+4 1233 2476 82.70929743374 70.43229042273704
+
+Best threshold 3
+Confusion matrix
+TP: 5898, TN: 305636, FP: 1233, FN: 2476, FNR: 0.2956770957726296, FPR: 0.004018001166621587
+Precision: 82.709%, Recall: 70.432%, F1-measure: 76.079%, Specificity: 0.996, Lead time: 12.202
+elapsed_time: 107.18829607963562
+
+Starting epoch: 11 | phase: train | ⏰: 11:49:10 | Learning rate: 0.010000
+Train loss: 0.19533457 - Train acc: 0.92: 100%|██████████| 468/468 [02:29<00:00,  3.12it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 11 | phase: valid | ⏰: 11:51:40
+: 100%|██████████| 52/52 [00:05<00:00,  9.32it/s]
+
+Validation loss: 0.2006677406338545 Validation accuracy: 0.9210111177884616
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:43<00:00, 10.26it/s]
+: 100%|██████████| 145/145 [00:13<00:00, 10.95it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 23.97it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 94.41it/s]
+Ce a dat pe validare
+5 826 4746 92.66755437194851 68.74547250576227
+
+Best threshold 4
+Confusion matrix
+TP: 10439, TN: 501544, FP: 826, FN: 4746, FNR: 0.3125452749423773, FPR: 0.0016442064613730915
+Precision: 92.668%, Recall: 68.745%, F1-measure: 78.934%, Specificity: 0.998, Lead time: 12.050
+elapsed_time: 330.35946106910706
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 444/444 [00:45<00:00,  9.86it/s]
+: 100%|██████████| 145/145 [00:13<00:00, 10.55it/s]
+Ce a dat pe validare
+5 0 1 100.0 66.66666666666667
+
+Ce a dat pe test
+5 826 4745 92.66625233064015 68.74588328283494
+
+Best threshold 4
+Confusion matrix
+TP: 10437, TN: 501262, FP: 826, FN: 4745, FNR: 0.31254116717165065, FPR: 0.0016451299373814949
+Precision: 92.666%, Recall: 68.746%, F1-measure: 78.934%, Specificity: 0.998, Lead time: 12.050
+elapsed_time: 242.99647784233093
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 3/3 [00:00<00:00, 17.64it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 18.24it/s]
+: 100%|██████████| 442/442 [00:38<00:00, 11.57it/s]
+: 100%|██████████| 145/145 [00:11<00:00, 12.78it/s]
+Ce a dat pe validare
+5 3 5 86.36363636363636 79.16666666666667
+
+Ce a dat pe test
+5 823 4741 92.67988970915236 68.72897566123606
+
+Best threshold 4
+Confusion matrix
+TP: 10420, TN: 499975, FP: 823, FN: 4741, FNR: 0.31271024338763936, FPR: 0.0016433771700366216
+Precision: 92.680%, Recall: 68.729%, F1-measure: 78.927%, Specificity: 0.998, Lead time: 12.048
+elapsed_time: 74.50668907165527
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 5/5 [00:00<00:00, 14.96it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 19.45it/s]
+: 100%|██████████| 440/440 [00:33<00:00, 13.14it/s]
+: 100%|██████████| 144/144 [00:09<00:00, 15.47it/s]
+Ce a dat pe validare
+5 4 8 90.2439024390244 82.22222222222223
+
+Ce a dat pe test
+5 822 4738 92.67640769779045 68.70541611624834
+
+Best threshold 4
+Confusion matrix
+TP: 10402, TN: 489510, FP: 822, FN: 4738, FNR: 0.31294583883751653, FPR: 0.001676415163603436
+Precision: 92.676%, Recall: 68.705%, F1-measure: 78.911%, Specificity: 0.998, Lead time: 12.050
+elapsed_time: 64.81640791893005
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 46/46 [00:03<00:00, 14.47it/s]
+: 100%|██████████| 15/15 [00:00<00:00, 15.95it/s]
+: 100%|██████████| 399/399 [00:26<00:00, 15.31it/s]
+: 100%|██████████| 131/131 [00:07<00:00, 16.60it/s]
+Ce a dat pe validare
+5 91 162 95.59961315280464 92.42636746143057
+
+Ce a dat pe test
+5 735 4584 92.00826356420572 64.86279319331597
+
+Best threshold 4
+Confusion matrix
+TP: 8462, TN: 473226, FP: 735, FN: 4584, FNR: 0.3513720680668404, FPR: 0.0015507605056112213
+Precision: 92.008%, Recall: 64.863%, F1-measure: 76.087%, Specificity: 0.998, Lead time: 12.038
+elapsed_time: 64.1874749660492
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 111/111 [00:08<00:00, 13.69it/s]
+: 100%|██████████| 37/37 [00:02<00:00, 16.44it/s]
+: 100%|██████████| 334/334 [00:19<00:00, 16.96it/s]
+: 100%|██████████| 109/109 [00:06<00:00, 17.54it/s]
+Ce a dat pe validare
+5 207 1165 95.06555423122765 77.39181059576946
+
+Ce a dat pe test
+5 619 3581 91.24469589816124 64.30422647527911
+
+Best threshold 4
+Confusion matrix
+TP: 6451, TN: 434345, FP: 619, FN: 3581, FNR: 0.3569577352472089, FPR: 0.0014231062800599589
+Precision: 91.245%, Recall: 64.304%, F1-measure: 75.441%, Specificity: 0.999, Lead time: 12.046
+elapsed_time: 75.49011707305908
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 221/221 [00:14<00:00, 15.53it/s]
+: 100%|██████████| 73/73 [00:05<00:00, 12.40it/s]
+: 100%|██████████| 223/223 [00:14<00:00, 14.89it/s]
+: 100%|██████████| 73/73 [00:04<00:00, 16.41it/s]
+Ce a dat pe validare
+5 445 3359 92.63610789343042 62.498604443452045
+
+Ce a dat pe test
+5 381 1387 92.70394484871697 77.7296082209377
+
+Best threshold 4
+Confusion matrix
+TP: 4841, TN: 358213, FP: 381, FN: 1387, FNR: 0.22270391779062298, FPR: 0.0010624829194018862
+Precision: 92.704%, Recall: 77.730%, F1-measure: 84.559%, Specificity: 0.999, Lead time: 12.036
+elapsed_time: 99.84316062927246
+:   0%|          | 0/468 [00:00<?, ?it/s]
+Starting epoch: 12 | phase: train | ⏰: 12:07:55 | Learning rate: 0.010000
+Train loss: 0.19481306 - Train acc: 0.92: 100%|██████████| 468/468 [02:36<00:00,  2.99it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 12 | phase: valid | ⏰: 12:10:32
+: 100%|██████████| 52/52 [00:05<00:00,  9.01it/s]
+
+Validation loss: 0.19939518805879813 Validation accuracy: 0.9196026141826923
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:47<00:00,  9.36it/s]
+: 100%|██████████| 145/145 [00:12<00:00, 11.89it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 19.38it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 99.86it/s]
+Ce a dat pe validare
+4 2168 3221 84.65893008774412 78.78827790582812
+
+Best threshold 3
+Confusion matrix
+TP: 11964, TN: 500202, FP: 2168, FN: 3221, FNR: 0.2121172209417188, FPR: 0.004315544319923563
+Precision: 84.659%, Recall: 78.788%, F1-measure: 81.618%, Specificity: 0.996, Lead time: 12.191
+elapsed_time: 341.0472729206085
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 444/444 [00:51<00:00,  8.58it/s]
+: 100%|██████████| 145/145 [00:09<00:00, 14.51it/s]
+Ce a dat pe validare
+15 0 2 100.0 33.333333333333336
+
+Ce a dat pe test
+15 25 10840 99.42752461644149 28.599657489131868
+
+Best threshold 14
+Confusion matrix
+TP: 4342, TN: 502297, FP: 25, FN: 10840, FNR: 0.7140034251086813, FPR: 4.97688733521526e-05
+Precision: 99.428%, Recall: 28.600%, F1-measure: 44.422%, Specificity: 1.000, Lead time: 16.478
+elapsed_time: 240.65793418884277
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 3/3 [00:00<00:00, 19.23it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 14.23it/s]
+: 100%|██████████| 442/442 [00:35<00:00, 12.37it/s]
+: 100%|██████████| 145/145 [00:11<00:00, 12.58it/s]
+Ce a dat pe validare
+5 16 19 73.33333333333333 69.84126984126983
+
+Ce a dat pe test
+5 811 5107 92.5087751708849 66.22801216770269
+
+Best threshold 4
+Confusion matrix
+TP: 10015, TN: 500955, FP: 811, FN: 5107, FNR: 0.3377198783229732, FPR: 0.0016162912592722503
+Precision: 92.509%, Recall: 66.228%, F1-measure: 77.193%, Specificity: 0.998, Lead time: 12.659
+elapsed_time: 67.78169226646423
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 5/5 [00:00<00:00, 13.18it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 17.91it/s]
+: 100%|██████████| 440/440 [00:32<00:00, 13.41it/s]
+: 100%|██████████| 144/144 [00:10<00:00, 13.50it/s]
+Ce a dat pe validare
+4 29 21 80.53691275167785 85.1063829787234
+
+Ce a dat pe test
+4 2139 3200 84.70285346492169 78.72906141983515
+
+Best threshold 3
+Confusion matrix
+TP: 11844, TN: 498468, FP: 2139, FN: 3200, FNR: 0.2127093858016485, FPR: 0.004272812805254421
+Precision: 84.703%, Recall: 78.729%, F1-measure: 81.607%, Specificity: 0.996, Lead time: 12.186
+elapsed_time: 63.95739388465881
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 45/45 [00:03<00:00, 14.26it/s]
+: 100%|██████████| 15/15 [00:00<00:00, 15.28it/s]
+: 100%|██████████| 400/400 [00:25<00:00, 15.73it/s]
+: 100%|██████████| 131/131 [00:08<00:00, 15.81it/s]
+Ce a dat pe validare
+4 200 122 84.55598455598455 89.97534921939194
+
+Ce a dat pe test
+4 1968 3099 84.6693152605749 77.81357388316151
+
+Best threshold 3
+Confusion matrix
+TP: 10869, TN: 456520, FP: 1968, FN: 3099, FNR: 0.22186426116838487, FPR: 0.004292369702151419
+Precision: 84.669%, Recall: 77.814%, F1-measure: 81.097%, Specificity: 0.996, Lead time: 12.189
+elapsed_time: 65.34304189682007
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 114/114 [00:07<00:00, 15.24it/s]
+: 100%|██████████| 36/36 [00:02<00:00, 16.10it/s]
+: 100%|██████████| 331/331 [00:21<00:00, 15.08it/s]
+: 100%|██████████| 110/110 [00:06<00:00, 16.20it/s]
+Ce a dat pe validare
+4 691 609 79.67647058823529 81.64556962025317
+
+Ce a dat pe test
+4 1477 2612 86.2374207976146 77.98938232072133
+
+Best threshold 3
+Confusion matrix
+TP: 9255, TN: 419558, FP: 1477, FN: 2612, FNR: 0.2201061767927867, FPR: 0.0035080218984169962
+Precision: 86.237%, Recall: 77.989%, F1-measure: 81.906%, Specificity: 0.996, Lead time: 12.187
+elapsed_time: 77.82530879974365
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 224/224 [00:14<00:00, 15.99it/s]
+: 100%|██████████| 72/72 [00:05<00:00, 14.39it/s]
+: 100%|██████████| 221/221 [00:16<00:00, 13.68it/s]
+: 100%|██████████| 74/74 [00:05<00:00, 14.47it/s]
+Ce a dat pe validare
+4 1120 2451 79.66224804793899 64.15618601930389
+
+Ce a dat pe test
+4 1048 770 87.84927536231883 90.77512878878639
+
+Best threshold 3
+Confusion matrix
+TP: 7577, TN: 297995, FP: 1048, FN: 770, FNR: 0.0922487121121361, FPR: 0.0035045127289386477
+Precision: 87.849%, Recall: 90.775%, F1-measure: 89.288%, Specificity: 0.996, Lead time: 12.235
+elapsed_time: 108.5415551662445
+
+Starting epoch: 13 | phase: train | ⏰: 12:26:59 | Learning rate: 0.010000
+Train loss: 0.19323046 - Train acc: 0.92: 100%|██████████| 468/468 [02:35<00:00,  3.00it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 13 | phase: valid | ⏰: 12:29:35
+: 100%|██████████| 52/52 [00:06<00:00,  8.53it/s]
+
+Validation loss: 0.19941321502511317 Validation accuracy: 0.9191706730769231
+Log saved
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:45<00:00,  9.68it/s]
+: 100%|██████████| 145/145 [00:12<00:00, 11.41it/s]
+Ce a dat pe validare
+4 2168 3221 84.65893008774412 78.78827790582812
+
+Best threshold 3
+Confusion matrix
+TP: 11964, TN: 500202, FP: 2168, FN: 3221, FNR: 0.2121172209417188, FPR: 0.004315544319923563
+Precision: 84.659%, Recall: 78.788%, F1-measure: 81.618%, Specificity: 0.996, Lead time: 12.191
+elapsed_time: 337.4988729953766
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 1/1 [00:00<00:00, 18.19it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 97.48it/s]
+: 100%|██████████| 444/444 [00:48<00:00,  9.23it/s]
+: 100%|██████████| 145/145 [00:13<00:00, 10.73it/s]
+Ce a dat pe validare
+6 1 2 66.66666666666667 50.0
+
+Ce a dat pe test
+6 707 6271 92.64843506290943 58.69178578486266
+
+Best threshold 5
+Confusion matrix
+TP: 8910, TN: 501557, FP: 707, FN: 6271, FNR: 0.41308214215137345, FPR: 0.0014076262682573308
+Precision: 92.648%, Recall: 58.692%, F1-measure: 71.861%, Specificity: 0.999, Lead time: 12.876
+elapsed_time: 229.0439076423645
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 3/3 [00:00<00:00, 15.50it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 19.58it/s]
+: 100%|██████████| 442/442 [00:44<00:00, 10.02it/s]
+: 100%|██████████| 145/145 [00:13<00:00, 10.56it/s]
+Ce a dat pe validare
+4 7 5 72.0 78.26086956521739
+
+Ce a dat pe test
+4 2161 3216 84.68136386191253 78.78907795805303
+
+Best threshold 3
+Confusion matrix
+TP: 11946, TN: 499205, FP: 2161, FN: 3216, FNR: 0.21210922041946972, FPR: 0.00431022446675682
+Precision: 84.681%, Recall: 78.789%, F1-measure: 81.629%, Specificity: 0.996, Lead time: 12.188
+elapsed_time: 84.48502278327942
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 5/5 [00:00<00:00, 14.77it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 18.23it/s]
+: 100%|██████████| 440/440 [00:38<00:00, 11.49it/s]
+: 100%|██████████| 144/144 [00:10<00:00, 13.71it/s]
+Ce a dat pe validare
+7 2 19 98.07692307692308 84.29752066115702
+
+Ce a dat pe test
+7 530 6935 93.87920083150479 53.96309081253319
+
+Best threshold 6
+Confusion matrix
+TP: 8129, TN: 500564, FP: 530, FN: 6935, FNR: 0.46036909187466807, FPR: 0.0010576857835056896
+Precision: 93.879%, Recall: 53.963%, F1-measure: 68.533%, Specificity: 0.999, Lead time: 13.013
+elapsed_time: 75.10809803009033
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 44/44 [00:02<00:00, 16.33it/s]
+: 100%|██████████| 16/16 [00:01<00:00, 15.66it/s]
+: 100%|██████████| 401/401 [00:31<00:00, 12.72it/s]
+: 100%|██████████| 130/130 [00:11<00:00, 11.19it/s]
+Ce a dat pe validare
+4 201 144 73.92996108949416 79.83193277310924
+
+Ce a dat pe test
+4 1967 3077 85.27804805029564 78.7367839126529
+
+Best threshold 3
+Confusion matrix
+TP: 11394, TN: 472808, FP: 1967, FN: 3077, FNR: 0.2126321608734711, FPR: 0.004143015112421673
+Precision: 85.278%, Recall: 78.737%, F1-measure: 81.877%, Specificity: 0.996, Lead time: 12.197
+elapsed_time: 77.3805947303772
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 110/110 [00:07<00:00, 14.44it/s]
+: 100%|██████████| 37/37 [00:02<00:00, 15.01it/s]
+: 100%|██████████| 334/334 [00:25<00:00, 13.33it/s]
+: 100%|██████████| 108/108 [00:09<00:00, 11.38it/s]
+Ce a dat pe validare
+4 587 1459 75.92288761279738 55.9214501510574
+
+Ce a dat pe test
+4 1581 1762 86.48024628014366 85.1621052631579
+
+Best threshold 3
+Confusion matrix
+TP: 10113, TN: 294490, FP: 1581, FN: 1762, FNR: 0.14837894736842105, FPR: 0.005339935353344299
+Precision: 86.480%, Recall: 85.162%, F1-measure: 85.816%, Specificity: 0.995, Lead time: 12.183
+elapsed_time: 86.32957172393799
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 226/226 [00:17<00:00, 13.23it/s]
+: 100%|██████████| 74/74 [00:05<00:00, 14.39it/s]
+: 100%|██████████| 219/219 [00:14<00:00, 14.81it/s]
+: 100%|██████████| 72/72 [00:04<00:00, 15.66it/s]
+Ce a dat pe validare
+4 1294 1870 78.29951366761698 71.40235510016822
+
+Ce a dat pe test
+4 874 1351 89.30101603623454 84.37427712236872
+
+Best threshold 3
+Confusion matrix
+TP: 7295, TN: 202110, FP: 874, FN: 1351, FNR: 0.15625722877631273, FPR: 0.004305758089307532
+Precision: 89.301%, Recall: 84.374%, F1-measure: 86.768%, Specificity: 0.996, Lead time: 12.187
+elapsed_time: 107.5507881641388
+
+Starting epoch: 14 | phase: train | ⏰: 12:46:36 | Learning rate: 0.010000
+Train loss: 0.19214889 - Train acc: 0.92: 100%|██████████| 468/468 [02:38<00:00,  2.95it/s]
+:   0%|          | 0/52 [00:00<?, ?it/s]
+Starting epoch: 14 | phase: valid | ⏰: 12:49:15
+: 100%|██████████| 52/52 [00:05<00:00,  8.73it/s]
+
+Validation loss: 0.19756609602616385 Validation accuracy: 0.9208045372596154
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+Log saved
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:47<00:00,  9.42it/s]
+: 100%|██████████| 145/145 [00:14<00:00, 10.27it/s]
+Ce a dat pe validare
+4 2047 4338 84.12439894524586 71.43233454066512
+
+Best threshold 3
+Confusion matrix
+TP: 10847, TN: 500323, FP: 2047, FN: 4338, FNR: 0.2856766545933487, FPR: 0.004074685988414913
+Precision: 84.124%, Recall: 71.432%, F1-measure: 77.261%, Specificity: 0.996, Lead time: 12.067
+elapsed_time: 364.09530901908875
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 1/1 [00:00<00:00, 18.52it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 75.02it/s]
+: 100%|██████████| 444/444 [00:45<00:00,  9.72it/s]
+: 100%|██████████| 145/145 [00:13<00:00, 10.60it/s]
+Ce a dat pe validare
+5 0 1 100.0 80.0
+
+Ce a dat pe test
+5 749 5340 92.92662196619133 64.82213438735178
+
+Best threshold 4
+Confusion matrix
+TP: 9840, TN: 501592, FP: 749, FN: 5340, FNR: 0.35177865612648224, FPR: 0.0014910190488134553
+Precision: 92.927%, Recall: 64.822%, F1-measure: 76.371%, Specificity: 0.999, Lead time: 12.513
+elapsed_time: 233.16442394256592
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 3/3 [00:00<00:00, 15.49it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 14.03it/s]
+: 100%|██████████| 442/442 [00:39<00:00, 11.24it/s]
+: 100%|██████████| 145/145 [00:11<00:00, 12.39it/s]
+Ce a dat pe validare
+5 3 7 95.23809523809524 89.55223880597015
+
+Ce a dat pe test
+5 746 5334 92.91547958214625 64.71755523217357
+
+Best threshold 4
+Confusion matrix
+TP: 9784, TN: 501039, FP: 746, FN: 5334, FNR: 0.3528244476782643, FPR: 0.001486692507747342
+Precision: 92.915%, Recall: 64.718%, F1-measure: 76.294%, Specificity: 0.999, Lead time: 12.511
+elapsed_time: 74.09303784370422
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 5/5 [00:00<00:00, 15.55it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 20.49it/s]
+: 100%|██████████| 440/440 [00:33<00:00, 13.29it/s]
+: 100%|██████████| 144/144 [00:09<00:00, 15.93it/s]
+Ce a dat pe validare
+4 6 19 92.5 79.56989247311827
+
+Ce a dat pe test
+4 2041 4319 84.07210863118465 71.38218923933209
+
+Best threshold 3
+Confusion matrix
+TP: 10773, TN: 495968, FP: 2041, FN: 4319, FNR: 0.28617810760667906, FPR: 0.004098319508281979
+Precision: 84.072%, Recall: 71.382%, F1-measure: 77.209%, Specificity: 0.996, Lead time: 12.065
+elapsed_time: 61.98872399330139
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 44/44 [00:03<00:00, 11.07it/s]
+: 100%|██████████| 15/15 [00:00<00:00, 15.62it/s]
+: 100%|██████████| 401/401 [00:28<00:00, 14.17it/s]
+: 100%|██████████| 131/131 [00:08<00:00, 15.13it/s]
+Ce a dat pe validare
+5 51 615 97.09401709401709 73.47994825355757
+
+Ce a dat pe test
+5 698 4726 92.10228558497397 63.26752681486087
+
+Best threshold 4
+Confusion matrix
+TP: 8140, TN: 461648, FP: 698, FN: 4726, FNR: 0.36732473185139125, FPR: 0.0015096918757813412
+Precision: 92.102%, Recall: 63.268%, F1-measure: 75.009%, Specificity: 0.998, Lead time: 12.489
+elapsed_time: 67.50178694725037
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 111/111 [00:09<00:00, 11.65it/s]
+: 100%|██████████| 36/36 [00:02<00:00, 16.24it/s]
+: 100%|██████████| 334/334 [00:22<00:00, 14.78it/s]
+: 100%|██████████| 110/110 [00:07<00:00, 15.02it/s]
+Ce a dat pe validare
+4 350 2326 92.35807860262008 64.52104942037828
+
+Ce a dat pe test
+4 1697 2012 79.58864565792639 76.68327732066288
+
+Best threshold 3
+Confusion matrix
+TP: 6617, TN: 390623, FP: 1697, FN: 2012, FNR: 0.23316722679337118, FPR: 0.00432555057096248
+Precision: 79.589%, Recall: 76.683%, F1-measure: 78.109%, Specificity: 0.996, Lead time: 12.035
+elapsed_time: 83.36793088912964
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 222/222 [00:15<00:00, 14.39it/s]
+: 100%|██████████| 73/73 [00:04<00:00, 14.66it/s]
+: 100%|██████████| 222/222 [00:14<00:00, 15.64it/s]
+: 100%|██████████| 73/73 [00:05<00:00, 14.29it/s]
+Ce a dat pe validare
+4 1170 2977 86.3493174658733 71.31431875120447
+
+Ce a dat pe test
+4 877 1361 79.71316215591025 71.68712294570417
+
+Best threshold 3
+Confusion matrix
+TP: 3446, TN: 262268, FP: 877, FN: 1361, FNR: 0.2831287705429582, FPR: 0.003332763305401965
+Precision: 79.713%, Recall: 71.687%, F1-measure: 75.487%, Specificity: 0.997, Lead time: 12.054
+elapsed_time: 111.30929613113403
+plot done
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Lens test
+13419 3819
+: 100%|██████████| 444/444 [00:47<00:00,  9.44it/s]
+: 100%|██████████| 145/145 [00:11<00:00, 12.48it/s]
+Ce a dat pe validare
+4 2047 4338 84.12439894524586 71.43233454066512
+
+Best threshold 3
+Confusion matrix
+TP: 10847, TN: 500323, FP: 2047, FN: 4338, FNR: 0.2856766545933487, FPR: 0.004074685988414913
+Precision: 84.124%, Recall: 71.432%, F1-measure: 77.261%, Specificity: 0.996, Lead time: 12.067
+elapsed_time: 323.25811290740967
+======== My contribution ===========
+34
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+*** Percentage *** 0.001
+Lens valid
+13 3
+Lens test
+13406 3816
+: 100%|██████████| 1/1 [00:00<00:00, 18.38it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 117.03it/s]
+: 100%|██████████| 444/444 [00:42<00:00, 10.51it/s]
+: 100%|██████████| 145/145 [00:12<00:00, 11.75it/s]
+Ce a dat pe validare
+7 0 0 100.0 100.0
+
+Ce a dat pe test
+7 464 7313 94.43177727109084 51.831115795020416
+
+Best threshold 6
+Confusion matrix
+TP: 7869, TN: 501853, FP: 464, FN: 7313, FNR: 0.4816888420497958, FPR: 0.0009237194839115539
+Precision: 94.432%, Recall: 51.831%, F1-measure: 66.927%, Specificity: 0.999, Lead time: 13.148
+elapsed_time: 205.65215587615967
+*** Percentage *** 0.005
+Lens valid
+67 19
+Lens test
+13352 3800
+: 100%|██████████| 3/3 [00:00<00:00, 17.20it/s]
+: 100%|██████████| 1/1 [00:00<00:00, 19.66it/s]
+: 100%|██████████| 442/442 [00:36<00:00, 12.04it/s]
+: 100%|██████████| 145/145 [00:10<00:00, 13.42it/s]
+Ce a dat pe validare
+4 8 6 85.45454545454545 88.67924528301887
+
+Ce a dat pe test
+4 2039 4332 84.11870083339824 71.37192704203014
+
+Best threshold 3
+Confusion matrix
+TP: 10800, TN: 499808, FP: 2039, FN: 4332, FNR: 0.28628072957969863, FPR: 0.004062991310100489
+Precision: 84.119%, Recall: 71.372%, F1-measure: 77.223%, Specificity: 0.996, Lead time: 12.068
+elapsed_time: 67.73098492622375
+*** Percentage *** 0.01
+Lens valid
+134 38
+Lens test
+13285 3781
+: 100%|██████████| 5/5 [00:00<00:00, 16.95it/s]
+: 100%|██████████| 2/2 [00:00<00:00, 22.04it/s]
+: 100%|██████████| 440/440 [00:33<00:00, 13.33it/s]
+: 100%|██████████| 144/144 [00:09<00:00, 14.50it/s]
+Ce a dat pe validare
+4 8 9 90.2439024390244 89.1566265060241
+
+Ce a dat pe test
+4 2039 4329 84.08523259444272 71.33492252681764
+
+Best threshold 3
+Confusion matrix
+TP: 10773, TN: 453643, FP: 2039, FN: 4329, FNR: 0.2866507747318236, FPR: 0.004474611680952945
+Precision: 84.085%, Recall: 71.335%, F1-measure: 77.187%, Specificity: 0.996, Lead time: 12.066
+elapsed_time: 62.41290497779846
+*** Percentage *** 0.1
+Lens valid
+1341 381
+Lens test
+12078 3438
+: 100%|██████████| 47/47 [00:03<00:00, 15.27it/s]
+: 100%|██████████| 15/15 [00:01<00:00, 13.87it/s]
+: 100%|██████████| 398/398 [00:26<00:00, 14.91it/s]
+: 100%|██████████| 131/131 [00:10<00:00, 13.05it/s]
+Ce a dat pe validare
+5 89 434 84.65517241379311 53.08108108108108
+
+Ce a dat pe test
+5 660 4907 93.40856886048138 65.5890603085554
+
+Best threshold 4
+Confusion matrix
+TP: 9353, TN: 380621, FP: 660, FN: 4907, FNR: 0.344109396914446, FPR: 0.0017310067902675454
+Precision: 93.409%, Recall: 65.589%, F1-measure: 77.065%, Specificity: 0.998, Lead time: 12.503
+elapsed_time: 66.84232592582703
+*** Percentage *** 0.25
+Lens valid
+3354 954
+Lens test
+10065 2865
+: 100%|██████████| 114/114 [00:07<00:00, 15.00it/s]
+: 100%|██████████| 37/37 [00:02<00:00, 15.92it/s]
+: 100%|██████████| 331/331 [00:21<00:00, 15.52it/s]
+: 100%|██████████| 109/109 [00:06<00:00, 15.85it/s]
+Ce a dat pe validare
+4 590 655 79.95923913043478 78.23197075440346
+
+Ce a dat pe test
+4 1457 3683 85.35678391959799 69.75197109067017
+
+Best threshold 3
+Confusion matrix
+TP: 8493, TN: 324738, FP: 1457, FN: 3683, FNR: 0.30248028909329827, FPR: 0.004466653382179372
+Precision: 85.357%, Recall: 69.752%, F1-measure: 76.769%, Specificity: 0.996, Lead time: 12.071
+elapsed_time: 77.32315587997437
+*** Percentage *** 0.5
+Lens valid
+6709 1909
+Lens test
+6710 1910
+: 100%|██████████| 225/225 [00:12<00:00, 18.50it/s]
+: 100%|██████████| 73/73 [00:03<00:00, 18.44it/s]
+: 100%|██████████| 220/220 [00:12<00:00, 17.71it/s]
+: 100%|██████████| 73/73 [00:04<00:00, 15.49it/s]
+Ce a dat pe validare
+5 336 1585 93.32803812549642 74.78122513922037
+
+Ce a dat pe test
+5 413 3756 92.56793233759223 57.79775280898876
+
+Best threshold 4
+Confusion matrix
+TP: 5144, TN: 214247, FP: 413, FN: 3756, FNR: 0.4220224719101124, FPR: 0.001923972794186155
+Precision: 92.568%, Recall: 57.798%, F1-measure: 71.163%, Specificity: 0.998, Lead time: 12.482
+elapsed_time: 94.00509095191956
+
+Process finished with exit code 0
