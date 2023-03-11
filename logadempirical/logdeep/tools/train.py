@@ -30,12 +30,19 @@ from logadempirical.neural_log.transformers import NeuralLog
 
 
 def mean_selection(losses):
-    mean = losses.mean()
-    stddev = losses.std()
-    limit = 1.5 * stddev
-    lower_limit = (losses >= (mean - limit))
-    upper_limit = (losses <= (mean + limit))
-    return torch.where(torch.logical_and(lower_limit, upper_limit))[0]
+    Q1 = torch.quantile(losses, 0.25)
+    Q3 = torch.quantile(losses, 0.75)
+
+    IQR = Q3 - Q1
+    ul = Q3 + 1.5 * IQR
+    ll = Q1 - 1.5 * IQR
+    # stddev = losses.std()
+
+    # limit = 1.5 * stddev
+    # lower_limit = (losses >= (mean - limit))
+    upper_limit = (losses <= ul)
+    # return torch.where(torch.logical_and(lower_limit, upper_limit))[0]
+    return torch.where(upper_limit)[0], torch.where(torch.logical_not(upper_limit))[0]
 
 
 class Trainer():
@@ -108,11 +115,11 @@ class Trainer():
             # data = load_features(self.data_dir + "train.pkl", only_normal=self.is_predict_logkey)
             data = load_features(self.data_dir + "train.pkl", only_normal=False)
 
-            n_train = int(len(data) * self.train_size)
-            print("Length train", n_train)
-            train_logs, train_labels = sliding_window(data,
+            n_train = int(len(data))
+            print("Nr secvente train from train.pkl", n_train)
+            train_logs, train_labels, anomaly_labels = sliding_window(data,
                                                       vocab=vocab,
-                                                      window_size=self.history_size,
+                                                      history_size=self.history_size,
                                                       data_dir=self.emb_dir,
                                                       is_predict_logkey=self.is_predict_logkey,
                                                       semantics=self.semantics,
@@ -121,21 +128,23 @@ class Trainer():
                                                       in_size=self.input_size
                                                       )
 
-            train_logs, train_labels = shuffle(train_logs, train_labels)
+            train_logs, train_labels, anomaly_labels = shuffle(train_logs, train_labels, anomaly_labels)
             # train_logs = train_logs[:200000]
             # train_labels = train_labels[:200000]
             n_val = int(len(train_logs) * self.valid_ratio)
-            val_logs, val_labels = train_logs[-n_val:], train_labels[-n_val:]
-            train_logs, train_labels = train_logs[:-n_val], train_labels[:-n_val]
+            val_logs, val_labels, val_anomaly = train_logs[-n_val:], train_labels[-n_val:], anomaly_labels[-n_val:]
+            train_logs, train_labels, anomaly_labels = train_logs[:-n_val], train_labels[:-n_val], anomaly_labels[:-n_val]
             del data
             gc.collect()
         else:
             raise NotImplementedError
 
         train_dataset = log_dataset(logs=train_logs,
-                                    labels=train_labels)
+                                    labels=train_labels,
+                                    labels_anomaly=anomaly_labels)
         valid_dataset = log_dataset(logs=val_logs,
-                                    labels=val_labels)
+                                    labels=val_labels,
+                                    labels_anomaly=val_anomaly)
 
         del train_logs
         del val_logs
@@ -153,7 +162,7 @@ class Trainer():
         self.num_train_log = len(train_dataset)
         self.num_valid_log = len(valid_dataset)
 
-        print('Find %d train logs, %d validation logs' %
+        print('Find %d secvente de train, %d secvente de validation' %
               (self.num_train_log, self.num_valid_log))
 
         self.threshold_rate = self.num_train_log // self.num_valid_log
@@ -249,6 +258,7 @@ class Trainer():
             print("Failed to save logs")
 
     def train(self, epoch):
+        mean_selection_activated = False
         self.log['train']['epoch'].append(epoch)
         start = time.strftime("%H:%M:%S")
         lr = self.optimizer.state_dict()['param_groups'][0]['lr']
@@ -264,7 +274,11 @@ class Trainer():
         total_losses = 0
         acc = 0
         total_log = 0
-        for i, (log, label) in enumerate(tbar):
+        no_not_selected = 0
+        no_trained = 0
+        anomalies_not_selected = 0
+        normals_not_selected = 0
+        for i, (log, label, anomaly_label) in enumerate(tbar):
             del log['idx']
             features = [x.to(self.device) for x in log['features']]
             output, _ = self.model(features=features, device=self.device)
@@ -284,8 +298,27 @@ class Trainer():
                 label = label.view(-1).to(self.device)
                 label = label - 1
                 loss = self.criterion(output, label)
-                loss = loss[mean_selection(loss)].mean()
+                if mean_selection_activated:
+                    selected, not_selected = mean_selection(loss)
+                    if epoch > 5:
+                        loss = loss[selected].mean()
+                    else:
+                        loss = loss.mean()
+                    # print("Eliminated", len(not_selected) / (len(selected)+len(not_selected)), str(len(not_selected)) + "/" + str(len(selected)+len(not_selected)))
+                    no_not_selected += len(not_selected)
+                    no_trained += (len(selected)+len(not_selected))
 
+
+                    labels_for_not_selected = anomaly_label[not_selected]
+                    not_selected_anomalies_condition = (labels_for_not_selected == 1)
+                    not_selected_normal_condition = (labels_for_not_selected == 0)
+                    not_selected_anomalies = torch.where(not_selected_anomalies_condition)[0]
+                    not_selected_normal = torch.where(not_selected_normal_condition)[0]
+
+                    anomalies_not_selected += len(not_selected_anomalies)
+                    normals_not_selected += len(not_selected_normal)
+                else:
+                    loss = loss.mean()
                 predicted = output.argmax(dim=1).cpu().numpy()
                 label = np.array([y.cpu() for y in label])
                 acc += (predicted == label).sum()
@@ -302,6 +335,9 @@ class Trainer():
                     "Train loss: {0:.8f} - Train acc: {1:.2f}".format(total_losses / (i + 1), acc / total_log))
 
         self.log['train']['loss'].append(total_losses / num_batch)
+        if mean_selection_activated:
+            print("Eliminated instances percentage: ", no_not_selected / no_trained, str(no_not_selected) + "/" + str(no_trained))
+            print("Eliminated anomalies percentage: ", anomalies_not_selected / (normals_not_selected+ anomalies_not_selected), str(anomalies_not_selected) + "/" + str(normals_not_selected + anomalies_not_selected))
 
     def valid(self, epoch):
         self.model.eval()
@@ -317,7 +353,7 @@ class Trainer():
         tbar = tqdm(self.valid_loader, desc="\r")
         num_batch = len(self.valid_loader)
 
-        for i, (log, label) in enumerate(tbar):
+        for i, (log, label, anomaly) in enumerate(tbar):
             with torch.no_grad():
                 del log['idx']
                 features = [x.to(self.device) for x in log['features']]
@@ -454,6 +490,8 @@ class Trainer():
                 #                      save_optimizer=False,
                 #                      suffix=self.model_name)
                 n_val_epoch += 1
+                print("======== My contribution ===========")
+                predicter.compute_elbow()
                 print("======== Their approach ===========")
                 predicter.predict_semi_supervised()
                 # print("======== My contribution ===========")

@@ -153,6 +153,7 @@ class Predicter():
             FP = self.compute_anomaly(test_normal_results, num_normal_session_logs, th + 1)
             TP = self.compute_anomaly(test_abnormal_results, num_abnormal_session_logs, th + 1)
             if TP == 0:
+                print("For g ", th, " test metrics, TP: ", TP, "FP: ", FP)
                 continue
 
             # Compute precision, recall and F1-measure
@@ -162,6 +163,7 @@ class Predicter():
             R = 100 * TP / (TP + FN)
             F1 = 2 * P * R / (P + R)
             # print(th + 1, FP, FN, P, R)
+            print("For g ", th, " test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
             if F1 > res[-1]:
                 res = [th, TP, TN, FP, FN, P, R, F1]
         print("Ce a dat pe validare")
@@ -249,18 +251,19 @@ class Predicter():
         l = data_type == "test_abnormal"
         sess_events = [(k, l, []) for (k, v) in logs.items()]
         num_sess = [logs[x] for (x, l, _) in sess_events]
-        seqs, labels = sliding_window(sess_events, vocab, window_size=self.history_size, is_train=False,
+        seqs, labels, anomaly = sliding_window(sess_events, vocab, history_size=self.history_size, is_train=False,
                                       data_dir=self.data_dir, semantics=self.semantics)
 
         dataset = log_dataset(logs=seqs,
-                              labels=labels)
+                              labels=labels,
+                              labels_anomaly=anomaly)
         data_loader = DataLoader(dataset,
                                  batch_size=min(len(dataset), 512),
                                  shuffle=False,
                                  pin_memory=True)
         tbar = tqdm(data_loader, desc="\r")
         with torch.no_grad():
-            for _, (log, label) in enumerate(tbar):
+            for _, (log, label, anomaly) in enumerate(tbar):
                 seq_idx = log['idx'].clone().detach().cpu().numpy()
                 del log['idx']
                 features = [x.to(self.device) for x in log['features']]
@@ -273,6 +276,76 @@ class Predicter():
                             (torch.argsort(output[i], descending=True)[:self.num_candidates].clone().detach().cpu(),
                              label[i]))
         return test_results, num_sess
+
+    def find_elbow(self, test_normal_results, num_normal_session_logs, test_abnormal_results, num_abnormal_session_logs, threshold_range):
+        test_abnormal_length = sum(num_abnormal_session_logs)
+        test_normal_length = sum(num_normal_session_logs)
+        res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
+        # print(threshold_range)
+        no_anomalies_predicted = []
+        for th in range(threshold_range, 0, -1):
+            FP = self.compute_anomaly(test_normal_results, num_normal_session_logs, th + 1)
+            TP = self.compute_anomaly(test_abnormal_results, num_abnormal_session_logs, th + 1)
+            anomalies = FP + TP
+            no_anomalies_predicted.append(anomalies)
+            if TP == 0:
+                print("For g ", th, " Train metrics, TP: ", TP, "FP: ", FP)
+                continue
+
+            # Compute precision, recall and F1-measure
+            TN = test_normal_length - FP
+            FN = test_abnormal_length - TP
+            P = 100 * TP / (TP + FP)
+            R = 100 * TP / (TP + FN)
+            F1 = 2 * P * R / (P + R)
+            # print(th + 1, FP, FN, P, R)
+            print("For g ", th, " train metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:",
+                  F1)
+            if F1 > res[-1]:
+                res = [th, TP, TN, FP, FN, P, R, F1]
+
+        print("Ce a dat pe train")
+        print(res[0] + 1, res[3], res[4], res[5], res[6])
+        print()
+        return no_anomalies_predicted
+
+    def compute_elbow(self):
+        with open(self.vocab_path, 'rb') as f:
+            vocab = pickle.load(f)
+        if self.model_name == "deeplog":
+            lstm_model = deeplog
+        else:
+            lstm_model = loganomaly
+
+        model_init = lstm_model(input_size=self.input_size,
+                                hidden_size=self.hidden_size,
+                                num_layers=self.num_layers,
+                                vocab_size=len(vocab),
+                                embedding_dim=self.embedding_dim)
+        model = model_init.to(self.device)
+
+        model.load_state_dict(torch.load(self.model_path)['state_dict'])
+        model.eval()
+        print('model_path: {}'.format(self.model_path))
+
+        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural')
+        print("Nr secvente unice train: normale vs anormale")
+        print(len(train_normal), len(train_abnormal))
+
+        start_time = time.time()
+        train_normal_results, num_normal = self.semi_supervised_helper(model, train_normal, vocab, 'test_normal')
+        train_abnormal_results, num_abnormal = self.semi_supervised_helper(model, train_abnormal, vocab, 'test_abnormal')
+
+        print("------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------")
+        anomalies_per_thresold = self.find_elbow(train_normal_results, num_normal,
+                                                 train_abnormal_results, num_abnormal,
+                                                 threshold_range=self.num_candidates)
+        print(anomalies_per_thresold)
+        print("Changes in number of anomalies")
+        for idx in range(1, len(anomalies_per_thresold)):
+            print("Pentru g " + str(34-idx) + " anomalies diff:" + str(anomalies_per_thresold[idx] - anomalies_per_thresold[idx-1]))
+        elapsed_time = time.time() - start_time
+        print('elapsed_time: {}'.format(elapsed_time))
 
     def predict_semi_supervised(self):
 
@@ -295,7 +368,7 @@ class Predicter():
         print('model_path: {}'.format(self.model_path))
 
         test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural')
-        print("Lens test")
+        print("Nr secvente unice test: normale vs anormale")
         print(len(test_normal), len(test_abnormal))
 
         # Test the model
@@ -310,25 +383,22 @@ class Predicter():
         FNR = FN / (TP + FN)
         SP = TN / (TN + FP)
         # find lead time
-        lead_time = []
-        no_detection = 0
-        for pred in test_abnormal_results:
-            for i, p in enumerate(pred):
-                if p[1] not in p[0][:TH]:
-                    lead_time.append(i + self.history_size + 1)
-                    no_detection += 1
-                    break
-
-        with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
-            [f.write(str(i) + "\n") for i in lead_time]
+        # lead_time = []
+        # no_detection = 0
+        # for pred in test_abnormal_results:
+        #     for i, p in enumerate(pred):
+        #         if p[1] not in p[0][:TH]:
+        #             lead_time.append(i + self.history_size + 1)
+        #             no_detection += 1
+        #             break
+        #
+        # with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
+        #     [f.write(str(i) + "\n") for i in lead_time]
 
         print('Best threshold', TH)
         print("Confusion matrix")
         print("TP: {}, TN: {}, FP: {}, FN: {}, FNR: {}, FPR: {}".format(TP, TN, FP, FN, FNR, FPR))
-        print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}, '
-              'Lead time: {:.3f}'.format(P, R, F1, SP, sum(lead_time) / no_detection))
-
-
+        print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}'.format(P, R, F1, SP))
 
         print("--------------------------UNIQUE TEST SEQUENCES------------------------------------")
         TH, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold_unique(test_normal_results, num_normal,
@@ -413,9 +483,9 @@ class Predicter():
             for key in test_abnormal_keys:
                 test_abnormal_dict[key] = test_abnormal[key]
 
-            print("Lens valid")
+            print("Cate secvente de validare unice: normale vs anormale")
             print(len(valid_normal_dict), len(valid_abnormal_dict))
-            print("Lens test")
+            print("Cate secvente de test unice: normale vs anormale")
             print(len(test_normal_dict), len(test_abnormal_dict))
 
             start_time = time.time()
@@ -425,7 +495,7 @@ class Predicter():
             test_normal_results, num_test_normal = self.semi_supervised_helper(model, test_normal_dict, vocab, 'test_normal')
             test_abnormal_results, num_test_abnormal = self.semi_supervised_helper(model, test_abnormal_dict, vocab, 'test_abnormal')
 
-            print("NORMAL TEST SEQUENCES")
+            print("--------------------------NORMAL TEST SEQUENCES------------------------------------")
             TH, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold(valid_normal_results, num_valid_normal,
                                                                     valid_abnormal_results, num_valid_abnormal,
                                                                     threshold_range=self.num_candidates)
@@ -436,25 +506,24 @@ class Predicter():
             FNR = FN / (TP + FN)
             SP = TN / (TN + FP)
             # find lead time
-            lead_time = []
-            no_detection = 0
-            for pred in test_abnormal_results:
-                for i, p in enumerate(pred):
-                    if p[1] not in p[0][:TH]:
-                        lead_time.append(i + self.history_size + 1)
-                        no_detection += 1
-                        break
-
-            with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
-                [f.write(str(i) + "\n") for i in lead_time]
+            # lead_time = []
+            # no_detection = 0
+            # for pred in test_abnormal_results:
+            #     for i, p in enumerate(pred):
+            #         if p[1] not in p[0][:TH]:
+            #             lead_time.append(i + self.history_size + 1)
+            #             no_detection += 1
+            #             break
+            #
+            # with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
+            #     [f.write(str(i) + "\n") for i in lead_time]
 
             print('Best threshold', TH)
             print("Confusion matrix")
             print("TP: {}, TN: {}, FP: {}, FN: {}, FNR: {}, FPR: {}".format(TP, TN, FP, FN, FNR, FPR))
-            print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}, '
-                  'Lead time: {:.3f}'.format(P, R, F1, SP, sum(lead_time) / no_detection))
+            print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}'.format(P, R, F1, SP))
 
-            print("UNIQUE TEST SEQUENCES")
+            print("--------------------------UNIQUE TEST SEQUENCES------------------------------------")
 
             TH, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold_unique(valid_normal_results, num_valid_normal,
                                                                     valid_abnormal_results, num_valid_abnormal,
@@ -467,23 +536,22 @@ class Predicter():
             FNR = FN / (TP + FN)
             SP = TN / (TN + FP)
             # find lead time
-            lead_time = []
-            no_detection = 0
-            for pred in test_abnormal_results:
-                for i, p in enumerate(pred):
-                    if p[1] not in p[0][:TH]:
-                        lead_time.append(i + self.history_size + 1)
-                        no_detection += 1
-                        break
-
-            with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
-                [f.write(str(i) + "\n") for i in lead_time]
+            # lead_time = []
+            # no_detection = 0
+            # for pred in test_abnormal_results:
+            #     for i, p in enumerate(pred):
+            #         if p[1] not in p[0][:TH]:
+            #             lead_time.append(i + self.history_size + 1)
+            #             no_detection += 1
+            #             break
+            #
+            # with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
+            #     [f.write(str(i) + "\n") for i in lead_time]
 
             print('Best threshold', TH)
             print("Confusion matrix")
             print("TP: {}, TN: {}, FP: {}, FN: {}, FNR: {}, FPR: {}".format(TP, TN, FP, FN, FNR, FPR))
-            print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}, '
-                  'Lead time: {:.3f}'.format(P, R, F1, SP, sum(lead_time) / no_detection))
+            print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}'.format(P, R, F1, SP))
 
             elapsed_time = time.time() - start_time
             print('elapsed_time: {}'.format(elapsed_time))
@@ -519,7 +587,7 @@ class Predicter():
         TP = 0
         with torch.no_grad():
             for line in tqdm(test_normal_loader.keys()):
-                logs, labels = sliding_window([(line, 0, list(line))], vocab, window_size=self.history_size,
+                logs, labels = sliding_window([(line, 0, list(line))], vocab, history_size=self.history_size,
                                               is_train=False,
                                               data_dir=self.data_dir, semantics=self.semantics, is_predict_logkey=False,
                                               e_name=self.embeddings)
@@ -542,7 +610,7 @@ class Predicter():
         lead_time = []
         with torch.no_grad():
             for line in tqdm(test_abnormal_loader.keys()):
-                logs, labels = sliding_window([(line, 1, list(line))], vocab, window_size=self.history_size,
+                logs, labels = sliding_window([(line, 1, list(line))], vocab, history_size=self.history_size,
                                               is_train=False,
                                               data_dir=self.data_dir, semantics=self.semantics, is_predict_logkey=False,
                                               e_name=self.embeddings)
@@ -605,7 +673,7 @@ class Predicter():
                                                             is_neural=self.embeddings == 'neural')
         start_time = time.time()
         data = [(k, v, list(k)) for k, v in test_normal_loader.items()]
-        logs, labels = sliding_window(data, vocab, window_size=self.history_size, is_train=False,
+        logs, labels = sliding_window(data, vocab, history_size=self.history_size, is_train=False,
                                       data_dir=self.data_dir, semantics=self.semantics, is_predict_logkey=False,
                                       e_name=self.embeddings, in_size=self.input_size)
         dataset = log_dataset(logs=logs, labels=labels)
@@ -629,7 +697,7 @@ class Predicter():
                 FP += data[i][1]
             total_normal += data[i][1]
         data = [(k, v, list(k)) for k, v in test_abnormal_loader.items()]
-        logs, labels = sliding_window(data, vocab, window_size=self.history_size, is_train=False,
+        logs, labels = sliding_window(data, vocab, history_size=self.history_size, is_train=False,
                                       data_dir=self.data_dir, semantics=self.semantics, is_predict_logkey=False,
                                       e_name=self.embeddings, in_size=self.input_size)
         dataset = log_dataset(logs=logs, labels=labels)
@@ -689,7 +757,7 @@ class Predicter():
         test_normal_results = [[] for _ in range(len(test_normal_loader))]
         sess_normal_events = [(k, 0) for (k, v) in test_normal_loader.items()]
         num_normal_sess = [test_normal_loader[x] for (x, l) in sess_normal_events]
-        seqs, labels = sliding_window(sess_normal_events, vocab, window_size=self.history_size, is_train=False,
+        seqs, labels = sliding_window(sess_normal_events, vocab, history_size=self.history_size, is_train=False,
                                       is_predict_logkey=False,
                                       data_dir=self.data_dir, semantics=self.semantics)
 
@@ -715,7 +783,7 @@ class Predicter():
         test_abnormal_results = [[] for _ in range(len(test_abnormal_loader))]
         sess_abnormal_events = [(k, 1) for (k, v) in test_abnormal_loader.items()]
         num_abnormal_sess = [test_abnormal_loader[x] for (x, l) in sess_abnormal_events]
-        seqs, labels = sliding_window(sess_abnormal_events, vocab, window_size=self.history_size, is_train=False,
+        seqs, labels = sliding_window(sess_abnormal_events, vocab, history_size=self.history_size, is_train=False,
                                       data_dir=self.data_dir, semantics=self.semantics)
 
         dataset = log_dataset(logs=seqs,

@@ -8,7 +8,7 @@ from torch.utils.data import Dataset, Sampler
 
 
 class log_dataset(Dataset):
-    def __init__(self, logs, labels):
+    def __init__(self, logs, labels, labels_anomaly):
         self.logs = []
         for i in range(len(labels)):
             features = [torch.tensor(logs[i][0][0], dtype=torch.long)]
@@ -19,12 +19,13 @@ class log_dataset(Dataset):
                 "idx": logs[i][1]
             })
         self.labels = labels
+        self.labels_anomaly = labels_anomaly
 
     def __len__(self):
         return len(self.labels)
 
     def __getitem__(self, idx):
-        return self.logs[idx], self.labels[idx]
+        return self.logs[idx], self.labels[idx], self.labels_anomaly[idx]
 
 
 if __name__ == '__main__':

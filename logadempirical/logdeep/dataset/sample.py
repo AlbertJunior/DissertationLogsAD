@@ -60,7 +60,7 @@ def isint(x):
         return a == b
 
 
-def load_features(data_path, only_normal=True, min_len=0):
+def load_features(data_path, only_normal=False, min_len=0):
     with open(data_path, 'rb') as f:
         data = pickle.load(f)
     if only_normal:
@@ -80,6 +80,7 @@ def load_features(data_path, only_normal=True, min_len=0):
     else:
         logs = []
         no_abnormal = 0
+        no_normal = 0
         for seq in data:
             if len(seq['EventId']) < min_len:
                 continue
@@ -91,15 +92,18 @@ def load_features(data_path, only_normal=True, min_len=0):
                 label = seq['Label']
                 if label > 0:
                     no_abnormal += 1
+                else:
+                    no_normal += 1
             try:
                 logs.append((seq['EventId'], label, seq['Seq'].tolist()))
             except:
                 logs.append((seq['EventId'], label, seq['Seq']))
-        print("Number of abnormal sessions:", no_abnormal)
+        print("Secvente de train normale:", no_normal)
+        print("Secvente de train anormale:", no_abnormal)
     return logs
 
 
-def sliding_window(data_iter, vocab, window_size, is_train=True, data_dir="dataset/", is_predict_logkey=True,
+def sliding_window(data_iter, vocab, history_size, is_train=True, data_dir="dataset/", is_predict_logkey=True,
                    e_name="embeddings.json", semantics=False, sample_ratio=1, in_size=768):
     if e_name == "neural":
         event2semantic_vec = {}
@@ -109,6 +113,7 @@ def sliding_window(data_iter, vocab, window_size, is_train=True, data_dir="datas
         is_bert = False
     result_logs = []
     labels = []
+    anomaly_label = []
 
     num_sessions = 0
     num_classes = len(vocab)
@@ -122,9 +127,9 @@ def sliding_window(data_iter, vocab, window_size, is_train=True, data_dir="datas
             print("processed %s lines" % (num_sessions + 1), end='\r')
         line = [vocab.stoi.get(ln, vocab.find_similar(ln)) for ln in orig_line]
         if is_predict_logkey:
-            seq_len = max(window_size + 1, len(line))
+            seq_len = max(history_size + 1, len(line))
         else:
-            seq_len = max(window_size, len(line))
+            seq_len = max(history_size, len(line))
         line = [vocab.pad_index] * (seq_len - len(line)) + line
         orig_line = ["padding"] * (seq_len - len(orig_line)) + orig_line
         # print(contents)
@@ -132,25 +137,25 @@ def sliding_window(data_iter, vocab, window_size, is_train=True, data_dir="datas
         # if not is_train:
         #     duplicate_seq = {}
         if is_predict_logkey:
-            size = len(line) - window_size
+            size = len(line) - history_size
         else:
-            size = len(line) - window_size + 1
+            size = len(line) - history_size + 1
 
         for i in range(size):
             if is_predict_logkey:
-                if i + window_size >= len(line):
+                if i + history_size >= len(line):
                     break
-                label = line[i + window_size]
+                label = line[i + history_size]
             else:
                 if not isinstance(lbls, int):
-                    label = max(lbls[i: i + window_size])
+                    label = max(lbls[i: i + history_size])
                 else:
                     label = lbls
 
             if is_bert:
-                seq = contents[i: i + window_size]
+                seq = contents[i: i + history_size]
             else:
-                seq = line[i: i + window_size]
+                seq = line[i: i + history_size]
             if is_predict_logkey:
                 seq.append(label)
             seq = list(map(lambda k: str(k), seq))
@@ -163,13 +168,13 @@ def sliding_window(data_iter, vocab, window_size, is_train=True, data_dir="datas
             #     continue
 
             # duplicate_seq[seq] = len(labels)
-            sequential_pattern = line[i:i + window_size]
+            sequential_pattern = line[i:i + history_size]
             semantic_pattern = []
             if semantics:
                 if is_bert:
-                    seq_logs = contents[i: i + window_size]
+                    seq_logs = contents[i: i + history_size]
                 else:
-                    seq_logs = orig_line[i: i + window_size]
+                    seq_logs = orig_line[i: i + history_size]
                 for event in seq_logs:
                     if event == "padding":
                         semantic_pattern.append([-1] * in_size)
@@ -193,11 +198,12 @@ def sliding_window(data_iter, vocab, window_size, is_train=True, data_dir="datas
 
             result_logs.append(([sequential_pattern, quantitative_pattern, semantic_pattern], idx))
             labels.append(label)
+            anomaly_label.append(lbls)
         num_sessions += 1
 
     if sample_ratio != 1:
         result_logs, labels = down_sample(result_logs, labels, sample_ratio)
     if is_train:
-        print('number of sessions {}'.format(num_sessions))
-        print('number of seqs {}'.format(len(result_logs)))
-    return result_logs, labels
+        print('number of sessions {} . Cate una pentru fiecare identificator unic SAU logica de creare de sesiune'.format(num_sessions))
+        print('number of seqs {} . Exista mai multe pe train in functie de history_size'.format(len(result_logs)))
+    return result_logs, labels, anomaly_label
