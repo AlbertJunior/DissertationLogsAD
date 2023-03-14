@@ -1,0 +1,1714 @@
+/Volumes/workplace/disertatie/LogADEmpirical/venv/bin/python /Volumes/workplace/disertatie/LogADEmpirical/main_run.py --folder=hdfs/ --log_file=HDFS.log --dataset_name=hdfs --model_name=deeplog --window_type=session --sample=sliding_window --is_logkey --train_size=0.1 --train_ratio=1 --valid_ratio=0.1 --test_ratio=1 --n_warm_up_epoch=0 --n_epochs_stop=10 --batch_size=1024 --num_candidates=34 --history_size=10 --lr=0.001 --accumulation_step=5 --session_level=hour --window_size=30 --step_size=20 --output_dir=dataset/ --max_epoch=30 --is_process
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertModel: ['cls.predictions.decoder.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.seq_relationship.bias', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.weight', 'cls.predictions.bias']
+- This IS expected if you are initializing BertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Loading ./dataset/hdfs/HDFS.log_structured.csv
+575061it [00:00, 1080803.07it/s]
+R.A.: Schimbare train_window test_window
+11175629it [00:51, 216802.15it/s]
+575061
+57506
+517555
+Save options parameters
+vocab size 32
+save vocab in dataset/hdfs/deeplog_vocab.pkl
+Loading vocab
+32
+Loading train dataset
+
+Secvente de train normale: 55836
+Secvente de train anormale: 1670
+Nr secvente train from train.pkl 57506
+number of sessions 57506 . Cate una pentru fiecare identificator unic SAU logica de creare de sesiune
+number of seqs 539660 . Exista mai multe pe train in functie de history_size
+Find 485694 secvente de train, 53966 secvente de validation
+Checkpoint not found
+
+Starting EPOCH: 0 | phase: train | ⏰: 09:26:32 | Learning rate: 0.000031
+Train loss: 3.41776880 - Train acc: 0.11: 100%|██████████| 475/475 [02:31<00:00,  3.14it/s]
+Eliminated instances percentage:  0.005083447602811647 2469/485694
+Eliminated anomalies percentage:  0.10409072498987444 257/2469
+Log saved
+
+Starting EPOCH: 1 | phase: train | ⏰: 09:29:03 | Learning rate: 0.000063
+Train loss: 2.30731476 - Train acc: 0.27: 100%|██████████| 475/475 [02:27<00:00,  3.22it/s]
+: 100%|██████████| 53/53 [00:05<00:00, 10.27it/s]
+: 100%|██████████| 105/105 [00:07<00:00, 14.09it/s]
+Eliminated instances percentage:  0.09502485103789629 46153/485694
+Eliminated anomalies percentage:  0.06311615712954738 2913/46153
+
+Starting epoch: 1 | phase: valid | ⏰: 09:31:31
+
+Validation loss: 1.860105759692642 Validation accuracy: 0.49106845050587405
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+======== My contribution ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/train.pkl
+Length test 57506
+Nr secvente unice train: normale vs anormale
+3715 646
+------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------
+: 100%|██████████| 20/20 [00:01<00:00, 16.42it/s]
+For g  34  Train metrics, TP:  0 FP:  0
+For g  33  Train metrics, TP:  0 FP:  0
+For g  32  Train metrics, TP:  0 FP:  0
+For g  31  Train metrics, TP:  0 FP:  0
+For g  30  train metrics, TP:  2 , FP:  0 , FN: 1668 , P: 100.0 , R: 0.11976047904191617 , F1: 0.23923444976076555
+For g  29  train metrics, TP:  479 , FP:  172 , FN: 1191 , P: 73.57910906298002 , R: 28.682634730538922 , F1: 41.27531236535976
+For g  28  train metrics, TP:  479 , FP:  172 , FN: 1191 , P: 73.57910906298002 , R: 28.682634730538922 , F1: 41.27531236535976
+For g  27  train metrics, TP:  479 , FP:  172 , FN: 1191 , P: 73.57910906298002 , R: 28.682634730538922 , F1: 41.27531236535976
+For g  26  train metrics, TP:  480 , FP:  172 , FN: 1190 , P: 73.61963190184049 , R: 28.74251497005988 , F1: 41.343669250645995
+For g  25  train metrics, TP:  633 , FP:  208 , FN: 1037 , P: 75.26753864447087 , R: 37.90419161676647 , F1: 50.41816009557945
+For g  24  train metrics, TP:  633 , FP:  208 , FN: 1037 , P: 75.26753864447087 , R: 37.90419161676647 , F1: 50.41816009557945
+For g  23  train metrics, TP:  734 , FP:  208 , FN: 936 , P: 77.91932059447983 , R: 43.952095808383234 , F1: 56.2021439509954
+For g  22  train metrics, TP:  735 , FP:  208 , FN: 935 , P: 77.94273594909862 , R: 44.01197604790419 , F1: 56.257175660160726
+For g  21  train metrics, TP:  735 , FP:  208 , FN: 935 , P: 77.94273594909862 , R: 44.01197604790419 , F1: 56.257175660160726
+For g  20  train metrics, TP:  735 , FP:  208 , FN: 935 , P: 77.94273594909862 , R: 44.01197604790419 , F1: 56.257175660160726
+For g  19  train metrics, TP:  735 , FP:  208 , FN: 935 , P: 77.94273594909862 , R: 44.01197604790419 , F1: 56.257175660160726
+For g  18  train metrics, TP:  1021 , FP:  208 , FN: 649 , P: 83.07567127746135 , R: 61.137724550898206 , F1: 70.43808209727493
+For g  17  train metrics, TP:  1021 , FP:  208 , FN: 649 , P: 83.07567127746135 , R: 61.137724550898206 , F1: 70.43808209727493
+For g  16  train metrics, TP:  1021 , FP:  208 , FN: 649 , P: 83.07567127746135 , R: 61.137724550898206 , F1: 70.43808209727493
+For g  15  train metrics, TP:  1489 , FP:  228 , FN: 181 , P: 86.72102504368084 , R: 89.16167664670658 , F1: 87.92441688810156
+For g  14  train metrics, TP:  1490 , FP:  228 , FN: 180 , P: 86.72875436554132 , R: 89.22155688622755 , F1: 87.95749704840613
+For g  13  train metrics, TP:  1490 , FP:  228 , FN: 180 , P: 86.72875436554132 , R: 89.22155688622755 , F1: 87.95749704840613
+For g  12  train metrics, TP:  1518 , FP:  228 , FN: 152 , P: 86.94158075601375 , R: 90.89820359281437 , F1: 88.87587822014052
+For g  11  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  10  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  9  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  8  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  7  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  6  train metrics, TP:  1658 , FP:  8109 , FN: 12 , P: 16.97552984539777 , R: 99.2814371257485 , F1: 28.993617207309608
+For g  5  train metrics, TP:  1669 , FP:  20198 , FN: 1 , P: 7.63250560204875 , R: 99.94011976047904 , F1: 14.181926328758976
+For g  4  train metrics, TP:  1669 , FP:  24023 , FN: 1 , P: 6.496185583060875 , R: 99.94011976047904 , F1: 12.199400628609018
+For g  3  train metrics, TP:  1669 , FP:  26896 , FN: 1 , P: 5.842814633292491 , R: 99.94011976047904 , F1: 11.040185215809494
+For g  2  train metrics, TP:  1669 , FP:  26908 , FN: 1 , P: 5.8403611295797315 , R: 99.94011976047904 , F1: 11.035805203821866
+For g  1  train metrics, TP:  1669 , FP:  55835 , FN: 1 , P: 2.902406789092933 , R: 99.94011976047904 , F1: 5.640990975766384
+Ce a dat pe train
+12 229 12 87.86433492315845 99.2814371257485
+
+[0, 0, 0, 0, 2, 651, 651, 651, 652, 841, 841, 942, 943, 943, 943, 943, 1229, 1229, 1229, 1717, 1718, 1718, 1746, 1887, 1887, 1887, 1887, 1887, 9767, 21867, 25692, 28565, 28577, 57504]
+Changes in number of anomalies
+Pentru g 33 anomalies diff:0
+Pentru g 32 anomalies diff:0
+Pentru g 31 anomalies diff:0
+Pentru g 30 anomalies diff:2
+Pentru g 29 anomalies diff:649
+Pentru g 28 anomalies diff:0
+Pentru g 27 anomalies diff:0
+Pentru g 26 anomalies diff:1
+Pentru g 25 anomalies diff:189
+Pentru g 24 anomalies diff:0
+Pentru g 23 anomalies diff:101
+Pentru g 22 anomalies diff:1
+Pentru g 21 anomalies diff:0
+Pentru g 20 anomalies diff:0
+Pentru g 19 anomalies diff:0
+Pentru g 18 anomalies diff:286
+Pentru g 17 anomalies diff:0
+Pentru g 16 anomalies diff:0
+Pentru g 15 anomalies diff:488
+Pentru g 14 anomalies diff:1
+Pentru g 13 anomalies diff:0
+Pentru g 12 anomalies diff:28
+Pentru g 11 anomalies diff:141
+Pentru g 10 anomalies diff:0
+Pentru g 9 anomalies diff:0
+Pentru g 8 anomalies diff:0
+Pentru g 7 anomalies diff:0
+Pentru g 6 anomalies diff:7880
+Pentru g 5 anomalies diff:12100
+Pentru g 4 anomalies diff:3825
+Pentru g 3 anomalies diff:2873
+Pentru g 2 anomalies diff:12
+Pentru g 1 anomalies diff:28927
+elapsed_time: 49.379217863082886
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Nr secvente unice test: normale vs anormale
+13084 3694
+: 100%|██████████| 390/390 [00:32<00:00, 11.96it/s]
+------------------------NORMAL TEST SEQUENCES----------------------------
+For g  34  test metrics, TP:  0 FP:  0
+For g  33  test metrics, TP:  0 FP:  0
+: 100%|██████████| 121/121 [00:06<00:00, 18.77it/s]
+For g  32  test metrics, TP:  0 FP:  0
+For g  31  test metrics, TP:  0 FP:  0
+For g  30  test metrics, TP:  40 , FP:  0 , FN: 15128 , P: 100.0 , R: 0.26371308016877637 , F1: 0.5260389268805892
+For g  29  test metrics, TP:  4282 , FP:  1645 , FN: 10886 , P: 72.24565547494517 , R: 28.23048523206751 , F1: 40.59729793789998
+For g  28  test metrics, TP:  4282 , FP:  1645 , FN: 10886 , P: 72.24565547494517 , R: 28.23048523206751 , F1: 40.59729793789998
+For g  27  test metrics, TP:  4282 , FP:  1645 , FN: 10886 , P: 72.24565547494517 , R: 28.23048523206751 , F1: 40.59729793789998
+For g  26  test metrics, TP:  4300 , FP:  1645 , FN: 10868 , P: 72.32968881412953 , R: 28.34915611814346 , F1: 40.73319755600814
+For g  25  test metrics, TP:  5803 , FP:  1993 , FN: 9365 , P: 74.43560800410467 , R: 38.25817510548523 , F1: 50.53997561400452
+For g  24  test metrics, TP:  5806 , FP:  1993 , FN: 9362 , P: 74.44544172329786 , R: 38.27795358649789 , F1: 50.55949841076327
+For g  23  test metrics, TP:  6592 , FP:  1993 , FN: 8576 , P: 76.78509027373326 , R: 43.459915611814345 , F1: 55.504567844061796
+For g  22  test metrics, TP:  6612 , FP:  1999 , FN: 8556 , P: 76.78550690976658 , R: 43.59177215189873 , F1: 55.61209470541233
+For g  21  test metrics, TP:  6612 , FP:  1999 , FN: 8556 , P: 76.78550690976658 , R: 43.59177215189873 , F1: 55.61209470541233
+For g  20  test metrics, TP:  6612 , FP:  1999 , FN: 8556 , P: 76.78550690976658 , R: 43.59177215189873 , F1: 55.61209470541233
+For g  19  test metrics, TP:  6614 , FP:  1999 , FN: 8554 , P: 76.79089748055266 , R: 43.604957805907176 , F1: 55.62423783692864
+For g  18  test metrics, TP:  9553 , FP:  1999 , FN: 5615 , P: 82.69563711911357 , R: 62.98127637130802 , F1: 71.50449101796407
+For g  17  test metrics, TP:  9555 , FP:  1999 , FN: 5613 , P: 82.69863250822226 , R: 62.99446202531646 , F1: 71.51410822543224
+For g  16  test metrics, TP:  9555 , FP:  1999 , FN: 5613 , P: 82.69863250822226 , R: 62.99446202531646 , F1: 71.51410822543224
+For g  15  test metrics, TP:  13593 , FP:  2195 , FN: 1575 , P: 86.09703572333417 , R: 89.61629746835443 , F1: 87.82142395658354
+For g  14  test metrics, TP:  13600 , FP:  2195 , FN: 1568 , P: 86.10319721430832 , R: 89.66244725738396 , F1: 87.84678487226691
+For g  13  test metrics, TP:  13606 , FP:  2195 , FN: 1562 , P: 86.10847414720587 , R: 89.70200421940929 , F1: 87.8685136749653
+For g  12  test metrics, TP:  13932 , FP:  2195 , FN: 1236 , P: 86.3892850499163 , R: 91.85126582278481 , F1: 89.03658731426746
+For g  11  test metrics, TP:  15028 , FP:  2206 , FN: 140 , P: 87.19972148079378 , R: 99.07700421940929 , F1: 92.75970619097586
+For g  10  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  9  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  8  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  7  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  6  test metrics, TP:  15055 , FP:  73823 , FN: 113 , P: 16.938950021377618 , R: 99.2550105485232 , F1: 28.939123080176074
+For g  5  test metrics, TP:  15152 , FP:  182137 , FN: 16 , P: 7.680103807105312 , R: 99.89451476793249 , F1: 14.263592162178698
+For g  4  test metrics, TP:  15153 , FP:  216384 , FN: 15 , P: 6.544526360797627 , R: 99.9011075949367 , F1: 12.284307168480574
+For g  3  test metrics, TP:  15167 , FP:  242767 , FN: 1 , P: 5.880186404273962 , R: 99.99340717299577 , F1: 11.107205366493107
+For g  2  test metrics, TP:  15167 , FP:  242883 , FN: 1 , P: 5.877543111800039 , R: 99.99340717299577 , F1: 11.102489587069666
+For g  1  test metrics, TP:  15167 , FP:  502368 , FN: 1 , P: 2.930623049648816 , R: 99.99340717299577 , F1: 5.69435501583434
+Ce a dat pe validare
+12 2206 140 87.19972148079378 99.07700421940929
+
+Best threshold 11
+Confusion matrix
+TP: 15028, TN: 500181, FP: 2206, FN: 140, FNR: 0.009229957805907173, FPR: 0.004391037188462281
+Precision: 87.200%, Recall: 99.077%, F1-measure: 92.760%, Specificity: 0.996
+--------------------------UNIQUE TEST SEQUENCES------------------------------------
+Ce a dat pe validare
+12 724 116 83.17061831706184 96.85977260422307
+
+Best threshold 11
+Confusion matrix
+TP: 3578, TN: 12360, FP: 724, FN: 116, FNR: 0.03140227395776936, FPR: 0.05533476001222867
+Precision: 83.171%, Recall: 96.860%, F1-measure: 89.495%, Specificity: 0.945, Lead time: 16.414
+elapsed_time: 412.75722074508667
+Log saved
+
+Starting EPOCH: 2 | phase: train | ⏰: 09:39:26 | Learning rate: 0.000125
+Train loss: 1.74459345 - Train acc: 0.52: 100%|██████████| 475/475 [02:43<00:00,  2.90it/s]
+Eliminated instances percentage:  0.10731036413873755 52120/485694
+Eliminated anomalies percentage:  0.07720644666155027 4024/52120
+
+Starting epoch: 2 | phase: valid | ⏰: 09:42:09
+: 100%|██████████| 53/53 [00:06<00:00,  8.48it/s]
+
+Validation loss: 1.5389687902522537 Validation accuracy: 0.6243375458622096
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+======== My contribution ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/train.pkl
+Length test 57506
+Nr secvente unice train: normale vs anormale
+3715 646
+: 100%|██████████| 105/105 [00:10<00:00,  9.66it/s]
+: 100%|██████████| 20/20 [00:01<00:00, 13.38it/s]
+------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------
+For g  34  Train metrics, TP:  0 FP:  0
+For g  33  Train metrics, TP:  0 FP:  0
+For g  32  Train metrics, TP:  0 FP:  0
+For g  31  Train metrics, TP:  0 FP:  0
+For g  30  train metrics, TP:  2 , FP:  0 , FN: 1668 , P: 100.0 , R: 0.11976047904191617 , F1: 0.23923444976076555
+For g  29  train metrics, TP:  2 , FP:  0 , FN: 1668 , P: 100.0 , R: 0.11976047904191617 , F1: 0.23923444976076555
+For g  28  train metrics, TP:  3 , FP:  0 , FN: 1667 , P: 100.0 , R: 0.17964071856287425 , F1: 0.3586371787208607
+For g  27  train metrics, TP:  5 , FP:  0 , FN: 1665 , P: 100.0 , R: 0.2994011976047904 , F1: 0.5970149253731343
+For g  26  train metrics, TP:  6 , FP:  0 , FN: 1664 , P: 100.0 , R: 0.3592814371257485 , F1: 0.7159904534606205
+For g  25  train metrics, TP:  6 , FP:  0 , FN: 1664 , P: 100.0 , R: 0.3592814371257485 , F1: 0.7159904534606205
+For g  24  train metrics, TP:  6 , FP:  1 , FN: 1664 , P: 85.71428571428571 , R: 0.3592814371257485 , F1: 0.7155635062611807
+For g  23  train metrics, TP:  11 , FP:  3 , FN: 1659 , P: 78.57142857142857 , R: 0.6586826347305389 , F1: 1.3064133016627077
+For g  22  train metrics, TP:  147 , FP:  66 , FN: 1523 , P: 69.01408450704226 , R: 8.802395209580839 , F1: 15.613382899628254
+For g  21  train metrics, TP:  344 , FP:  68 , FN: 1326 , P: 83.49514563106796 , R: 20.59880239520958 , F1: 33.04514889529299
+For g  20  train metrics, TP:  387 , FP:  90 , FN: 1283 , P: 81.13207547169812 , R: 23.17365269461078 , F1: 36.0503027480205
+For g  19  train metrics, TP:  497 , FP:  183 , FN: 1173 , P: 73.08823529411765 , R: 29.760479041916167 , F1: 42.29787234042553
+For g  18  train metrics, TP:  656 , FP:  188 , FN: 1014 , P: 77.72511848341232 , R: 39.2814371257485 , F1: 52.187748607796344
+For g  17  train metrics, TP:  992 , FP:  202 , FN: 678 , P: 83.0820770519263 , R: 59.40119760479042 , F1: 69.27374301675978
+For g  16  train metrics, TP:  996 , FP:  203 , FN: 674 , P: 83.06922435362803 , R: 59.64071856287425 , F1: 69.43185779017078
+For g  15  train metrics, TP:  1029 , FP:  204 , FN: 641 , P: 83.45498783454988 , R: 61.616766467065865 , F1: 70.892180502928
+For g  14  train metrics, TP:  1041 , FP:  205 , FN: 629 , P: 83.54735152487962 , R: 62.33532934131737 , F1: 71.39917695473251
+For g  13  train metrics, TP:  1050 , FP:  208 , FN: 620 , P: 83.46581875993641 , R: 62.874251497005986 , F1: 71.72131147540983
+For g  12  train metrics, TP:  1492 , FP:  225 , FN: 178 , P: 86.89574839836925 , R: 89.34131736526946 , F1: 88.10156480661352
+For g  11  train metrics, TP:  1519 , FP:  228 , FN: 151 , P: 86.949055523755 , R: 90.95808383233533 , F1: 88.90839918056776
+For g  10  train metrics, TP:  1550 , FP:  228 , FN: 120 , P: 87.17660292463442 , R: 92.81437125748504 , F1: 89.90719257540604
+For g  9  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  8  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  7  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  6  train metrics, TP:  1658 , FP:  8109 , FN: 12 , P: 16.97552984539777 , R: 99.2814371257485 , F1: 28.993617207309608
+For g  5  train metrics, TP:  1669 , FP:  20198 , FN: 1 , P: 7.63250560204875 , R: 99.94011976047904 , F1: 14.181926328758976
+For g  4  train metrics, TP:  1669 , FP:  24824 , FN: 1 , P: 6.299777299664062 , R: 99.94011976047904 , F1: 11.85243049391045
+For g  3  train metrics, TP:  1669 , FP:  26742 , FN: 1 , P: 5.874485234592235 , R: 99.94011976047904 , F1: 11.096705561650209
+For g  2  train metrics, TP:  1669 , FP:  26908 , FN: 1 , P: 5.8403611295797315 , R: 99.94011976047904 , F1: 11.035805203821866
+For g  1  train metrics, TP:  1669 , FP:  26923 , FN: 1 , P: 5.837297146054841 , R: 99.94011976047904 , F1: 11.030335073689777
+Ce a dat pe train
+10 229 12 87.86433492315845 99.2814371257485
+
+[0, 0, 0, 0, 2, 2, 3, 5, 6, 6, 7, 14, 213, 412, 477, 680, 844, 1194, 1199, 1233, 1246, 1258, 1717, 1747, 1778, 1887, 1887, 1887, 9767, 21867, 26493, 28411, 28577, 28592]
+Changes in number of anomalies
+Pentru g 33 anomalies diff:0
+Pentru g 32 anomalies diff:0
+Pentru g 31 anomalies diff:0
+Pentru g 30 anomalies diff:2
+Pentru g 29 anomalies diff:0
+Pentru g 28 anomalies diff:1
+Pentru g 27 anomalies diff:2
+Pentru g 26 anomalies diff:1
+Pentru g 25 anomalies diff:0
+Pentru g 24 anomalies diff:1
+Pentru g 23 anomalies diff:7
+Pentru g 22 anomalies diff:199
+Pentru g 21 anomalies diff:199
+Pentru g 20 anomalies diff:65
+Pentru g 19 anomalies diff:203
+Pentru g 18 anomalies diff:164
+Pentru g 17 anomalies diff:350
+Pentru g 16 anomalies diff:5
+Pentru g 15 anomalies diff:34
+Pentru g 14 anomalies diff:13
+Pentru g 13 anomalies diff:12
+Pentru g 12 anomalies diff:459
+Pentru g 11 anomalies diff:30
+Pentru g 10 anomalies diff:31
+Pentru g 9 anomalies diff:109
+Pentru g 8 anomalies diff:0
+Pentru g 7 anomalies diff:0
+Pentru g 6 anomalies diff:7880
+Pentru g 5 anomalies diff:12100
+Pentru g 4 anomalies diff:4626
+Pentru g 3 anomalies diff:1918
+Pentru g 2 anomalies diff:166
+Pentru g 1 anomalies diff:15
+elapsed_time: 53.936179876327515
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Nr secvente unice test: normale vs anormale
+13084 3694
+: 100%|██████████| 390/390 [00:41<00:00,  9.37it/s]
+: 100%|██████████| 121/121 [00:10<00:00, 11.93it/s]
+------------------------NORMAL TEST SEQUENCES----------------------------
+For g  34  test metrics, TP:  0 FP:  0
+For g  33  test metrics, TP:  0 FP:  0
+For g  32  test metrics, TP:  0 FP:  0
+For g  31  test metrics, TP:  0 FP:  0
+For g  30  test metrics, TP:  40 , FP:  0 , FN: 15128 , P: 100.0 , R: 0.26371308016877637 , F1: 0.5260389268805892
+For g  29  test metrics, TP:  45 , FP:  0 , FN: 15123 , P: 100.0 , R: 0.29667721518987344 , F1: 0.591599290080852
+For g  28  test metrics, TP:  54 , FP:  0 , FN: 15114 , P: 100.0 , R: 0.3560126582278481 , F1: 0.7094994087504927
+For g  27  test metrics, TP:  62 , FP:  0 , FN: 15106 , P: 100.0 , R: 0.40875527426160335 , F1: 0.8141825344714378
+For g  26  test metrics, TP:  71 , FP:  0 , FN: 15097 , P: 100.0 , R: 0.4680907172995781 , F1: 0.9318196732069034
+For g  25  test metrics, TP:  83 , FP:  0 , FN: 15085 , P: 100.0 , R: 0.547204641350211 , F1: 1.0884532161825455
+For g  24  test metrics, TP:  94 , FP:  1 , FN: 15074 , P: 98.94736842105263 , R: 0.6197257383966245 , F1: 1.2317368800366901
+For g  23  test metrics, TP:  147 , FP:  37 , FN: 15021 , P: 79.8913043478261 , R: 0.9691455696202531 , F1: 1.9150599270453361
+For g  22  test metrics, TP:  1183 , FP:  666 , FN: 13985 , P: 63.98053001622499 , R: 7.7993143459915615 , F1: 13.903743315508022
+For g  21  test metrics, TP:  2816 , FP:  699 , FN: 12352 , P: 80.11379800853486 , R: 18.565400843881857 , F1: 30.145051651233743
+For g  20  test metrics, TP:  3182 , FP:  912 , FN: 11986 , P: 77.72349780166097 , R: 20.97837552742616 , F1: 33.03914442944657
+For g  19  test metrics, TP:  4188 , FP:  1769 , FN: 10980 , P: 70.3038442168877 , R: 27.610759493670887 , F1: 39.64970414201184
+For g  18  test metrics, TP:  5772 , FP:  1797 , FN: 9396 , P: 76.2584225128815 , R: 38.05379746835443 , F1: 50.77186963979417
+For g  17  test metrics, TP:  9282 , FP:  1949 , FN: 5886 , P: 82.64624699492477 , R: 61.19462025316456 , F1: 70.32084548657147
+For g  16  test metrics, TP:  9351 , FP:  1962 , FN: 5817 , P: 82.65712012728719 , R: 61.649525316455694 , F1: 70.62422113968506
+For g  15  test metrics, TP:  9765 , FP:  1981 , FN: 5403 , P: 83.134684147795 , R: 64.37895569620254 , F1: 72.56446459091923
+For g  14  test metrics, TP:  9850 , FP:  1986 , FN: 5318 , P: 83.22068266306185 , R: 64.93934599156118 , F1: 72.95215523626129
+For g  13  test metrics, TP:  9887 , FP:  1999 , FN: 5281 , P: 83.18189466599361 , R: 65.1832805907173 , F1: 73.09085532638427
+For g  12  test metrics, TP:  13682 , FP:  2160 , FN: 1486 , P: 86.36535790935488 , R: 90.20305907172995 , F1: 88.24250241857465
+For g  11  test metrics, TP:  13939 , FP:  2195 , FN: 1229 , P: 86.39519028139333 , R: 91.89741561181435 , F1: 89.06140182735928
+For g  10  test metrics, TP:  14147 , FP:  2195 , FN: 1021 , P: 86.5683514869661 , R: 93.26872362869199 , F1: 89.79371628054585
+For g  9  test metrics, TP:  15028 , FP:  2206 , FN: 140 , P: 87.19972148079378 , R: 99.07700421940929 , F1: 92.75970619097586
+For g  8  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  7  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  6  test metrics, TP:  15055 , FP:  73823 , FN: 113 , P: 16.938950021377618 , R: 99.2550105485232 , F1: 28.939123080176074
+For g  5  test metrics, TP:  15152 , FP:  182137 , FN: 16 , P: 7.680103807105312 , R: 99.89451476793249 , F1: 14.263592162178698
+For g  4  test metrics, TP:  15166 , FP:  223992 , FN: 2 , P: 6.341414462405607 , R: 99.98681434599156 , F1: 11.92642513938803
+For g  3  test metrics, TP:  15167 , FP:  241192 , FN: 1 , P: 5.916312670902913 , R: 99.99340717299577 , F1: 11.171633023603544
+For g  2  test metrics, TP:  15167 , FP:  242883 , FN: 1 , P: 5.877543111800039 , R: 99.99340717299577 , F1: 11.102489587069666
+For g  1  test metrics, TP:  15167 , FP:  243039 , FN: 1 , P: 5.873992083840035 , R: 99.99340717299577 , F1: 11.096153986845861
+Ce a dat pe validare
+10 2206 140 87.19972148079378 99.07700421940929
+
+Best threshold 9
+Confusion matrix
+TP: 15028, TN: 500181, FP: 2206, FN: 140, FNR: 0.009229957805907173, FPR: 0.004391037188462281
+Precision: 87.200%, Recall: 99.077%, F1-measure: 92.760%, Specificity: 0.996
+--------------------------UNIQUE TEST SEQUENCES------------------------------------
+Ce a dat pe validare
+10 724 116 83.17061831706184 96.85977260422307
+
+Best threshold 9
+Confusion matrix
+TP: 3578, TN: 12360, FP: 724, FN: 116, FNR: 0.03140227395776936, FPR: 0.05533476001222867
+Precision: 83.171%, Recall: 96.860%, F1-measure: 89.495%, Specificity: 0.945, Lead time: 16.407
+elapsed_time: 456.0001561641693
+Log saved
+
+Starting EPOCH: 3 | phase: train | ⏰: 09:50:54 | Learning rate: 0.000250
+Train loss: 1.06390010 - Train acc: 0.71: 100%|██████████| 475/475 [02:37<00:00,  3.01it/s]
+:   0%|          | 0/53 [00:00<?, ?it/s]Eliminated instances percentage:  0.036679473083875855 17815/485694
+Eliminated anomalies percentage:  0.19640752175133314 3499/17815
+
+Starting epoch: 3 | phase: valid | ⏰: 09:53:32
+: 100%|██████████| 53/53 [00:05<00:00,  9.23it/s]
+
+Validation loss: 0.7633080426252113 Validation accuracy: 0.7438387132639069
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+======== My contribution ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/train.pkl
+Length test 57506
+Nr secvente unice train: normale vs anormale
+3715 646
+: 100%|██████████| 105/105 [00:09<00:00, 11.52it/s]
+: 100%|██████████| 20/20 [00:01<00:00, 11.56it/s]
+------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------
+For g  34  Train metrics, TP:  0 FP:  0
+For g  33  Train metrics, TP:  0 FP:  0
+For g  32  Train metrics, TP:  0 FP:  0
+For g  31  Train metrics, TP:  0 FP:  0
+For g  30  train metrics, TP:  3 , FP:  0 , FN: 1667 , P: 100.0 , R: 0.17964071856287425 , F1: 0.3586371787208607
+For g  29  train metrics, TP:  20 , FP:  0 , FN: 1650 , P: 100.0 , R: 1.1976047904191616 , F1: 2.3668639053254434
+For g  28  train metrics, TP:  67 , FP:  0 , FN: 1603 , P: 100.0 , R: 4.0119760479041915 , F1: 7.714450201496834
+For g  27  train metrics, TP:  67 , FP:  0 , FN: 1603 , P: 100.0 , R: 4.0119760479041915 , F1: 7.714450201496834
+For g  26  train metrics, TP:  67 , FP:  0 , FN: 1603 , P: 100.0 , R: 4.0119760479041915 , F1: 7.714450201496834
+For g  25  train metrics, TP:  68 , FP:  0 , FN: 1602 , P: 100.0 , R: 4.07185628742515 , F1: 7.8250863060989655
+For g  24  train metrics, TP:  68 , FP:  0 , FN: 1602 , P: 100.0 , R: 4.07185628742515 , F1: 7.8250863060989655
+For g  23  train metrics, TP:  69 , FP:  0 , FN: 1601 , P: 100.0 , R: 4.131736526946108 , F1: 7.935595169637724
+For g  22  train metrics, TP:  69 , FP:  0 , FN: 1601 , P: 100.0 , R: 4.131736526946108 , F1: 7.935595169637724
+For g  21  train metrics, TP:  71 , FP:  2 , FN: 1599 , P: 97.26027397260275 , R: 4.251497005988024 , F1: 8.14687320711417
+For g  20  train metrics, TP:  74 , FP:  12 , FN: 1596 , P: 86.04651162790698 , R: 4.431137724550898 , F1: 8.428246013667426
+For g  19  train metrics, TP:  76 , FP:  25 , FN: 1594 , P: 75.24752475247524 , R: 4.550898203592815 , F1: 8.582721626199888
+For g  18  train metrics, TP:  83 , FP:  26 , FN: 1587 , P: 76.14678899082568 , R: 4.970059880239521 , F1: 9.331084879145589
+For g  17  train metrics, TP:  87 , FP:  36 , FN: 1583 , P: 70.73170731707317 , R: 5.209580838323354 , F1: 9.70440602342443
+For g  16  train metrics, TP:  272 , FP:  36 , FN: 1398 , P: 88.31168831168831 , R: 16.2874251497006 , F1: 27.502527805864514
+For g  15  train metrics, TP:  563 , FP:  36 , FN: 1107 , P: 93.98998330550918 , R: 33.712574850299404 , F1: 49.6253856324372
+For g  14  train metrics, TP:  565 , FP:  36 , FN: 1105 , P: 94.0099833610649 , R: 33.83233532934132 , F1: 49.75781594011449
+For g  13  train metrics, TP:  570 , FP:  37 , FN: 1100 , P: 93.90444810543657 , R: 34.131736526946106 , F1: 50.06587615283267
+For g  12  train metrics, TP:  597 , FP:  63 , FN: 1073 , P: 90.45454545454545 , R: 35.74850299401198 , F1: 51.24463519313304
+For g  11  train metrics, TP:  742 , FP:  78 , FN: 928 , P: 90.48780487804878 , R: 44.4311377245509 , F1: 59.598393574297184
+For g  10  train metrics, TP:  1023 , FP:  197 , FN: 647 , P: 83.85245901639344 , R: 61.25748502994012 , F1: 70.79584775086505
+For g  9  train metrics, TP:  1049 , FP:  199 , FN: 621 , P: 84.05448717948718 , R: 62.81437125748503 , F1: 71.89856065798493
+For g  8  train metrics, TP:  1657 , FP:  226 , FN: 13 , P: 87.99787573021774 , R: 99.22155688622755 , F1: 93.27329017731495
+For g  7  train metrics, TP:  1658 , FP:  228 , FN: 12 , P: 87.91092258748674 , R: 99.2814371257485 , F1: 93.25084364454442
+For g  6  train metrics, TP:  1658 , FP:  258 , FN: 12 , P: 86.53444676409185 , R: 99.2814371257485 , F1: 92.4707194645845
+For g  5  train metrics, TP:  1658 , FP:  267 , FN: 12 , P: 86.12987012987013 , R: 99.2814371257485 , F1: 92.23922114047286
+For g  4  train metrics, TP:  1667 , FP:  307 , FN: 3 , P: 84.44782168186424 , R: 99.82035928143712 , F1: 91.49286498353457
+For g  3  train metrics, TP:  1669 , FP:  2853 , FN: 1 , P: 36.908447589562144 , R: 99.94011976047904 , F1: 53.908268733850136
+For g  2  train metrics, TP:  1669 , FP:  8291 , FN: 1 , P: 16.7570281124498 , R: 99.94011976047904 , F1: 28.701633705932927
+For g  1  train metrics, TP:  1669 , FP:  23442 , FN: 1 , P: 6.646489586237108 , R: 99.94011976047904 , F1: 12.464060341286734
+Ce a dat pe train
+9 226 13 87.99787573021774 99.22155688622755
+
+[0, 0, 0, 0, 3, 20, 67, 67, 67, 68, 68, 69, 69, 73, 86, 101, 109, 123, 308, 599, 601, 607, 660, 820, 1220, 1248, 1883, 1886, 1916, 1925, 1974, 4522, 9960, 25111]
+Changes in number of anomalies
+Pentru g 33 anomalies diff:0
+Pentru g 32 anomalies diff:0
+Pentru g 31 anomalies diff:0
+Pentru g 30 anomalies diff:3
+Pentru g 29 anomalies diff:17
+Pentru g 28 anomalies diff:47
+Pentru g 27 anomalies diff:0
+Pentru g 26 anomalies diff:0
+Pentru g 25 anomalies diff:1
+Pentru g 24 anomalies diff:0
+Pentru g 23 anomalies diff:1
+Pentru g 22 anomalies diff:0
+Pentru g 21 anomalies diff:4
+Pentru g 20 anomalies diff:13
+Pentru g 19 anomalies diff:15
+Pentru g 18 anomalies diff:8
+Pentru g 17 anomalies diff:14
+Pentru g 16 anomalies diff:185
+Pentru g 15 anomalies diff:291
+Pentru g 14 anomalies diff:2
+Pentru g 13 anomalies diff:6
+Pentru g 12 anomalies diff:53
+Pentru g 11 anomalies diff:160
+Pentru g 10 anomalies diff:400
+Pentru g 9 anomalies diff:28
+Pentru g 8 anomalies diff:635
+Pentru g 7 anomalies diff:3
+Pentru g 6 anomalies diff:30
+Pentru g 5 anomalies diff:9
+Pentru g 4 anomalies diff:49
+Pentru g 3 anomalies diff:2548
+Pentru g 2 anomalies diff:5438
+Pentru g 1 anomalies diff:15151
+elapsed_time: 54.001667737960815
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Nr secvente unice test: normale vs anormale
+13084 3694
+: 100%|██████████| 390/390 [00:35<00:00, 10.98it/s]
+: 100%|██████████| 121/121 [00:09<00:00, 12.87it/s]
+------------------------NORMAL TEST SEQUENCES----------------------------
+For g  34  test metrics, TP:  0 FP:  0
+For g  33  test metrics, TP:  0 FP:  0
+For g  32  test metrics, TP:  0 FP:  0
+For g  31  test metrics, TP:  0 FP:  0
+For g  30  test metrics, TP:  55 , FP:  0 , FN: 15113 , P: 100.0 , R: 0.36260548523206754 , F1: 0.7225908165276227
+For g  29  test metrics, TP:  190 , FP:  0 , FN: 14978 , P: 100.0 , R: 1.2526371308016877 , F1: 2.474280505274124
+For g  28  test metrics, TP:  505 , FP:  0 , FN: 14663 , P: 100.0 , R: 3.3293776371308015 , F1: 6.444203407133285
+For g  27  test metrics, TP:  515 , FP:  0 , FN: 14653 , P: 100.0 , R: 3.395305907172996 , F1: 6.567620990881847
+For g  26  test metrics, TP:  522 , FP:  0 , FN: 14646 , P: 100.0 , R: 3.4414556962025316 , F1: 6.653919694072657
+For g  25  test metrics, TP:  529 , FP:  0 , FN: 14639 , P: 100.0 , R: 3.4876054852320677 , F1: 6.740141428298401
+For g  24  test metrics, TP:  535 , FP:  0 , FN: 14633 , P: 100.0 , R: 3.527162447257384 , F1: 6.813984588932052
+For g  23  test metrics, TP:  551 , FP:  2 , FN: 14617 , P: 99.63833634719711 , R: 3.6326476793248945 , F1: 7.009732205330449
+For g  22  test metrics, TP:  560 , FP:  2 , FN: 14608 , P: 99.644128113879 , R: 3.691983122362869 , F1: 7.12015257469803
+For g  21  test metrics, TP:  561 , FP:  10 , FN: 14607 , P: 98.24868651488616 , R: 3.6985759493670884 , F1: 7.128788360124531
+For g  20  test metrics, TP:  567 , FP:  128 , FN: 14601 , P: 81.58273381294964 , R: 3.738132911392405 , F1: 7.148710836537856
+For g  19  test metrics, TP:  571 , FP:  214 , FN: 14597 , P: 72.73885350318471 , R: 3.764504219409283 , F1: 7.158528176518523
+For g  18  test metrics, TP:  631 , FP:  223 , FN: 14537 , P: 73.88758782201405 , R: 4.160073839662447 , F1: 7.876669579328422
+For g  17  test metrics, TP:  656 , FP:  349 , FN: 14512 , P: 65.27363184079601 , R: 4.324894514767933 , F1: 8.11228590861312
+For g  16  test metrics, TP:  2472 , FP:  350 , FN: 12696 , P: 87.59744861800142 , R: 16.29746835443038 , F1: 27.481934408004445
+For g  15  test metrics, TP:  5444 , FP:  350 , FN: 9724 , P: 93.95926820849154 , R: 35.891350210970465 , F1: 51.941608625131195
+For g  14  test metrics, TP:  5460 , FP:  350 , FN: 9708 , P: 93.97590361445783 , R: 35.99683544303797 , F1: 52.05453332062161
+For g  13  test metrics, TP:  5542 , FP:  363 , FN: 9626 , P: 93.85266723116004 , R: 36.53744725738397 , F1: 52.598111327290844
+For g  12  test metrics, TP:  5928 , FP:  637 , FN: 9240 , P: 90.29702970297029 , R: 39.08227848101266 , F1: 54.552983941471496
+For g  11  test metrics, TP:  7103 , FP:  804 , FN: 8065 , P: 89.83179461236878 , R: 46.828850210970465 , F1: 61.56446370530877
+For g  10  test metrics, TP:  9582 , FP:  1911 , FN: 5586 , P: 83.37248760114852 , R: 63.17246835443038 , F1: 71.88027455834364
+For g  9  test metrics, TP:  9824 , FP:  1959 , FN: 5344 , P: 83.37435288126963 , R: 64.76793248945148 , F1: 72.90267522540908
+For g  8  test metrics, TP:  15027 , FP:  2201 , FN: 141 , P: 87.22428604597168 , R: 99.07041139240506 , F1: 92.77071243363379
+For g  7  test metrics, TP:  15028 , FP:  2204 , FN: 140 , P: 87.20984215413185 , R: 99.07700421940929 , F1: 92.76543209876543
+For g  6  test metrics, TP:  15030 , FP:  2466 , FN: 138 , P: 85.90534979423869 , R: 99.09018987341773 , F1: 92.02792064658338
+For g  5  test metrics, TP:  15040 , FP:  2520 , FN: 128 , P: 85.6492027334852 , R: 99.15611814345992 , F1: 91.90906868736249
+For g  4  test metrics, TP:  15121 , FP:  2894 , FN: 47 , P: 83.93560921454343 , R: 99.69013713080169 , F1: 91.13702799626314
+For g  3  test metrics, TP:  15143 , FP:  26296 , FN: 25 , P: 36.5428702430078 , R: 99.83517932489451 , F1: 53.50221704029537
+For g  2  test metrics, TP:  15166 , FP:  75529 , FN: 2 , P: 16.721980263520592 , R: 99.98681434599156 , F1: 28.652125860782334
+For g  1  test metrics, TP:  15167 , FP:  211437 , FN: 1 , P: 6.693173995163368 , R: 99.99340717299577 , F1: 12.54653144284698
+Ce a dat pe validare
+9 2201 141 87.22428604597168 99.07041139240506
+
+Best threshold 8
+Confusion matrix
+TP: 15027, TN: 500186, FP: 2201, FN: 141, FNR: 0.009295886075949366, FPR: 0.004381084701634398
+Precision: 87.224%, Recall: 99.070%, F1-measure: 92.771%, Specificity: 0.996
+--------------------------UNIQUE TEST SEQUENCES------------------------------------
+Ce a dat pe validare
+9 720 117 83.24412380730742 96.8327016783974
+
+Best threshold 8
+Confusion matrix
+TP: 3577, TN: 12364, FP: 720, FN: 117, FNR: 0.03167298321602599, FPR: 0.055029043106083766
+Precision: 83.244%, Recall: 96.833%, F1-measure: 89.526%, Specificity: 0.945, Lead time: 16.081
+elapsed_time: 478.3171970844269
+Log saved
+
+Starting EPOCH: 4 | phase: train | ⏰: 10:02:45 | Learning rate: 0.000500
+Train loss: 0.44004377 - Train acc: 0.76: 100%|██████████| 475/475 [02:39<00:00,  2.97it/s]
+: 100%|██████████| 53/53 [00:05<00:00,  8.89it/s]
+Eliminated instances percentage:  0.075874933600168 36852/485694
+Eliminated anomalies percentage:  0.1291381743188972 4759/36852
+
+Starting epoch: 4 | phase: valid | ⏰: 10:05:25
+
+Validation loss: 0.7252472582853066 Validation accuracy: 0.8069710558499796
+Save model checkpoint at dataset/hdfs/deeplog/deeplog.pth
+======== My contribution ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/train.pkl
+Length test 57506
+Nr secvente unice train: normale vs anormale
+3715 646
+: 100%|██████████| 105/105 [00:08<00:00, 12.11it/s]
+: 100%|██████████| 20/20 [00:01<00:00, 12.83it/s]
+------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------
+For g  34  Train metrics, TP:  0 FP:  0
+For g  33  Train metrics, TP:  0 FP:  0
+For g  32  Train metrics, TP:  0 FP:  0
+For g  31  Train metrics, TP:  0 FP:  0
+For g  30  train metrics, TP:  2 , FP:  0 , FN: 1668 , P: 100.0 , R: 0.11976047904191617 , F1: 0.23923444976076555
+For g  29  train metrics, TP:  3 , FP:  0 , FN: 1667 , P: 100.0 , R: 0.17964071856287425 , F1: 0.3586371787208607
+For g  28  train metrics, TP:  4 , FP:  0 , FN: 1666 , P: 100.0 , R: 0.23952095808383234 , F1: 0.4778972520908005
+For g  27  train metrics, TP:  52 , FP:  1 , FN: 1618 , P: 98.11320754716981 , R: 3.1137724550898205 , F1: 6.035983749274521
+For g  26  train metrics, TP:  54 , FP:  3 , FN: 1616 , P: 94.73684210526316 , R: 3.2335329341317367 , F1: 6.253618992472496
+For g  25  train metrics, TP:  59 , FP:  12 , FN: 1611 , P: 83.09859154929578 , R: 3.532934131736527 , F1: 6.777713957495692
+For g  24  train metrics, TP:  70 , FP:  23 , FN: 1600 , P: 75.26881720430107 , R: 4.191616766467066 , F1: 7.941009642654565
+For g  23  train metrics, TP:  70 , FP:  25 , FN: 1600 , P: 73.6842105263158 , R: 4.191616766467066 , F1: 7.93201133144476
+For g  22  train metrics, TP:  72 , FP:  28 , FN: 1598 , P: 72.0 , R: 4.311377245508982 , F1: 8.135593220338983
+For g  21  train metrics, TP:  76 , FP:  28 , FN: 1594 , P: 73.07692307692308 , R: 4.550898203592815 , F1: 8.568207440811726
+For g  20  train metrics, TP:  82 , FP:  30 , FN: 1588 , P: 73.21428571428571 , R: 4.910179640718563 , F1: 9.20314253647587
+For g  19  train metrics, TP:  122 , FP:  31 , FN: 1548 , P: 79.73856209150327 , R: 7.3053892215568865 , F1: 13.384530992868898
+For g  18  train metrics, TP:  173 , FP:  57 , FN: 1497 , P: 75.21739130434783 , R: 10.359281437125748 , F1: 18.210526315789473
+For g  17  train metrics, TP:  402 , FP:  71 , FN: 1268 , P: 84.98942917547569 , R: 24.07185628742515 , F1: 37.5174988334111
+For g  16  train metrics, TP:  471 , FP:  134 , FN: 1199 , P: 77.85123966942149 , R: 28.20359281437126 , F1: 41.40659340659341
+For g  15  train metrics, TP:  516 , FP:  177 , FN: 1154 , P: 74.45887445887446 , R: 30.898203592814372 , F1: 43.67329665679222
+For g  14  train metrics, TP:  579 , FP:  202 , FN: 1091 , P: 74.13572343149808 , R: 34.67065868263473 , F1: 47.24602203182374
+For g  13  train metrics, TP:  743 , FP:  203 , FN: 927 , P: 78.54122621564483 , R: 44.49101796407186 , F1: 56.80428134556575
+For g  12  train metrics, TP:  746 , FP:  205 , FN: 924 , P: 78.44374342797056 , R: 44.67065868263473 , F1: 56.924837848149565
+For g  11  train metrics, TP:  903 , FP:  207 , FN: 767 , P: 81.35135135135135 , R: 54.07185628742515 , F1: 64.96402877697842
+For g  10  train metrics, TP:  905 , FP:  208 , FN: 765 , P: 81.31176999101527 , R: 54.191616766467064 , F1: 65.03772906934962
+For g  9  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  8  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  7  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  6  train metrics, TP:  1658 , FP:  5309 , FN: 12 , P: 23.797904406487728 , R: 99.2814371257485 , F1: 38.39296051869862
+For g  5  train metrics, TP:  1658 , FP:  8113 , FN: 12 , P: 16.96858049329649 , R: 99.2814371257485 , F1: 28.983480464994315
+For g  4  train metrics, TP:  1660 , FP:  8176 , FN: 10 , P: 16.87677917852786 , R: 99.40119760479043 , F1: 28.854510690074747
+For g  3  train metrics, TP:  1669 , FP:  14778 , FN: 1 , P: 10.147747309539733 , R: 99.94011976047904 , F1: 18.424683998454487
+For g  2  train metrics, TP:  1669 , FP:  19723 , FN: 1 , P: 7.801982049364248 , R: 99.94011976047904 , F1: 14.474026537160695
+For g  1  train metrics, TP:  1669 , FP:  23522 , FN: 1 , P: 6.625382080901909 , R: 99.94011976047904 , F1: 12.426938684337888
+Ce a dat pe train
+10 229 12 87.86433492315845 99.2814371257485
+
+[0, 0, 0, 0, 2, 3, 4, 53, 57, 71, 93, 95, 100, 104, 112, 153, 230, 473, 605, 693, 781, 946, 951, 1110, 1113, 1887, 1887, 1887, 6967, 9771, 9836, 16447, 21392, 25191]
+Changes in number of anomalies
+Pentru g 33 anomalies diff:0
+Pentru g 32 anomalies diff:0
+Pentru g 31 anomalies diff:0
+Pentru g 30 anomalies diff:2
+Pentru g 29 anomalies diff:1
+Pentru g 28 anomalies diff:1
+Pentru g 27 anomalies diff:49
+Pentru g 26 anomalies diff:4
+Pentru g 25 anomalies diff:14
+Pentru g 24 anomalies diff:22
+Pentru g 23 anomalies diff:2
+Pentru g 22 anomalies diff:5
+Pentru g 21 anomalies diff:4
+Pentru g 20 anomalies diff:8
+Pentru g 19 anomalies diff:41
+Pentru g 18 anomalies diff:77
+Pentru g 17 anomalies diff:243
+Pentru g 16 anomalies diff:132
+Pentru g 15 anomalies diff:88
+Pentru g 14 anomalies diff:88
+Pentru g 13 anomalies diff:165
+Pentru g 12 anomalies diff:5
+Pentru g 11 anomalies diff:159
+Pentru g 10 anomalies diff:3
+Pentru g 9 anomalies diff:774
+Pentru g 8 anomalies diff:0
+Pentru g 7 anomalies diff:0
+Pentru g 6 anomalies diff:5080
+Pentru g 5 anomalies diff:2804
+Pentru g 4 anomalies diff:65
+Pentru g 3 anomalies diff:6611
+Pentru g 2 anomalies diff:4945
+Pentru g 1 anomalies diff:3799
+elapsed_time: 51.94577693939209
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Nr secvente unice test: normale vs anormale
+13084 3694
+: 100%|██████████| 390/390 [00:36<00:00, 10.74it/s]
+: 100%|██████████| 121/121 [00:08<00:00, 14.26it/s]
+------------------------NORMAL TEST SEQUENCES----------------------------
+For g  34  test metrics, TP:  0 FP:  0
+For g  33  test metrics, TP:  0 FP:  0
+For g  32  test metrics, TP:  0 FP:  0
+For g  31  test metrics, TP:  0 FP:  0
+For g  30  test metrics, TP:  43 , FP:  0 , FN: 15125 , P: 100.0 , R: 0.2834915611814346 , F1: 0.565380316875945
+For g  29  test metrics, TP:  62 , FP:  0 , FN: 15106 , P: 100.0 , R: 0.40875527426160335 , F1: 0.8141825344714378
+For g  28  test metrics, TP:  68 , FP:  0 , FN: 15100 , P: 100.0 , R: 0.44831223628691985 , F1: 0.8926227356261487
+For g  27  test metrics, TP:  399 , FP:  4 , FN: 14769 , P: 99.0074441687345 , R: 2.6305379746835444 , F1: 5.124911694817289
+For g  26  test metrics, TP:  423 , FP:  19 , FN: 14745 , P: 95.70135746606334 , R: 2.7887658227848102 , F1: 5.4196028187059575
+For g  25  test metrics, TP:  452 , FP:  137 , FN: 14716 , P: 76.7402376910017 , R: 2.979957805907173 , F1: 5.737132702925684
+For g  24  test metrics, TP:  531 , FP:  215 , FN: 14637 , P: 71.17962466487936 , R: 3.5007911392405062 , F1: 6.673369360311675
+For g  23  test metrics, TP:  551 , FP:  221 , FN: 14617 , P: 71.37305699481865 , R: 3.6326476793248945 , F1: 6.9134253450439145
+For g  22  test metrics, TP:  560 , FP:  233 , FN: 14608 , P: 70.61790668348046 , R: 3.691983122362869 , F1: 7.017104191466699
+For g  21  test metrics, TP:  579 , FP:  234 , FN: 14589 , P: 71.21771217712177 , R: 3.8172468354430378 , F1: 7.246104749389899
+For g  20  test metrics, TP:  668 , FP:  255 , FN: 14500 , P: 72.37269772481041 , R: 4.404008438818566 , F1: 8.30277795040706
+For g  19  test metrics, TP:  1004 , FP:  289 , FN: 14164 , P: 77.64887857695282 , R: 6.6191983122362865 , F1: 12.19852985845331
+For g  18  test metrics, TP:  1380 , FP:  567 , FN: 13788 , P: 70.87827426810478 , R: 9.098101265822784 , F1: 16.1262050832603
+For g  17  test metrics, TP:  3590 , FP:  679 , FN: 11578 , P: 84.09463574607636 , R: 23.668248945147678 , F1: 36.93985697381283
+For g  16  test metrics, TP:  4241 , FP:  1277 , FN: 10927 , P: 76.8575570859007 , R: 27.960179324894515 , F1: 41.0035772986561
+For g  15  test metrics, TP:  4689 , FP:  1644 , FN: 10479 , P: 74.04073898626244 , R: 30.91376582278481 , F1: 43.616575973210544
+For g  14  test metrics, TP:  5292 , FP:  1936 , FN: 9876 , P: 73.2152739346984 , R: 34.889240506329116 , F1: 47.25843900696553
+For g  13  test metrics, TP:  6782 , FP:  1969 , FN: 8386 , P: 77.49971431836362 , R: 44.71255274261603 , F1: 56.708056356871104
+For g  12  test metrics, TP:  6814 , FP:  1978 , FN: 8354 , P: 77.50227479526842 , R: 44.92352320675106 , F1: 56.87813021702838
+For g  11  test metrics, TP:  8035 , FP:  1994 , FN: 7133 , P: 80.11765878951041 , R: 52.97336497890296 , F1: 63.77743382148669
+For g  10  test metrics, TP:  8047 , FP:  2004 , FN: 7121 , P: 80.06168540443737 , R: 53.05247890295359 , F1: 63.81696340061066
+For g  9  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  8  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  7  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  6  test metrics, TP:  15046 , FP:  48622 , FN: 122 , P: 23.631965822705283 , R: 99.19567510548524 , F1: 38.17037901466335
+For g  5  test metrics, TP:  15060 , FP:  73845 , FN: 108 , P: 16.939429728361734 , R: 99.2879746835443 , F1: 28.941223948574557
+For g  4  test metrics, TP:  15073 , FP:  74479 , FN: 95 , P: 16.831561550830802 , R: 99.37368143459915 , F1: 28.787242169595114
+For g  3  test metrics, TP:  15155 , FP:  133812 , FN: 13 , P: 10.173394107419764 , R: 99.91429324894514 , F1: 18.46650622962805
+For g  2  test metrics, TP:  15167 , FP:  177725 , FN: 1 , P: 7.862949215104826 , R: 99.99340717299577 , F1: 14.579448236085746
+For g  1  test metrics, TP:  15167 , FP:  212333 , FN: 1 , P: 6.666813186813187 , R: 99.99340717299577 , F1: 12.50020604282394
+Ce a dat pe validare
+8 2207 140 87.19466202494922 99.07700421940929
+
+Best threshold 7
+Confusion matrix
+TP: 15028, TN: 500180, FP: 2207, FN: 140, FNR: 0.009229957805907173, FPR: 0.004393027685827858
+Precision: 87.195%, Recall: 99.077%, F1-measure: 92.757%, Specificity: 0.996
+--------------------------UNIQUE TEST SEQUENCES------------------------------------
+Ce a dat pe validare
+8 725 116 83.15128979781548 96.85977260422307
+
+Best threshold 7
+Confusion matrix
+TP: 3578, TN: 12359, FP: 725, FN: 116, FNR: 0.03140227395776936, FPR: 0.0554111892387649
+Precision: 83.151%, Recall: 96.860%, F1-measure: 89.484%, Specificity: 0.945, Lead time: 15.582
+elapsed_time: 434.926961183548
+Log saved
+
+Starting EPOCH: 5 | phase: train | ⏰: 10:13:47 | Learning rate: 0.001000
+Train loss: 0.16972859 - Train acc: 0.80: 100%|██████████| 475/475 [02:41<00:00,  2.95it/s]
+:   0%|          | 0/53 [00:00<?, ?it/s]Eliminated instances percentage:  0.13790370068396973 66979/485694
+Eliminated anomalies percentage:  0.08327983397781394 5578/66979
+
+Starting epoch: 5 | phase: valid | ⏰: 10:16:28
+: 100%|██████████| 53/53 [00:06<00:00,  8.46it/s]
+
+Validation loss: 1.1372096606020659 Validation accuracy: 0.7880887966497424
+======== My contribution ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/train.pkl
+Length test 57506
+Nr secvente unice train: normale vs anormale
+3715 646
+: 100%|██████████| 105/105 [00:09<00:00, 11.23it/s]
+: 100%|██████████| 20/20 [00:01<00:00, 13.72it/s]
+------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------
+For g  34  Train metrics, TP:  0 FP:  0
+For g  33  Train metrics, TP:  0 FP:  0
+For g  32  Train metrics, TP:  0 FP:  0
+For g  31  Train metrics, TP:  0 FP:  0
+For g  30  train metrics, TP:  2 , FP:  0 , FN: 1668 , P: 100.0 , R: 0.11976047904191617 , F1: 0.23923444976076555
+For g  29  train metrics, TP:  3 , FP:  0 , FN: 1667 , P: 100.0 , R: 0.17964071856287425 , F1: 0.3586371787208607
+For g  28  train metrics, TP:  4 , FP:  0 , FN: 1666 , P: 100.0 , R: 0.23952095808383234 , F1: 0.4778972520908005
+For g  27  train metrics, TP:  52 , FP:  1 , FN: 1618 , P: 98.11320754716981 , R: 3.1137724550898205 , F1: 6.035983749274521
+For g  26  train metrics, TP:  54 , FP:  3 , FN: 1616 , P: 94.73684210526316 , R: 3.2335329341317367 , F1: 6.253618992472496
+For g  25  train metrics, TP:  59 , FP:  12 , FN: 1611 , P: 83.09859154929578 , R: 3.532934131736527 , F1: 6.777713957495692
+For g  24  train metrics, TP:  70 , FP:  23 , FN: 1600 , P: 75.26881720430107 , R: 4.191616766467066 , F1: 7.941009642654565
+For g  23  train metrics, TP:  70 , FP:  25 , FN: 1600 , P: 73.6842105263158 , R: 4.191616766467066 , F1: 7.93201133144476
+For g  22  train metrics, TP:  72 , FP:  28 , FN: 1598 , P: 72.0 , R: 4.311377245508982 , F1: 8.135593220338983
+For g  21  train metrics, TP:  76 , FP:  28 , FN: 1594 , P: 73.07692307692308 , R: 4.550898203592815 , F1: 8.568207440811726
+For g  20  train metrics, TP:  82 , FP:  30 , FN: 1588 , P: 73.21428571428571 , R: 4.910179640718563 , F1: 9.20314253647587
+For g  19  train metrics, TP:  122 , FP:  31 , FN: 1548 , P: 79.73856209150327 , R: 7.3053892215568865 , F1: 13.384530992868898
+For g  18  train metrics, TP:  173 , FP:  57 , FN: 1497 , P: 75.21739130434783 , R: 10.359281437125748 , F1: 18.210526315789473
+For g  17  train metrics, TP:  402 , FP:  71 , FN: 1268 , P: 84.98942917547569 , R: 24.07185628742515 , F1: 37.5174988334111
+For g  16  train metrics, TP:  471 , FP:  134 , FN: 1199 , P: 77.85123966942149 , R: 28.20359281437126 , F1: 41.40659340659341
+For g  15  train metrics, TP:  516 , FP:  177 , FN: 1154 , P: 74.45887445887446 , R: 30.898203592814372 , F1: 43.67329665679222
+For g  14  train metrics, TP:  579 , FP:  202 , FN: 1091 , P: 74.13572343149808 , R: 34.67065868263473 , F1: 47.24602203182374
+For g  13  train metrics, TP:  743 , FP:  203 , FN: 927 , P: 78.54122621564483 , R: 44.49101796407186 , F1: 56.80428134556575
+For g  12  train metrics, TP:  746 , FP:  205 , FN: 924 , P: 78.44374342797056 , R: 44.67065868263473 , F1: 56.924837848149565
+For g  11  train metrics, TP:  903 , FP:  207 , FN: 767 , P: 81.35135135135135 , R: 54.07185628742515 , F1: 64.96402877697842
+For g  10  train metrics, TP:  905 , FP:  208 , FN: 765 , P: 81.31176999101527 , R: 54.191616766467064 , F1: 65.03772906934962
+For g  9  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  8  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  7  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  6  train metrics, TP:  1658 , FP:  5309 , FN: 12 , P: 23.797904406487728 , R: 99.2814371257485 , F1: 38.39296051869862
+For g  5  train metrics, TP:  1658 , FP:  8113 , FN: 12 , P: 16.96858049329649 , R: 99.2814371257485 , F1: 28.983480464994315
+For g  4  train metrics, TP:  1660 , FP:  8176 , FN: 10 , P: 16.87677917852786 , R: 99.40119760479043 , F1: 28.854510690074747
+For g  3  train metrics, TP:  1669 , FP:  14778 , FN: 1 , P: 10.147747309539733 , R: 99.94011976047904 , F1: 18.424683998454487
+For g  2  train metrics, TP:  1669 , FP:  19723 , FN: 1 , P: 7.801982049364248 , R: 99.94011976047904 , F1: 14.474026537160695
+For g  1  train metrics, TP:  1669 , FP:  23522 , FN: 1 , P: 6.625382080901909 , R: 99.94011976047904 , F1: 12.426938684337888
+Ce a dat pe train
+10 229 12 87.86433492315845 99.2814371257485
+
+[0, 0, 0, 0, 2, 3, 4, 53, 57, 71, 93, 95, 100, 104, 112, 153, 230, 473, 605, 693, 781, 946, 951, 1110, 1113, 1887, 1887, 1887, 6967, 9771, 9836, 16447, 21392, 25191]
+Changes in number of anomalies
+Pentru g 33 anomalies diff:0
+Pentru g 32 anomalies diff:0
+Pentru g 31 anomalies diff:0
+Pentru g 30 anomalies diff:2
+Pentru g 29 anomalies diff:1
+Pentru g 28 anomalies diff:1
+Pentru g 27 anomalies diff:49
+Pentru g 26 anomalies diff:4
+Pentru g 25 anomalies diff:14
+Pentru g 24 anomalies diff:22
+Pentru g 23 anomalies diff:2
+Pentru g 22 anomalies diff:5
+Pentru g 21 anomalies diff:4
+Pentru g 20 anomalies diff:8
+Pentru g 19 anomalies diff:41
+Pentru g 18 anomalies diff:77
+Pentru g 17 anomalies diff:243
+Pentru g 16 anomalies diff:132
+Pentru g 15 anomalies diff:88
+Pentru g 14 anomalies diff:88
+Pentru g 13 anomalies diff:165
+Pentru g 12 anomalies diff:5
+Pentru g 11 anomalies diff:159
+Pentru g 10 anomalies diff:3
+Pentru g 9 anomalies diff:774
+Pentru g 8 anomalies diff:0
+Pentru g 7 anomalies diff:0
+Pentru g 6 anomalies diff:5080
+Pentru g 5 anomalies diff:2804
+Pentru g 4 anomalies diff:65
+Pentru g 3 anomalies diff:6611
+Pentru g 2 anomalies diff:4945
+Pentru g 1 anomalies diff:3799
+elapsed_time: 54.95285892486572
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Nr secvente unice test: normale vs anormale
+13084 3694
+: 100%|██████████| 390/390 [00:34<00:00, 11.30it/s]
+: 100%|██████████| 121/121 [00:08<00:00, 14.89it/s]
+------------------------NORMAL TEST SEQUENCES----------------------------
+For g  34  test metrics, TP:  0 FP:  0
+For g  33  test metrics, TP:  0 FP:  0
+For g  32  test metrics, TP:  0 FP:  0
+For g  31  test metrics, TP:  0 FP:  0
+For g  30  test metrics, TP:  43 , FP:  0 , FN: 15125 , P: 100.0 , R: 0.2834915611814346 , F1: 0.565380316875945
+For g  29  test metrics, TP:  62 , FP:  0 , FN: 15106 , P: 100.0 , R: 0.40875527426160335 , F1: 0.8141825344714378
+For g  28  test metrics, TP:  68 , FP:  0 , FN: 15100 , P: 100.0 , R: 0.44831223628691985 , F1: 0.8926227356261487
+For g  27  test metrics, TP:  399 , FP:  4 , FN: 14769 , P: 99.0074441687345 , R: 2.6305379746835444 , F1: 5.124911694817289
+For g  26  test metrics, TP:  423 , FP:  19 , FN: 14745 , P: 95.70135746606334 , R: 2.7887658227848102 , F1: 5.4196028187059575
+For g  25  test metrics, TP:  452 , FP:  137 , FN: 14716 , P: 76.7402376910017 , R: 2.979957805907173 , F1: 5.737132702925684
+For g  24  test metrics, TP:  531 , FP:  215 , FN: 14637 , P: 71.17962466487936 , R: 3.5007911392405062 , F1: 6.673369360311675
+For g  23  test metrics, TP:  551 , FP:  221 , FN: 14617 , P: 71.37305699481865 , R: 3.6326476793248945 , F1: 6.9134253450439145
+For g  22  test metrics, TP:  560 , FP:  233 , FN: 14608 , P: 70.61790668348046 , R: 3.691983122362869 , F1: 7.017104191466699
+For g  21  test metrics, TP:  579 , FP:  234 , FN: 14589 , P: 71.21771217712177 , R: 3.8172468354430378 , F1: 7.246104749389899
+For g  20  test metrics, TP:  668 , FP:  255 , FN: 14500 , P: 72.37269772481041 , R: 4.404008438818566 , F1: 8.30277795040706
+For g  19  test metrics, TP:  1004 , FP:  289 , FN: 14164 , P: 77.64887857695282 , R: 6.6191983122362865 , F1: 12.19852985845331
+For g  18  test metrics, TP:  1380 , FP:  567 , FN: 13788 , P: 70.87827426810478 , R: 9.098101265822784 , F1: 16.1262050832603
+For g  17  test metrics, TP:  3590 , FP:  679 , FN: 11578 , P: 84.09463574607636 , R: 23.668248945147678 , F1: 36.93985697381283
+For g  16  test metrics, TP:  4241 , FP:  1277 , FN: 10927 , P: 76.8575570859007 , R: 27.960179324894515 , F1: 41.0035772986561
+For g  15  test metrics, TP:  4689 , FP:  1644 , FN: 10479 , P: 74.04073898626244 , R: 30.91376582278481 , F1: 43.616575973210544
+For g  14  test metrics, TP:  5292 , FP:  1936 , FN: 9876 , P: 73.2152739346984 , R: 34.889240506329116 , F1: 47.25843900696553
+For g  13  test metrics, TP:  6782 , FP:  1969 , FN: 8386 , P: 77.49971431836362 , R: 44.71255274261603 , F1: 56.708056356871104
+For g  12  test metrics, TP:  6814 , FP:  1978 , FN: 8354 , P: 77.50227479526842 , R: 44.92352320675106 , F1: 56.87813021702838
+For g  11  test metrics, TP:  8035 , FP:  1994 , FN: 7133 , P: 80.11765878951041 , R: 52.97336497890296 , F1: 63.77743382148669
+For g  10  test metrics, TP:  8047 , FP:  2004 , FN: 7121 , P: 80.06168540443737 , R: 53.05247890295359 , F1: 63.81696340061066
+For g  9  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  8  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  7  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  6  test metrics, TP:  15046 , FP:  48622 , FN: 122 , P: 23.631965822705283 , R: 99.19567510548524 , F1: 38.17037901466335
+For g  5  test metrics, TP:  15060 , FP:  73845 , FN: 108 , P: 16.939429728361734 , R: 99.2879746835443 , F1: 28.941223948574557
+For g  4  test metrics, TP:  15073 , FP:  74479 , FN: 95 , P: 16.831561550830802 , R: 99.37368143459915 , F1: 28.787242169595114
+For g  3  test metrics, TP:  15155 , FP:  133812 , FN: 13 , P: 10.173394107419764 , R: 99.91429324894514 , F1: 18.46650622962805
+For g  2  test metrics, TP:  15167 , FP:  177725 , FN: 1 , P: 7.862949215104826 , R: 99.99340717299577 , F1: 14.579448236085746
+For g  1  test metrics, TP:  15167 , FP:  212333 , FN: 1 , P: 6.666813186813187 , R: 99.99340717299577 , F1: 12.50020604282394
+Ce a dat pe validare
+8 2207 140 87.19466202494922 99.07700421940929
+
+Best threshold 7
+Confusion matrix
+TP: 15028, TN: 500180, FP: 2207, FN: 140, FNR: 0.009229957805907173, FPR: 0.004393027685827858
+Precision: 87.195%, Recall: 99.077%, F1-measure: 92.757%, Specificity: 0.996
+--------------------------UNIQUE TEST SEQUENCES------------------------------------
+Train loss: 0.12598005 - Train acc: 0.79:   3%|▎         | 14/475 [00:06<03:18,  2.32it/s]Ce a dat pe validare
+8 725 116 83.15128979781548 96.85977260422307
+
+Best threshold 7
+Confusion matrix
+TP: 3578, TN: 12359, FP: 725, FN: 116, FNR: 0.03140227395776936, FPR: 0.0554111892387649
+Precision: 83.151%, Recall: 96.860%, F1-measure: 89.484%, Specificity: 0.945, Lead time: 15.582
+elapsed_time: 454.8416998386383
+Log saved
+
+Starting EPOCH: 6 | phase: train | ⏰: 10:25:13 | Learning rate: 0.001000
+Train loss: 0.11691831 - Train acc: 0.79: 100%|██████████| 475/475 [02:51<00:00,  2.78it/s]
+:   0%|          | 0/53 [00:00<?, ?it/s]Eliminated instances percentage:  0.15476616964590875 75169/485694
+Eliminated anomalies percentage:  0.07412630206601126 5572/75169
+
+Starting epoch: 6 | phase: valid | ⏰: 10:28:04
+: 100%|██████████| 53/53 [00:05<00:00,  8.89it/s]
+
+Validation loss: 1.1871280377765872 Validation accuracy: 0.8001148871511693
+======== My contribution ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/train.pkl
+Length test 57506
+Nr secvente unice train: normale vs anormale
+3715 646
+: 100%|██████████| 105/105 [00:08<00:00, 12.31it/s]
+: 100%|██████████| 20/20 [00:01<00:00, 16.57it/s]
+------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------
+For g  34  Train metrics, TP:  0 FP:  0
+For g  33  Train metrics, TP:  0 FP:  0
+For g  32  Train metrics, TP:  0 FP:  0
+For g  31  Train metrics, TP:  0 FP:  0
+For g  30  train metrics, TP:  2 , FP:  0 , FN: 1668 , P: 100.0 , R: 0.11976047904191617 , F1: 0.23923444976076555
+For g  29  train metrics, TP:  3 , FP:  0 , FN: 1667 , P: 100.0 , R: 0.17964071856287425 , F1: 0.3586371787208607
+For g  28  train metrics, TP:  4 , FP:  0 , FN: 1666 , P: 100.0 , R: 0.23952095808383234 , F1: 0.4778972520908005
+For g  27  train metrics, TP:  52 , FP:  1 , FN: 1618 , P: 98.11320754716981 , R: 3.1137724550898205 , F1: 6.035983749274521
+For g  26  train metrics, TP:  54 , FP:  3 , FN: 1616 , P: 94.73684210526316 , R: 3.2335329341317367 , F1: 6.253618992472496
+For g  25  train metrics, TP:  59 , FP:  12 , FN: 1611 , P: 83.09859154929578 , R: 3.532934131736527 , F1: 6.777713957495692
+For g  24  train metrics, TP:  70 , FP:  23 , FN: 1600 , P: 75.26881720430107 , R: 4.191616766467066 , F1: 7.941009642654565
+For g  23  train metrics, TP:  70 , FP:  25 , FN: 1600 , P: 73.6842105263158 , R: 4.191616766467066 , F1: 7.93201133144476
+For g  22  train metrics, TP:  72 , FP:  28 , FN: 1598 , P: 72.0 , R: 4.311377245508982 , F1: 8.135593220338983
+For g  21  train metrics, TP:  76 , FP:  28 , FN: 1594 , P: 73.07692307692308 , R: 4.550898203592815 , F1: 8.568207440811726
+For g  20  train metrics, TP:  82 , FP:  30 , FN: 1588 , P: 73.21428571428571 , R: 4.910179640718563 , F1: 9.20314253647587
+For g  19  train metrics, TP:  122 , FP:  31 , FN: 1548 , P: 79.73856209150327 , R: 7.3053892215568865 , F1: 13.384530992868898
+For g  18  train metrics, TP:  173 , FP:  57 , FN: 1497 , P: 75.21739130434783 , R: 10.359281437125748 , F1: 18.210526315789473
+For g  17  train metrics, TP:  402 , FP:  71 , FN: 1268 , P: 84.98942917547569 , R: 24.07185628742515 , F1: 37.5174988334111
+For g  16  train metrics, TP:  471 , FP:  134 , FN: 1199 , P: 77.85123966942149 , R: 28.20359281437126 , F1: 41.40659340659341
+For g  15  train metrics, TP:  516 , FP:  177 , FN: 1154 , P: 74.45887445887446 , R: 30.898203592814372 , F1: 43.67329665679222
+For g  14  train metrics, TP:  579 , FP:  202 , FN: 1091 , P: 74.13572343149808 , R: 34.67065868263473 , F1: 47.24602203182374
+For g  13  train metrics, TP:  743 , FP:  203 , FN: 927 , P: 78.54122621564483 , R: 44.49101796407186 , F1: 56.80428134556575
+For g  12  train metrics, TP:  746 , FP:  205 , FN: 924 , P: 78.44374342797056 , R: 44.67065868263473 , F1: 56.924837848149565
+For g  11  train metrics, TP:  903 , FP:  207 , FN: 767 , P: 81.35135135135135 , R: 54.07185628742515 , F1: 64.96402877697842
+For g  10  train metrics, TP:  905 , FP:  208 , FN: 765 , P: 81.31176999101527 , R: 54.191616766467064 , F1: 65.03772906934962
+For g  9  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  8  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  7  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  6  train metrics, TP:  1658 , FP:  5309 , FN: 12 , P: 23.797904406487728 , R: 99.2814371257485 , F1: 38.39296051869862
+For g  5  train metrics, TP:  1658 , FP:  8113 , FN: 12 , P: 16.96858049329649 , R: 99.2814371257485 , F1: 28.983480464994315
+For g  4  train metrics, TP:  1660 , FP:  8176 , FN: 10 , P: 16.87677917852786 , R: 99.40119760479043 , F1: 28.854510690074747
+For g  3  train metrics, TP:  1669 , FP:  14778 , FN: 1 , P: 10.147747309539733 , R: 99.94011976047904 , F1: 18.424683998454487
+For g  2  train metrics, TP:  1669 , FP:  19723 , FN: 1 , P: 7.801982049364248 , R: 99.94011976047904 , F1: 14.474026537160695
+For g  1  train metrics, TP:  1669 , FP:  23522 , FN: 1 , P: 6.625382080901909 , R: 99.94011976047904 , F1: 12.426938684337888
+Ce a dat pe train
+10 229 12 87.86433492315845 99.2814371257485
+
+[0, 0, 0, 0, 2, 3, 4, 53, 57, 71, 93, 95, 100, 104, 112, 153, 230, 473, 605, 693, 781, 946, 951, 1110, 1113, 1887, 1887, 1887, 6967, 9771, 9836, 16447, 21392, 25191]
+Changes in number of anomalies
+Pentru g 33 anomalies diff:0
+Pentru g 32 anomalies diff:0
+Pentru g 31 anomalies diff:0
+Pentru g 30 anomalies diff:2
+Pentru g 29 anomalies diff:1
+Pentru g 28 anomalies diff:1
+Pentru g 27 anomalies diff:49
+Pentru g 26 anomalies diff:4
+Pentru g 25 anomalies diff:14
+Pentru g 24 anomalies diff:22
+Pentru g 23 anomalies diff:2
+Pentru g 22 anomalies diff:5
+Pentru g 21 anomalies diff:4
+Pentru g 20 anomalies diff:8
+Pentru g 19 anomalies diff:41
+Pentru g 18 anomalies diff:77
+Pentru g 17 anomalies diff:243
+Pentru g 16 anomalies diff:132
+Pentru g 15 anomalies diff:88
+Pentru g 14 anomalies diff:88
+Pentru g 13 anomalies diff:165
+Pentru g 12 anomalies diff:5
+Pentru g 11 anomalies diff:159
+Pentru g 10 anomalies diff:3
+Pentru g 9 anomalies diff:774
+Pentru g 8 anomalies diff:0
+Pentru g 7 anomalies diff:0
+Pentru g 6 anomalies diff:5080
+Pentru g 5 anomalies diff:2804
+Pentru g 4 anomalies diff:65
+Pentru g 3 anomalies diff:6611
+Pentru g 2 anomalies diff:4945
+Pentru g 1 anomalies diff:3799
+elapsed_time: 54.54886603355408
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Nr secvente unice test: normale vs anormale
+13084 3694
+: 100%|██████████| 390/390 [00:36<00:00, 10.67it/s]
+: 100%|██████████| 121/121 [00:10<00:00, 11.69it/s]
+------------------------NORMAL TEST SEQUENCES----------------------------
+For g  34  test metrics, TP:  0 FP:  0
+For g  33  test metrics, TP:  0 FP:  0
+For g  32  test metrics, TP:  0 FP:  0
+For g  31  test metrics, TP:  0 FP:  0
+For g  30  test metrics, TP:  43 , FP:  0 , FN: 15125 , P: 100.0 , R: 0.2834915611814346 , F1: 0.565380316875945
+For g  29  test metrics, TP:  62 , FP:  0 , FN: 15106 , P: 100.0 , R: 0.40875527426160335 , F1: 0.8141825344714378
+For g  28  test metrics, TP:  68 , FP:  0 , FN: 15100 , P: 100.0 , R: 0.44831223628691985 , F1: 0.8926227356261487
+For g  27  test metrics, TP:  399 , FP:  4 , FN: 14769 , P: 99.0074441687345 , R: 2.6305379746835444 , F1: 5.124911694817289
+For g  26  test metrics, TP:  423 , FP:  19 , FN: 14745 , P: 95.70135746606334 , R: 2.7887658227848102 , F1: 5.4196028187059575
+For g  25  test metrics, TP:  452 , FP:  137 , FN: 14716 , P: 76.7402376910017 , R: 2.979957805907173 , F1: 5.737132702925684
+For g  24  test metrics, TP:  531 , FP:  215 , FN: 14637 , P: 71.17962466487936 , R: 3.5007911392405062 , F1: 6.673369360311675
+For g  23  test metrics, TP:  551 , FP:  221 , FN: 14617 , P: 71.37305699481865 , R: 3.6326476793248945 , F1: 6.9134253450439145
+For g  22  test metrics, TP:  560 , FP:  233 , FN: 14608 , P: 70.61790668348046 , R: 3.691983122362869 , F1: 7.017104191466699
+For g  21  test metrics, TP:  579 , FP:  234 , FN: 14589 , P: 71.21771217712177 , R: 3.8172468354430378 , F1: 7.246104749389899
+For g  20  test metrics, TP:  668 , FP:  255 , FN: 14500 , P: 72.37269772481041 , R: 4.404008438818566 , F1: 8.30277795040706
+For g  19  test metrics, TP:  1004 , FP:  289 , FN: 14164 , P: 77.64887857695282 , R: 6.6191983122362865 , F1: 12.19852985845331
+For g  18  test metrics, TP:  1380 , FP:  567 , FN: 13788 , P: 70.87827426810478 , R: 9.098101265822784 , F1: 16.1262050832603
+For g  17  test metrics, TP:  3590 , FP:  679 , FN: 11578 , P: 84.09463574607636 , R: 23.668248945147678 , F1: 36.93985697381283
+For g  16  test metrics, TP:  4241 , FP:  1277 , FN: 10927 , P: 76.8575570859007 , R: 27.960179324894515 , F1: 41.0035772986561
+For g  15  test metrics, TP:  4689 , FP:  1644 , FN: 10479 , P: 74.04073898626244 , R: 30.91376582278481 , F1: 43.616575973210544
+For g  14  test metrics, TP:  5292 , FP:  1936 , FN: 9876 , P: 73.2152739346984 , R: 34.889240506329116 , F1: 47.25843900696553
+For g  13  test metrics, TP:  6782 , FP:  1969 , FN: 8386 , P: 77.49971431836362 , R: 44.71255274261603 , F1: 56.708056356871104
+For g  12  test metrics, TP:  6814 , FP:  1978 , FN: 8354 , P: 77.50227479526842 , R: 44.92352320675106 , F1: 56.87813021702838
+For g  11  test metrics, TP:  8035 , FP:  1994 , FN: 7133 , P: 80.11765878951041 , R: 52.97336497890296 , F1: 63.77743382148669
+For g  10  test metrics, TP:  8047 , FP:  2004 , FN: 7121 , P: 80.06168540443737 , R: 53.05247890295359 , F1: 63.81696340061066
+For g  9  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  8  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  7  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  6  test metrics, TP:  15046 , FP:  48622 , FN: 122 , P: 23.631965822705283 , R: 99.19567510548524 , F1: 38.17037901466335
+For g  5  test metrics, TP:  15060 , FP:  73845 , FN: 108 , P: 16.939429728361734 , R: 99.2879746835443 , F1: 28.941223948574557
+For g  4  test metrics, TP:  15073 , FP:  74479 , FN: 95 , P: 16.831561550830802 , R: 99.37368143459915 , F1: 28.787242169595114
+For g  3  test metrics, TP:  15155 , FP:  133812 , FN: 13 , P: 10.173394107419764 , R: 99.91429324894514 , F1: 18.46650622962805
+For g  2  test metrics, TP:  15167 , FP:  177725 , FN: 1 , P: 7.862949215104826 , R: 99.99340717299577 , F1: 14.579448236085746
+For g  1  test metrics, TP:  15167 , FP:  212333 , FN: 1 , P: 6.666813186813187 , R: 99.99340717299577 , F1: 12.50020604282394
+Ce a dat pe validare
+8 2207 140 87.19466202494922 99.07700421940929
+
+Best threshold 7
+Confusion matrix
+TP: 15028, TN: 500180, FP: 2207, FN: 140, FNR: 0.009229957805907173, FPR: 0.004393027685827858
+Precision: 87.195%, Recall: 99.077%, F1-measure: 92.757%, Specificity: 0.996
+--------------------------UNIQUE TEST SEQUENCES------------------------------------
+Ce a dat pe validare
+8 725 116 83.15128979781548 96.85977260422307
+
+Best threshold 7
+Confusion matrix
+TP: 3578, TN: 12359, FP: 725, FN: 116, FNR: 0.03140227395776936, FPR: 0.0554111892387649
+Precision: 83.151%, Recall: 96.860%, F1-measure: 89.484%, Specificity: 0.945, Lead time: 15.582
+elapsed_time: 450.96423292160034
+Log saved
+
+Starting EPOCH: 7 | phase: train | ⏰: 10:36:47 | Learning rate: 0.001000
+Train loss: 0.03961809 - Train acc: 0.79: 100%|██████████| 475/475 [02:37<00:00,  3.01it/s]
+:   0%|          | 0/53 [00:00<?, ?it/s]Eliminated instances percentage:  0.1997780495538343 97031/485694
+Eliminated anomalies percentage:  0.06627778751120776 6431/97031
+
+Starting epoch: 7 | phase: valid | ⏰: 10:39:25
+: 100%|██████████| 53/53 [00:05<00:00,  9.16it/s]
+
+Validation loss: 1.5354731667716548 Validation accuracy: 0.7931475373383241
+======== My contribution ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/train.pkl
+Length test 57506
+Nr secvente unice train: normale vs anormale
+3715 646
+: 100%|██████████| 105/105 [00:09<00:00, 10.89it/s]
+: 100%|██████████| 20/20 [00:01<00:00, 13.31it/s]
+------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------
+For g  34  Train metrics, TP:  0 FP:  0
+For g  33  Train metrics, TP:  0 FP:  0
+For g  32  Train metrics, TP:  0 FP:  0
+For g  31  Train metrics, TP:  0 FP:  0
+For g  30  train metrics, TP:  2 , FP:  0 , FN: 1668 , P: 100.0 , R: 0.11976047904191617 , F1: 0.23923444976076555
+For g  29  train metrics, TP:  3 , FP:  0 , FN: 1667 , P: 100.0 , R: 0.17964071856287425 , F1: 0.3586371787208607
+For g  28  train metrics, TP:  4 , FP:  0 , FN: 1666 , P: 100.0 , R: 0.23952095808383234 , F1: 0.4778972520908005
+For g  27  train metrics, TP:  52 , FP:  1 , FN: 1618 , P: 98.11320754716981 , R: 3.1137724550898205 , F1: 6.035983749274521
+For g  26  train metrics, TP:  54 , FP:  3 , FN: 1616 , P: 94.73684210526316 , R: 3.2335329341317367 , F1: 6.253618992472496
+For g  25  train metrics, TP:  59 , FP:  12 , FN: 1611 , P: 83.09859154929578 , R: 3.532934131736527 , F1: 6.777713957495692
+For g  24  train metrics, TP:  70 , FP:  23 , FN: 1600 , P: 75.26881720430107 , R: 4.191616766467066 , F1: 7.941009642654565
+For g  23  train metrics, TP:  70 , FP:  25 , FN: 1600 , P: 73.6842105263158 , R: 4.191616766467066 , F1: 7.93201133144476
+For g  22  train metrics, TP:  72 , FP:  28 , FN: 1598 , P: 72.0 , R: 4.311377245508982 , F1: 8.135593220338983
+For g  21  train metrics, TP:  76 , FP:  28 , FN: 1594 , P: 73.07692307692308 , R: 4.550898203592815 , F1: 8.568207440811726
+For g  20  train metrics, TP:  82 , FP:  30 , FN: 1588 , P: 73.21428571428571 , R: 4.910179640718563 , F1: 9.20314253647587
+For g  19  train metrics, TP:  122 , FP:  31 , FN: 1548 , P: 79.73856209150327 , R: 7.3053892215568865 , F1: 13.384530992868898
+For g  18  train metrics, TP:  173 , FP:  57 , FN: 1497 , P: 75.21739130434783 , R: 10.359281437125748 , F1: 18.210526315789473
+For g  17  train metrics, TP:  402 , FP:  71 , FN: 1268 , P: 84.98942917547569 , R: 24.07185628742515 , F1: 37.5174988334111
+For g  16  train metrics, TP:  471 , FP:  134 , FN: 1199 , P: 77.85123966942149 , R: 28.20359281437126 , F1: 41.40659340659341
+For g  15  train metrics, TP:  516 , FP:  177 , FN: 1154 , P: 74.45887445887446 , R: 30.898203592814372 , F1: 43.67329665679222
+For g  14  train metrics, TP:  579 , FP:  202 , FN: 1091 , P: 74.13572343149808 , R: 34.67065868263473 , F1: 47.24602203182374
+For g  13  train metrics, TP:  743 , FP:  203 , FN: 927 , P: 78.54122621564483 , R: 44.49101796407186 , F1: 56.80428134556575
+For g  12  train metrics, TP:  746 , FP:  205 , FN: 924 , P: 78.44374342797056 , R: 44.67065868263473 , F1: 56.924837848149565
+For g  11  train metrics, TP:  903 , FP:  207 , FN: 767 , P: 81.35135135135135 , R: 54.07185628742515 , F1: 64.96402877697842
+For g  10  train metrics, TP:  905 , FP:  208 , FN: 765 , P: 81.31176999101527 , R: 54.191616766467064 , F1: 65.03772906934962
+For g  9  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  8  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  7  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  6  train metrics, TP:  1658 , FP:  5309 , FN: 12 , P: 23.797904406487728 , R: 99.2814371257485 , F1: 38.39296051869862
+For g  5  train metrics, TP:  1658 , FP:  8113 , FN: 12 , P: 16.96858049329649 , R: 99.2814371257485 , F1: 28.983480464994315
+For g  4  train metrics, TP:  1660 , FP:  8176 , FN: 10 , P: 16.87677917852786 , R: 99.40119760479043 , F1: 28.854510690074747
+For g  3  train metrics, TP:  1669 , FP:  14778 , FN: 1 , P: 10.147747309539733 , R: 99.94011976047904 , F1: 18.424683998454487
+For g  2  train metrics, TP:  1669 , FP:  19723 , FN: 1 , P: 7.801982049364248 , R: 99.94011976047904 , F1: 14.474026537160695
+For g  1  train metrics, TP:  1669 , FP:  23522 , FN: 1 , P: 6.625382080901909 , R: 99.94011976047904 , F1: 12.426938684337888
+Ce a dat pe train
+10 229 12 87.86433492315845 99.2814371257485
+
+[0, 0, 0, 0, 2, 3, 4, 53, 57, 71, 93, 95, 100, 104, 112, 153, 230, 473, 605, 693, 781, 946, 951, 1110, 1113, 1887, 1887, 1887, 6967, 9771, 9836, 16447, 21392, 25191]
+Changes in number of anomalies
+Pentru g 33 anomalies diff:0
+Pentru g 32 anomalies diff:0
+Pentru g 31 anomalies diff:0
+Pentru g 30 anomalies diff:2
+Pentru g 29 anomalies diff:1
+Pentru g 28 anomalies diff:1
+Pentru g 27 anomalies diff:49
+Pentru g 26 anomalies diff:4
+Pentru g 25 anomalies diff:14
+Pentru g 24 anomalies diff:22
+Pentru g 23 anomalies diff:2
+Pentru g 22 anomalies diff:5
+Pentru g 21 anomalies diff:4
+Pentru g 20 anomalies diff:8
+Pentru g 19 anomalies diff:41
+Pentru g 18 anomalies diff:77
+Pentru g 17 anomalies diff:243
+Pentru g 16 anomalies diff:132
+Pentru g 15 anomalies diff:88
+Pentru g 14 anomalies diff:88
+Pentru g 13 anomalies diff:165
+Pentru g 12 anomalies diff:5
+Pentru g 11 anomalies diff:159
+Pentru g 10 anomalies diff:3
+Pentru g 9 anomalies diff:774
+Pentru g 8 anomalies diff:0
+Pentru g 7 anomalies diff:0
+Pentru g 6 anomalies diff:5080
+Pentru g 5 anomalies diff:2804
+Pentru g 4 anomalies diff:65
+Pentru g 3 anomalies diff:6611
+Pentru g 2 anomalies diff:4945
+Pentru g 1 anomalies diff:3799
+elapsed_time: 56.683351039886475
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Nr secvente unice test: normale vs anormale
+13084 3694
+: 100%|██████████| 390/390 [00:33<00:00, 11.64it/s]
+: 100%|██████████| 121/121 [00:10<00:00, 11.82it/s]
+------------------------NORMAL TEST SEQUENCES----------------------------
+For g  34  test metrics, TP:  0 FP:  0
+For g  33  test metrics, TP:  0 FP:  0
+For g  32  test metrics, TP:  0 FP:  0
+For g  31  test metrics, TP:  0 FP:  0
+For g  30  test metrics, TP:  43 , FP:  0 , FN: 15125 , P: 100.0 , R: 0.2834915611814346 , F1: 0.565380316875945
+For g  29  test metrics, TP:  62 , FP:  0 , FN: 15106 , P: 100.0 , R: 0.40875527426160335 , F1: 0.8141825344714378
+For g  28  test metrics, TP:  68 , FP:  0 , FN: 15100 , P: 100.0 , R: 0.44831223628691985 , F1: 0.8926227356261487
+For g  27  test metrics, TP:  399 , FP:  4 , FN: 14769 , P: 99.0074441687345 , R: 2.6305379746835444 , F1: 5.124911694817289
+For g  26  test metrics, TP:  423 , FP:  19 , FN: 14745 , P: 95.70135746606334 , R: 2.7887658227848102 , F1: 5.4196028187059575
+For g  25  test metrics, TP:  452 , FP:  137 , FN: 14716 , P: 76.7402376910017 , R: 2.979957805907173 , F1: 5.737132702925684
+For g  24  test metrics, TP:  531 , FP:  215 , FN: 14637 , P: 71.17962466487936 , R: 3.5007911392405062 , F1: 6.673369360311675
+For g  23  test metrics, TP:  551 , FP:  221 , FN: 14617 , P: 71.37305699481865 , R: 3.6326476793248945 , F1: 6.9134253450439145
+For g  22  test metrics, TP:  560 , FP:  233 , FN: 14608 , P: 70.61790668348046 , R: 3.691983122362869 , F1: 7.017104191466699
+For g  21  test metrics, TP:  579 , FP:  234 , FN: 14589 , P: 71.21771217712177 , R: 3.8172468354430378 , F1: 7.246104749389899
+For g  20  test metrics, TP:  668 , FP:  255 , FN: 14500 , P: 72.37269772481041 , R: 4.404008438818566 , F1: 8.30277795040706
+For g  19  test metrics, TP:  1004 , FP:  289 , FN: 14164 , P: 77.64887857695282 , R: 6.6191983122362865 , F1: 12.19852985845331
+For g  18  test metrics, TP:  1380 , FP:  567 , FN: 13788 , P: 70.87827426810478 , R: 9.098101265822784 , F1: 16.1262050832603
+For g  17  test metrics, TP:  3590 , FP:  679 , FN: 11578 , P: 84.09463574607636 , R: 23.668248945147678 , F1: 36.93985697381283
+For g  16  test metrics, TP:  4241 , FP:  1277 , FN: 10927 , P: 76.8575570859007 , R: 27.960179324894515 , F1: 41.0035772986561
+For g  15  test metrics, TP:  4689 , FP:  1644 , FN: 10479 , P: 74.04073898626244 , R: 30.91376582278481 , F1: 43.616575973210544
+For g  14  test metrics, TP:  5292 , FP:  1936 , FN: 9876 , P: 73.2152739346984 , R: 34.889240506329116 , F1: 47.25843900696553
+For g  13  test metrics, TP:  6782 , FP:  1969 , FN: 8386 , P: 77.49971431836362 , R: 44.71255274261603 , F1: 56.708056356871104
+For g  12  test metrics, TP:  6814 , FP:  1978 , FN: 8354 , P: 77.50227479526842 , R: 44.92352320675106 , F1: 56.87813021702838
+For g  11  test metrics, TP:  8035 , FP:  1994 , FN: 7133 , P: 80.11765878951041 , R: 52.97336497890296 , F1: 63.77743382148669
+For g  10  test metrics, TP:  8047 , FP:  2004 , FN: 7121 , P: 80.06168540443737 , R: 53.05247890295359 , F1: 63.81696340061066
+For g  9  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  8  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  7  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  6  test metrics, TP:  15046 , FP:  48622 , FN: 122 , P: 23.631965822705283 , R: 99.19567510548524 , F1: 38.17037901466335
+For g  5  test metrics, TP:  15060 , FP:  73845 , FN: 108 , P: 16.939429728361734 , R: 99.2879746835443 , F1: 28.941223948574557
+For g  4  test metrics, TP:  15073 , FP:  74479 , FN: 95 , P: 16.831561550830802 , R: 99.37368143459915 , F1: 28.787242169595114
+For g  3  test metrics, TP:  15155 , FP:  133812 , FN: 13 , P: 10.173394107419764 , R: 99.91429324894514 , F1: 18.46650622962805
+For g  2  test metrics, TP:  15167 , FP:  177725 , FN: 1 , P: 7.862949215104826 , R: 99.99340717299577 , F1: 14.579448236085746
+For g  1  test metrics, TP:  15167 , FP:  212333 , FN: 1 , P: 6.666813186813187 , R: 99.99340717299577 , F1: 12.50020604282394
+Ce a dat pe validare
+8 2207 140 87.19466202494922 99.07700421940929
+
+Best threshold 7
+Confusion matrix
+TP: 15028, TN: 500180, FP: 2207, FN: 140, FNR: 0.009229957805907173, FPR: 0.004393027685827858
+Precision: 87.195%, Recall: 99.077%, F1-measure: 92.757%, Specificity: 0.996
+--------------------------UNIQUE TEST SEQUENCES------------------------------------
+Ce a dat pe validare
+8 725 116 83.15128979781548 96.85977260422307
+
+Best threshold 7
+Confusion matrix
+TP: 3578, TN: 12359, FP: 725, FN: 116, FNR: 0.03140227395776936, FPR: 0.0554111892387649
+Precision: 83.151%, Recall: 96.860%, F1-measure: 89.484%, Specificity: 0.945, Lead time: 15.582
+elapsed_time: 464.3560719490051
+Log saved
+
+Starting EPOCH: 8 | phase: train | ⏰: 10:48:22 | Learning rate: 0.001000
+Train loss: 0.00226934 - Train acc: 0.79: 100%|██████████| 475/475 [02:36<00:00,  3.04it/s]
+Eliminated instances percentage:  0.22616503395141796 109847/485694
+Eliminated anomalies percentage:  0.0646171493076734 7098/109847
+
+Starting epoch: 8 | phase: valid | ⏰: 10:50:59
+: 100%|██████████| 53/53 [00:05<00:00,  9.20it/s]
+
+Validation loss: 1.6267806516503387 Validation accuracy: 0.7916095319275099
+======== My contribution ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/train.pkl
+Length test 57506
+Nr secvente unice train: normale vs anormale
+3715 646
+: 100%|██████████| 105/105 [00:09<00:00, 10.99it/s]
+: 100%|██████████| 20/20 [00:01<00:00, 13.97it/s]
+------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------
+For g  34  Train metrics, TP:  0 FP:  0
+For g  33  Train metrics, TP:  0 FP:  0
+For g  32  Train metrics, TP:  0 FP:  0
+For g  31  Train metrics, TP:  0 FP:  0
+For g  30  train metrics, TP:  2 , FP:  0 , FN: 1668 , P: 100.0 , R: 0.11976047904191617 , F1: 0.23923444976076555
+For g  29  train metrics, TP:  3 , FP:  0 , FN: 1667 , P: 100.0 , R: 0.17964071856287425 , F1: 0.3586371787208607
+For g  28  train metrics, TP:  4 , FP:  0 , FN: 1666 , P: 100.0 , R: 0.23952095808383234 , F1: 0.4778972520908005
+For g  27  train metrics, TP:  52 , FP:  1 , FN: 1618 , P: 98.11320754716981 , R: 3.1137724550898205 , F1: 6.035983749274521
+For g  26  train metrics, TP:  54 , FP:  3 , FN: 1616 , P: 94.73684210526316 , R: 3.2335329341317367 , F1: 6.253618992472496
+For g  25  train metrics, TP:  59 , FP:  12 , FN: 1611 , P: 83.09859154929578 , R: 3.532934131736527 , F1: 6.777713957495692
+For g  24  train metrics, TP:  70 , FP:  23 , FN: 1600 , P: 75.26881720430107 , R: 4.191616766467066 , F1: 7.941009642654565
+For g  23  train metrics, TP:  70 , FP:  25 , FN: 1600 , P: 73.6842105263158 , R: 4.191616766467066 , F1: 7.93201133144476
+For g  22  train metrics, TP:  72 , FP:  28 , FN: 1598 , P: 72.0 , R: 4.311377245508982 , F1: 8.135593220338983
+For g  21  train metrics, TP:  76 , FP:  28 , FN: 1594 , P: 73.07692307692308 , R: 4.550898203592815 , F1: 8.568207440811726
+For g  20  train metrics, TP:  82 , FP:  30 , FN: 1588 , P: 73.21428571428571 , R: 4.910179640718563 , F1: 9.20314253647587
+For g  19  train metrics, TP:  122 , FP:  31 , FN: 1548 , P: 79.73856209150327 , R: 7.3053892215568865 , F1: 13.384530992868898
+For g  18  train metrics, TP:  173 , FP:  57 , FN: 1497 , P: 75.21739130434783 , R: 10.359281437125748 , F1: 18.210526315789473
+For g  17  train metrics, TP:  402 , FP:  71 , FN: 1268 , P: 84.98942917547569 , R: 24.07185628742515 , F1: 37.5174988334111
+For g  16  train metrics, TP:  471 , FP:  134 , FN: 1199 , P: 77.85123966942149 , R: 28.20359281437126 , F1: 41.40659340659341
+For g  15  train metrics, TP:  516 , FP:  177 , FN: 1154 , P: 74.45887445887446 , R: 30.898203592814372 , F1: 43.67329665679222
+For g  14  train metrics, TP:  579 , FP:  202 , FN: 1091 , P: 74.13572343149808 , R: 34.67065868263473 , F1: 47.24602203182374
+For g  13  train metrics, TP:  743 , FP:  203 , FN: 927 , P: 78.54122621564483 , R: 44.49101796407186 , F1: 56.80428134556575
+For g  12  train metrics, TP:  746 , FP:  205 , FN: 924 , P: 78.44374342797056 , R: 44.67065868263473 , F1: 56.924837848149565
+For g  11  train metrics, TP:  903 , FP:  207 , FN: 767 , P: 81.35135135135135 , R: 54.07185628742515 , F1: 64.96402877697842
+For g  10  train metrics, TP:  905 , FP:  208 , FN: 765 , P: 81.31176999101527 , R: 54.191616766467064 , F1: 65.03772906934962
+For g  9  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  8  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  7  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  6  train metrics, TP:  1658 , FP:  5309 , FN: 12 , P: 23.797904406487728 , R: 99.2814371257485 , F1: 38.39296051869862
+For g  5  train metrics, TP:  1658 , FP:  8113 , FN: 12 , P: 16.96858049329649 , R: 99.2814371257485 , F1: 28.983480464994315
+For g  4  train metrics, TP:  1660 , FP:  8176 , FN: 10 , P: 16.87677917852786 , R: 99.40119760479043 , F1: 28.854510690074747
+For g  3  train metrics, TP:  1669 , FP:  14778 , FN: 1 , P: 10.147747309539733 , R: 99.94011976047904 , F1: 18.424683998454487
+For g  2  train metrics, TP:  1669 , FP:  19723 , FN: 1 , P: 7.801982049364248 , R: 99.94011976047904 , F1: 14.474026537160695
+For g  1  train metrics, TP:  1669 , FP:  23522 , FN: 1 , P: 6.625382080901909 , R: 99.94011976047904 , F1: 12.426938684337888
+Ce a dat pe train
+10 229 12 87.86433492315845 99.2814371257485
+
+[0, 0, 0, 0, 2, 3, 4, 53, 57, 71, 93, 95, 100, 104, 112, 153, 230, 473, 605, 693, 781, 946, 951, 1110, 1113, 1887, 1887, 1887, 6967, 9771, 9836, 16447, 21392, 25191]
+Changes in number of anomalies
+Pentru g 33 anomalies diff:0
+Pentru g 32 anomalies diff:0
+Pentru g 31 anomalies diff:0
+Pentru g 30 anomalies diff:2
+Pentru g 29 anomalies diff:1
+Pentru g 28 anomalies diff:1
+Pentru g 27 anomalies diff:49
+Pentru g 26 anomalies diff:4
+Pentru g 25 anomalies diff:14
+Pentru g 24 anomalies diff:22
+Pentru g 23 anomalies diff:2
+Pentru g 22 anomalies diff:5
+Pentru g 21 anomalies diff:4
+Pentru g 20 anomalies diff:8
+Pentru g 19 anomalies diff:41
+Pentru g 18 anomalies diff:77
+Pentru g 17 anomalies diff:243
+Pentru g 16 anomalies diff:132
+Pentru g 15 anomalies diff:88
+Pentru g 14 anomalies diff:88
+Pentru g 13 anomalies diff:165
+Pentru g 12 anomalies diff:5
+Pentru g 11 anomalies diff:159
+Pentru g 10 anomalies diff:3
+Pentru g 9 anomalies diff:774
+Pentru g 8 anomalies diff:0
+Pentru g 7 anomalies diff:0
+Pentru g 6 anomalies diff:5080
+Pentru g 5 anomalies diff:2804
+Pentru g 4 anomalies diff:65
+Pentru g 3 anomalies diff:6611
+Pentru g 2 anomalies diff:4945
+Pentru g 1 anomalies diff:3799
+elapsed_time: 51.340659856796265
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Nr secvente unice test: normale vs anormale
+13084 3694
+: 100%|██████████| 390/390 [00:32<00:00, 12.14it/s]
+: 100%|██████████| 121/121 [00:08<00:00, 13.65it/s]
+------------------------NORMAL TEST SEQUENCES----------------------------
+For g  34  test metrics, TP:  0 FP:  0
+For g  33  test metrics, TP:  0 FP:  0
+For g  32  test metrics, TP:  0 FP:  0
+For g  31  test metrics, TP:  0 FP:  0
+For g  30  test metrics, TP:  43 , FP:  0 , FN: 15125 , P: 100.0 , R: 0.2834915611814346 , F1: 0.565380316875945
+For g  29  test metrics, TP:  62 , FP:  0 , FN: 15106 , P: 100.0 , R: 0.40875527426160335 , F1: 0.8141825344714378
+For g  28  test metrics, TP:  68 , FP:  0 , FN: 15100 , P: 100.0 , R: 0.44831223628691985 , F1: 0.8926227356261487
+For g  27  test metrics, TP:  399 , FP:  4 , FN: 14769 , P: 99.0074441687345 , R: 2.6305379746835444 , F1: 5.124911694817289
+For g  26  test metrics, TP:  423 , FP:  19 , FN: 14745 , P: 95.70135746606334 , R: 2.7887658227848102 , F1: 5.4196028187059575
+For g  25  test metrics, TP:  452 , FP:  137 , FN: 14716 , P: 76.7402376910017 , R: 2.979957805907173 , F1: 5.737132702925684
+For g  24  test metrics, TP:  531 , FP:  215 , FN: 14637 , P: 71.17962466487936 , R: 3.5007911392405062 , F1: 6.673369360311675
+For g  23  test metrics, TP:  551 , FP:  221 , FN: 14617 , P: 71.37305699481865 , R: 3.6326476793248945 , F1: 6.9134253450439145
+For g  22  test metrics, TP:  560 , FP:  233 , FN: 14608 , P: 70.61790668348046 , R: 3.691983122362869 , F1: 7.017104191466699
+For g  21  test metrics, TP:  579 , FP:  234 , FN: 14589 , P: 71.21771217712177 , R: 3.8172468354430378 , F1: 7.246104749389899
+For g  20  test metrics, TP:  668 , FP:  255 , FN: 14500 , P: 72.37269772481041 , R: 4.404008438818566 , F1: 8.30277795040706
+For g  19  test metrics, TP:  1004 , FP:  289 , FN: 14164 , P: 77.64887857695282 , R: 6.6191983122362865 , F1: 12.19852985845331
+For g  18  test metrics, TP:  1380 , FP:  567 , FN: 13788 , P: 70.87827426810478 , R: 9.098101265822784 , F1: 16.1262050832603
+For g  17  test metrics, TP:  3590 , FP:  679 , FN: 11578 , P: 84.09463574607636 , R: 23.668248945147678 , F1: 36.93985697381283
+For g  16  test metrics, TP:  4241 , FP:  1277 , FN: 10927 , P: 76.8575570859007 , R: 27.960179324894515 , F1: 41.0035772986561
+For g  15  test metrics, TP:  4689 , FP:  1644 , FN: 10479 , P: 74.04073898626244 , R: 30.91376582278481 , F1: 43.616575973210544
+For g  14  test metrics, TP:  5292 , FP:  1936 , FN: 9876 , P: 73.2152739346984 , R: 34.889240506329116 , F1: 47.25843900696553
+For g  13  test metrics, TP:  6782 , FP:  1969 , FN: 8386 , P: 77.49971431836362 , R: 44.71255274261603 , F1: 56.708056356871104
+For g  12  test metrics, TP:  6814 , FP:  1978 , FN: 8354 , P: 77.50227479526842 , R: 44.92352320675106 , F1: 56.87813021702838
+For g  11  test metrics, TP:  8035 , FP:  1994 , FN: 7133 , P: 80.11765878951041 , R: 52.97336497890296 , F1: 63.77743382148669
+For g  10  test metrics, TP:  8047 , FP:  2004 , FN: 7121 , P: 80.06168540443737 , R: 53.05247890295359 , F1: 63.81696340061066
+For g  9  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  8  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  7  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  6  test metrics, TP:  15046 , FP:  48622 , FN: 122 , P: 23.631965822705283 , R: 99.19567510548524 , F1: 38.17037901466335
+For g  5  test metrics, TP:  15060 , FP:  73845 , FN: 108 , P: 16.939429728361734 , R: 99.2879746835443 , F1: 28.941223948574557
+For g  4  test metrics, TP:  15073 , FP:  74479 , FN: 95 , P: 16.831561550830802 , R: 99.37368143459915 , F1: 28.787242169595114
+For g  3  test metrics, TP:  15155 , FP:  133812 , FN: 13 , P: 10.173394107419764 , R: 99.91429324894514 , F1: 18.46650622962805
+For g  2  test metrics, TP:  15167 , FP:  177725 , FN: 1 , P: 7.862949215104826 , R: 99.99340717299577 , F1: 14.579448236085746
+For g  1  test metrics, TP:  15167 , FP:  212333 , FN: 1 , P: 6.666813186813187 , R: 99.99340717299577 , F1: 12.50020604282394
+Ce a dat pe validare
+8 2207 140 87.19466202494922 99.07700421940929
+
+Best threshold 7
+Confusion matrix
+TP: 15028, TN: 500180, FP: 2207, FN: 140, FNR: 0.009229957805907173, FPR: 0.004393027685827858
+Precision: 87.195%, Recall: 99.077%, F1-measure: 92.757%, Specificity: 0.996
+--------------------------UNIQUE TEST SEQUENCES------------------------------------
+Ce a dat pe validare
+8 725 116 83.15128979781548 96.85977260422307
+
+Best threshold 7
+Confusion matrix
+TP: 3578, TN: 12359, FP: 725, FN: 116, FNR: 0.03140227395776936, FPR: 0.0554111892387649
+Precision: 83.151%, Recall: 96.860%, F1-measure: 89.484%, Specificity: 0.945, Lead time: 15.582
+elapsed_time: 470.60580706596375
+Log saved
+
+Starting EPOCH: 9 | phase: train | ⏰: 10:59:59 | Learning rate: 0.001000
+Train loss: 0.00155493 - Train acc: 0.79: 100%|██████████| 475/475 [02:43<00:00,  2.90it/s]
+Eliminated instances percentage:  0.227015363582832 110260/485694
+Eliminated anomalies percentage:  0.06457464175584982 7120/110260
+
+Starting epoch: 9 | phase: valid | ⏰: 11:02:43
+: 100%|██████████| 53/53 [00:05<00:00,  9.11it/s]
+
+Validation loss: 1.689766598197649 Validation accuracy: 0.7910721565430086
+======== My contribution ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/train.pkl
+Length test 57506
+Nr secvente unice train: normale vs anormale
+3715 646
+: 100%|██████████| 105/105 [00:09<00:00, 11.30it/s]
+: 100%|██████████| 20/20 [00:01<00:00, 14.71it/s]
+------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------
+For g  34  Train metrics, TP:  0 FP:  0
+For g  33  Train metrics, TP:  0 FP:  0
+For g  32  Train metrics, TP:  0 FP:  0
+For g  31  Train metrics, TP:  0 FP:  0
+For g  30  train metrics, TP:  2 , FP:  0 , FN: 1668 , P: 100.0 , R: 0.11976047904191617 , F1: 0.23923444976076555
+For g  29  train metrics, TP:  3 , FP:  0 , FN: 1667 , P: 100.0 , R: 0.17964071856287425 , F1: 0.3586371787208607
+For g  28  train metrics, TP:  4 , FP:  0 , FN: 1666 , P: 100.0 , R: 0.23952095808383234 , F1: 0.4778972520908005
+For g  27  train metrics, TP:  52 , FP:  1 , FN: 1618 , P: 98.11320754716981 , R: 3.1137724550898205 , F1: 6.035983749274521
+For g  26  train metrics, TP:  54 , FP:  3 , FN: 1616 , P: 94.73684210526316 , R: 3.2335329341317367 , F1: 6.253618992472496
+For g  25  train metrics, TP:  59 , FP:  12 , FN: 1611 , P: 83.09859154929578 , R: 3.532934131736527 , F1: 6.777713957495692
+For g  24  train metrics, TP:  70 , FP:  23 , FN: 1600 , P: 75.26881720430107 , R: 4.191616766467066 , F1: 7.941009642654565
+For g  23  train metrics, TP:  70 , FP:  25 , FN: 1600 , P: 73.6842105263158 , R: 4.191616766467066 , F1: 7.93201133144476
+For g  22  train metrics, TP:  72 , FP:  28 , FN: 1598 , P: 72.0 , R: 4.311377245508982 , F1: 8.135593220338983
+For g  21  train metrics, TP:  76 , FP:  28 , FN: 1594 , P: 73.07692307692308 , R: 4.550898203592815 , F1: 8.568207440811726
+For g  20  train metrics, TP:  82 , FP:  30 , FN: 1588 , P: 73.21428571428571 , R: 4.910179640718563 , F1: 9.20314253647587
+For g  19  train metrics, TP:  122 , FP:  31 , FN: 1548 , P: 79.73856209150327 , R: 7.3053892215568865 , F1: 13.384530992868898
+For g  18  train metrics, TP:  173 , FP:  57 , FN: 1497 , P: 75.21739130434783 , R: 10.359281437125748 , F1: 18.210526315789473
+For g  17  train metrics, TP:  402 , FP:  71 , FN: 1268 , P: 84.98942917547569 , R: 24.07185628742515 , F1: 37.5174988334111
+For g  16  train metrics, TP:  471 , FP:  134 , FN: 1199 , P: 77.85123966942149 , R: 28.20359281437126 , F1: 41.40659340659341
+For g  15  train metrics, TP:  516 , FP:  177 , FN: 1154 , P: 74.45887445887446 , R: 30.898203592814372 , F1: 43.67329665679222
+For g  14  train metrics, TP:  579 , FP:  202 , FN: 1091 , P: 74.13572343149808 , R: 34.67065868263473 , F1: 47.24602203182374
+For g  13  train metrics, TP:  743 , FP:  203 , FN: 927 , P: 78.54122621564483 , R: 44.49101796407186 , F1: 56.80428134556575
+For g  12  train metrics, TP:  746 , FP:  205 , FN: 924 , P: 78.44374342797056 , R: 44.67065868263473 , F1: 56.924837848149565
+For g  11  train metrics, TP:  903 , FP:  207 , FN: 767 , P: 81.35135135135135 , R: 54.07185628742515 , F1: 64.96402877697842
+For g  10  train metrics, TP:  905 , FP:  208 , FN: 765 , P: 81.31176999101527 , R: 54.191616766467064 , F1: 65.03772906934962
+For g  9  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  8  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  7  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  6  train metrics, TP:  1658 , FP:  5309 , FN: 12 , P: 23.797904406487728 , R: 99.2814371257485 , F1: 38.39296051869862
+For g  5  train metrics, TP:  1658 , FP:  8113 , FN: 12 , P: 16.96858049329649 , R: 99.2814371257485 , F1: 28.983480464994315
+For g  4  train metrics, TP:  1660 , FP:  8176 , FN: 10 , P: 16.87677917852786 , R: 99.40119760479043 , F1: 28.854510690074747
+For g  3  train metrics, TP:  1669 , FP:  14778 , FN: 1 , P: 10.147747309539733 , R: 99.94011976047904 , F1: 18.424683998454487
+For g  2  train metrics, TP:  1669 , FP:  19723 , FN: 1 , P: 7.801982049364248 , R: 99.94011976047904 , F1: 14.474026537160695
+For g  1  train metrics, TP:  1669 , FP:  23522 , FN: 1 , P: 6.625382080901909 , R: 99.94011976047904 , F1: 12.426938684337888
+Ce a dat pe train
+10 229 12 87.86433492315845 99.2814371257485
+
+[0, 0, 0, 0, 2, 3, 4, 53, 57, 71, 93, 95, 100, 104, 112, 153, 230, 473, 605, 693, 781, 946, 951, 1110, 1113, 1887, 1887, 1887, 6967, 9771, 9836, 16447, 21392, 25191]
+Changes in number of anomalies
+Pentru g 33 anomalies diff:0
+Pentru g 32 anomalies diff:0
+Pentru g 31 anomalies diff:0
+Pentru g 30 anomalies diff:2
+Pentru g 29 anomalies diff:1
+Pentru g 28 anomalies diff:1
+Pentru g 27 anomalies diff:49
+Pentru g 26 anomalies diff:4
+Pentru g 25 anomalies diff:14
+Pentru g 24 anomalies diff:22
+Pentru g 23 anomalies diff:2
+Pentru g 22 anomalies diff:5
+Pentru g 21 anomalies diff:4
+Pentru g 20 anomalies diff:8
+Pentru g 19 anomalies diff:41
+Pentru g 18 anomalies diff:77
+Pentru g 17 anomalies diff:243
+Pentru g 16 anomalies diff:132
+Pentru g 15 anomalies diff:88
+Pentru g 14 anomalies diff:88
+Pentru g 13 anomalies diff:165
+Pentru g 12 anomalies diff:5
+Pentru g 11 anomalies diff:159
+Pentru g 10 anomalies diff:3
+Pentru g 9 anomalies diff:774
+Pentru g 8 anomalies diff:0
+Pentru g 7 anomalies diff:0
+Pentru g 6 anomalies diff:5080
+Pentru g 5 anomalies diff:2804
+Pentru g 4 anomalies diff:65
+Pentru g 3 anomalies diff:6611
+Pentru g 2 anomalies diff:4945
+Pentru g 1 anomalies diff:3799
+elapsed_time: 52.602473974227905
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Nr secvente unice test: normale vs anormale
+13084 3694
+: 100%|██████████| 390/390 [00:32<00:00, 12.08it/s]
+: 100%|██████████| 121/121 [00:08<00:00, 14.79it/s]
+------------------------NORMAL TEST SEQUENCES----------------------------
+For g  34  test metrics, TP:  0 FP:  0
+For g  33  test metrics, TP:  0 FP:  0
+For g  32  test metrics, TP:  0 FP:  0
+For g  31  test metrics, TP:  0 FP:  0
+For g  30  test metrics, TP:  43 , FP:  0 , FN: 15125 , P: 100.0 , R: 0.2834915611814346 , F1: 0.565380316875945
+For g  29  test metrics, TP:  62 , FP:  0 , FN: 15106 , P: 100.0 , R: 0.40875527426160335 , F1: 0.8141825344714378
+For g  28  test metrics, TP:  68 , FP:  0 , FN: 15100 , P: 100.0 , R: 0.44831223628691985 , F1: 0.8926227356261487
+For g  27  test metrics, TP:  399 , FP:  4 , FN: 14769 , P: 99.0074441687345 , R: 2.6305379746835444 , F1: 5.124911694817289
+For g  26  test metrics, TP:  423 , FP:  19 , FN: 14745 , P: 95.70135746606334 , R: 2.7887658227848102 , F1: 5.4196028187059575
+For g  25  test metrics, TP:  452 , FP:  137 , FN: 14716 , P: 76.7402376910017 , R: 2.979957805907173 , F1: 5.737132702925684
+For g  24  test metrics, TP:  531 , FP:  215 , FN: 14637 , P: 71.17962466487936 , R: 3.5007911392405062 , F1: 6.673369360311675
+For g  23  test metrics, TP:  551 , FP:  221 , FN: 14617 , P: 71.37305699481865 , R: 3.6326476793248945 , F1: 6.9134253450439145
+For g  22  test metrics, TP:  560 , FP:  233 , FN: 14608 , P: 70.61790668348046 , R: 3.691983122362869 , F1: 7.017104191466699
+For g  21  test metrics, TP:  579 , FP:  234 , FN: 14589 , P: 71.21771217712177 , R: 3.8172468354430378 , F1: 7.246104749389899
+For g  20  test metrics, TP:  668 , FP:  255 , FN: 14500 , P: 72.37269772481041 , R: 4.404008438818566 , F1: 8.30277795040706
+For g  19  test metrics, TP:  1004 , FP:  289 , FN: 14164 , P: 77.64887857695282 , R: 6.6191983122362865 , F1: 12.19852985845331
+For g  18  test metrics, TP:  1380 , FP:  567 , FN: 13788 , P: 70.87827426810478 , R: 9.098101265822784 , F1: 16.1262050832603
+For g  17  test metrics, TP:  3590 , FP:  679 , FN: 11578 , P: 84.09463574607636 , R: 23.668248945147678 , F1: 36.93985697381283
+For g  16  test metrics, TP:  4241 , FP:  1277 , FN: 10927 , P: 76.8575570859007 , R: 27.960179324894515 , F1: 41.0035772986561
+For g  15  test metrics, TP:  4689 , FP:  1644 , FN: 10479 , P: 74.04073898626244 , R: 30.91376582278481 , F1: 43.616575973210544
+For g  14  test metrics, TP:  5292 , FP:  1936 , FN: 9876 , P: 73.2152739346984 , R: 34.889240506329116 , F1: 47.25843900696553
+For g  13  test metrics, TP:  6782 , FP:  1969 , FN: 8386 , P: 77.49971431836362 , R: 44.71255274261603 , F1: 56.708056356871104
+For g  12  test metrics, TP:  6814 , FP:  1978 , FN: 8354 , P: 77.50227479526842 , R: 44.92352320675106 , F1: 56.87813021702838
+For g  11  test metrics, TP:  8035 , FP:  1994 , FN: 7133 , P: 80.11765878951041 , R: 52.97336497890296 , F1: 63.77743382148669
+For g  10  test metrics, TP:  8047 , FP:  2004 , FN: 7121 , P: 80.06168540443737 , R: 53.05247890295359 , F1: 63.81696340061066
+For g  9  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  8  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  7  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  6  test metrics, TP:  15046 , FP:  48622 , FN: 122 , P: 23.631965822705283 , R: 99.19567510548524 , F1: 38.17037901466335
+For g  5  test metrics, TP:  15060 , FP:  73845 , FN: 108 , P: 16.939429728361734 , R: 99.2879746835443 , F1: 28.941223948574557
+For g  4  test metrics, TP:  15073 , FP:  74479 , FN: 95 , P: 16.831561550830802 , R: 99.37368143459915 , F1: 28.787242169595114
+For g  3  test metrics, TP:  15155 , FP:  133812 , FN: 13 , P: 10.173394107419764 , R: 99.91429324894514 , F1: 18.46650622962805
+For g  2  test metrics, TP:  15167 , FP:  177725 , FN: 1 , P: 7.862949215104826 , R: 99.99340717299577 , F1: 14.579448236085746
+For g  1  test metrics, TP:  15167 , FP:  212333 , FN: 1 , P: 6.666813186813187 , R: 99.99340717299577 , F1: 12.50020604282394
+Ce a dat pe validare
+8 2207 140 87.19466202494922 99.07700421940929
+
+Best threshold 7
+Confusion matrix
+TP: 15028, TN: 500180, FP: 2207, FN: 140, FNR: 0.009229957805907173, FPR: 0.004393027685827858
+Precision: 87.195%, Recall: 99.077%, F1-measure: 92.757%, Specificity: 0.996
+--------------------------UNIQUE TEST SEQUENCES------------------------------------
+Ce a dat pe validare
+8 725 116 83.15128979781548 96.85977260422307
+
+Best threshold 7
+Confusion matrix
+TP: 3578, TN: 12359, FP: 725, FN: 116, FNR: 0.03140227395776936, FPR: 0.0554111892387649
+Precision: 83.151%, Recall: 96.860%, F1-measure: 89.484%, Specificity: 0.945, Lead time: 15.582
+elapsed_time: 447.5707688331604
+Log saved
+
+Starting EPOCH: 10 | phase: train | ⏰: 11:11:18 | Learning rate: 0.001000
+Train loss: 0.00112045 - Train acc: 0.79: 100%|██████████| 475/475 [02:39<00:00,  2.99it/s]
+Eliminated instances percentage:  0.22837424386547908 110920/485694
+Eliminated anomalies percentage:  0.06416336098088712 7117/110920
+
+Starting epoch: 10 | phase: valid | ⏰: 11:13:57
+: 100%|██████████| 53/53 [00:06<00:00,  8.16it/s]
+
+Validation loss: 1.7457153437272557 Validation accuracy: 0.7910165659859911
+======== My contribution ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/train.pkl
+Length test 57506
+Nr secvente unice train: normale vs anormale
+3715 646
+: 100%|██████████| 105/105 [00:09<00:00, 10.72it/s]
+: 100%|██████████| 20/20 [00:01<00:00, 12.59it/s]
+------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------
+For g  34  Train metrics, TP:  0 FP:  0
+For g  33  Train metrics, TP:  0 FP:  0
+For g  32  Train metrics, TP:  0 FP:  0
+For g  31  Train metrics, TP:  0 FP:  0
+For g  30  train metrics, TP:  2 , FP:  0 , FN: 1668 , P: 100.0 , R: 0.11976047904191617 , F1: 0.23923444976076555
+For g  29  train metrics, TP:  3 , FP:  0 , FN: 1667 , P: 100.0 , R: 0.17964071856287425 , F1: 0.3586371787208607
+For g  28  train metrics, TP:  4 , FP:  0 , FN: 1666 , P: 100.0 , R: 0.23952095808383234 , F1: 0.4778972520908005
+For g  27  train metrics, TP:  52 , FP:  1 , FN: 1618 , P: 98.11320754716981 , R: 3.1137724550898205 , F1: 6.035983749274521
+For g  26  train metrics, TP:  54 , FP:  3 , FN: 1616 , P: 94.73684210526316 , R: 3.2335329341317367 , F1: 6.253618992472496
+For g  25  train metrics, TP:  59 , FP:  12 , FN: 1611 , P: 83.09859154929578 , R: 3.532934131736527 , F1: 6.777713957495692
+For g  24  train metrics, TP:  70 , FP:  23 , FN: 1600 , P: 75.26881720430107 , R: 4.191616766467066 , F1: 7.941009642654565
+For g  23  train metrics, TP:  70 , FP:  25 , FN: 1600 , P: 73.6842105263158 , R: 4.191616766467066 , F1: 7.93201133144476
+For g  22  train metrics, TP:  72 , FP:  28 , FN: 1598 , P: 72.0 , R: 4.311377245508982 , F1: 8.135593220338983
+For g  21  train metrics, TP:  76 , FP:  28 , FN: 1594 , P: 73.07692307692308 , R: 4.550898203592815 , F1: 8.568207440811726
+For g  20  train metrics, TP:  82 , FP:  30 , FN: 1588 , P: 73.21428571428571 , R: 4.910179640718563 , F1: 9.20314253647587
+For g  19  train metrics, TP:  122 , FP:  31 , FN: 1548 , P: 79.73856209150327 , R: 7.3053892215568865 , F1: 13.384530992868898
+For g  18  train metrics, TP:  173 , FP:  57 , FN: 1497 , P: 75.21739130434783 , R: 10.359281437125748 , F1: 18.210526315789473
+For g  17  train metrics, TP:  402 , FP:  71 , FN: 1268 , P: 84.98942917547569 , R: 24.07185628742515 , F1: 37.5174988334111
+For g  16  train metrics, TP:  471 , FP:  134 , FN: 1199 , P: 77.85123966942149 , R: 28.20359281437126 , F1: 41.40659340659341
+For g  15  train metrics, TP:  516 , FP:  177 , FN: 1154 , P: 74.45887445887446 , R: 30.898203592814372 , F1: 43.67329665679222
+For g  14  train metrics, TP:  579 , FP:  202 , FN: 1091 , P: 74.13572343149808 , R: 34.67065868263473 , F1: 47.24602203182374
+For g  13  train metrics, TP:  743 , FP:  203 , FN: 927 , P: 78.54122621564483 , R: 44.49101796407186 , F1: 56.80428134556575
+For g  12  train metrics, TP:  746 , FP:  205 , FN: 924 , P: 78.44374342797056 , R: 44.67065868263473 , F1: 56.924837848149565
+For g  11  train metrics, TP:  903 , FP:  207 , FN: 767 , P: 81.35135135135135 , R: 54.07185628742515 , F1: 64.96402877697842
+For g  10  train metrics, TP:  905 , FP:  208 , FN: 765 , P: 81.31176999101527 , R: 54.191616766467064 , F1: 65.03772906934962
+For g  9  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  8  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  7  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  6  train metrics, TP:  1658 , FP:  5309 , FN: 12 , P: 23.797904406487728 , R: 99.2814371257485 , F1: 38.39296051869862
+For g  5  train metrics, TP:  1658 , FP:  8113 , FN: 12 , P: 16.96858049329649 , R: 99.2814371257485 , F1: 28.983480464994315
+For g  4  train metrics, TP:  1660 , FP:  8176 , FN: 10 , P: 16.87677917852786 , R: 99.40119760479043 , F1: 28.854510690074747
+For g  3  train metrics, TP:  1669 , FP:  14778 , FN: 1 , P: 10.147747309539733 , R: 99.94011976047904 , F1: 18.424683998454487
+For g  2  train metrics, TP:  1669 , FP:  19723 , FN: 1 , P: 7.801982049364248 , R: 99.94011976047904 , F1: 14.474026537160695
+For g  1  train metrics, TP:  1669 , FP:  23522 , FN: 1 , P: 6.625382080901909 , R: 99.94011976047904 , F1: 12.426938684337888
+Ce a dat pe train
+10 229 12 87.86433492315845 99.2814371257485
+
+[0, 0, 0, 0, 2, 3, 4, 53, 57, 71, 93, 95, 100, 104, 112, 153, 230, 473, 605, 693, 781, 946, 951, 1110, 1113, 1887, 1887, 1887, 6967, 9771, 9836, 16447, 21392, 25191]
+Changes in number of anomalies
+Pentru g 33 anomalies diff:0
+Pentru g 32 anomalies diff:0
+Pentru g 31 anomalies diff:0
+Pentru g 30 anomalies diff:2
+Pentru g 29 anomalies diff:1
+Pentru g 28 anomalies diff:1
+Pentru g 27 anomalies diff:49
+Pentru g 26 anomalies diff:4
+Pentru g 25 anomalies diff:14
+Pentru g 24 anomalies diff:22
+Pentru g 23 anomalies diff:2
+Pentru g 22 anomalies diff:5
+Pentru g 21 anomalies diff:4
+Pentru g 20 anomalies diff:8
+Pentru g 19 anomalies diff:41
+Pentru g 18 anomalies diff:77
+Pentru g 17 anomalies diff:243
+Pentru g 16 anomalies diff:132
+Pentru g 15 anomalies diff:88
+Pentru g 14 anomalies diff:88
+Pentru g 13 anomalies diff:165
+Pentru g 12 anomalies diff:5
+Pentru g 11 anomalies diff:159
+Pentru g 10 anomalies diff:3
+Pentru g 9 anomalies diff:774
+Pentru g 8 anomalies diff:0
+Pentru g 7 anomalies diff:0
+Pentru g 6 anomalies diff:5080
+Pentru g 5 anomalies diff:2804
+Pentru g 4 anomalies diff:65
+Pentru g 3 anomalies diff:6611
+Pentru g 2 anomalies diff:4945
+Pentru g 1 anomalies diff:3799
+elapsed_time: 60.29756689071655
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Nr secvente unice test: normale vs anormale
+13084 3694
+: 100%|██████████| 390/390 [00:34<00:00, 11.16it/s]
+: 100%|██████████| 121/121 [00:09<00:00, 13.15it/s]
+------------------------NORMAL TEST SEQUENCES----------------------------
+For g  34  test metrics, TP:  0 FP:  0
+For g  33  test metrics, TP:  0 FP:  0
+For g  32  test metrics, TP:  0 FP:  0
+For g  31  test metrics, TP:  0 FP:  0
+For g  30  test metrics, TP:  43 , FP:  0 , FN: 15125 , P: 100.0 , R: 0.2834915611814346 , F1: 0.565380316875945
+For g  29  test metrics, TP:  62 , FP:  0 , FN: 15106 , P: 100.0 , R: 0.40875527426160335 , F1: 0.8141825344714378
+For g  28  test metrics, TP:  68 , FP:  0 , FN: 15100 , P: 100.0 , R: 0.44831223628691985 , F1: 0.8926227356261487
+For g  27  test metrics, TP:  399 , FP:  4 , FN: 14769 , P: 99.0074441687345 , R: 2.6305379746835444 , F1: 5.124911694817289
+For g  26  test metrics, TP:  423 , FP:  19 , FN: 14745 , P: 95.70135746606334 , R: 2.7887658227848102 , F1: 5.4196028187059575
+For g  25  test metrics, TP:  452 , FP:  137 , FN: 14716 , P: 76.7402376910017 , R: 2.979957805907173 , F1: 5.737132702925684
+For g  24  test metrics, TP:  531 , FP:  215 , FN: 14637 , P: 71.17962466487936 , R: 3.5007911392405062 , F1: 6.673369360311675
+For g  23  test metrics, TP:  551 , FP:  221 , FN: 14617 , P: 71.37305699481865 , R: 3.6326476793248945 , F1: 6.9134253450439145
+For g  22  test metrics, TP:  560 , FP:  233 , FN: 14608 , P: 70.61790668348046 , R: 3.691983122362869 , F1: 7.017104191466699
+For g  21  test metrics, TP:  579 , FP:  234 , FN: 14589 , P: 71.21771217712177 , R: 3.8172468354430378 , F1: 7.246104749389899
+For g  20  test metrics, TP:  668 , FP:  255 , FN: 14500 , P: 72.37269772481041 , R: 4.404008438818566 , F1: 8.30277795040706
+For g  19  test metrics, TP:  1004 , FP:  289 , FN: 14164 , P: 77.64887857695282 , R: 6.6191983122362865 , F1: 12.19852985845331
+For g  18  test metrics, TP:  1380 , FP:  567 , FN: 13788 , P: 70.87827426810478 , R: 9.098101265822784 , F1: 16.1262050832603
+For g  17  test metrics, TP:  3590 , FP:  679 , FN: 11578 , P: 84.09463574607636 , R: 23.668248945147678 , F1: 36.93985697381283
+For g  16  test metrics, TP:  4241 , FP:  1277 , FN: 10927 , P: 76.8575570859007 , R: 27.960179324894515 , F1: 41.0035772986561
+For g  15  test metrics, TP:  4689 , FP:  1644 , FN: 10479 , P: 74.04073898626244 , R: 30.91376582278481 , F1: 43.616575973210544
+For g  14  test metrics, TP:  5292 , FP:  1936 , FN: 9876 , P: 73.2152739346984 , R: 34.889240506329116 , F1: 47.25843900696553
+For g  13  test metrics, TP:  6782 , FP:  1969 , FN: 8386 , P: 77.49971431836362 , R: 44.71255274261603 , F1: 56.708056356871104
+For g  12  test metrics, TP:  6814 , FP:  1978 , FN: 8354 , P: 77.50227479526842 , R: 44.92352320675106 , F1: 56.87813021702838
+For g  11  test metrics, TP:  8035 , FP:  1994 , FN: 7133 , P: 80.11765878951041 , R: 52.97336497890296 , F1: 63.77743382148669
+For g  10  test metrics, TP:  8047 , FP:  2004 , FN: 7121 , P: 80.06168540443737 , R: 53.05247890295359 , F1: 63.81696340061066
+For g  9  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  8  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  7  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  6  test metrics, TP:  15046 , FP:  48622 , FN: 122 , P: 23.631965822705283 , R: 99.19567510548524 , F1: 38.17037901466335
+For g  5  test metrics, TP:  15060 , FP:  73845 , FN: 108 , P: 16.939429728361734 , R: 99.2879746835443 , F1: 28.941223948574557
+For g  4  test metrics, TP:  15073 , FP:  74479 , FN: 95 , P: 16.831561550830802 , R: 99.37368143459915 , F1: 28.787242169595114
+For g  3  test metrics, TP:  15155 , FP:  133812 , FN: 13 , P: 10.173394107419764 , R: 99.91429324894514 , F1: 18.46650622962805
+For g  2  test metrics, TP:  15167 , FP:  177725 , FN: 1 , P: 7.862949215104826 , R: 99.99340717299577 , F1: 14.579448236085746
+For g  1  test metrics, TP:  15167 , FP:  212333 , FN: 1 , P: 6.666813186813187 , R: 99.99340717299577 , F1: 12.50020604282394
+Ce a dat pe validare
+8 2207 140 87.19466202494922 99.07700421940929
+
+Best threshold 7
+Confusion matrix
+TP: 15028, TN: 500180, FP: 2207, FN: 140, FNR: 0.009229957805907173, FPR: 0.004393027685827858
+Precision: 87.195%, Recall: 99.077%, F1-measure: 92.757%, Specificity: 0.996
+--------------------------UNIQUE TEST SEQUENCES------------------------------------
+Ce a dat pe validare
+8 725 116 83.15128979781548 96.85977260422307
+
+Best threshold 7
+Confusion matrix
+TP: 3578, TN: 12359, FP: 725, FN: 116, FNR: 0.03140227395776936, FPR: 0.0554111892387649
+Precision: 83.151%, Recall: 96.860%, F1-measure: 89.484%, Specificity: 0.945, Lead time: 15.582
+elapsed_time: 456.3595359325409
+Log saved
+
+Starting EPOCH: 11 | phase: train | ⏰: 11:22:50 | Learning rate: 0.001000
+Train loss: 0.00088178 - Train acc: 0.79: 100%|██████████| 475/475 [02:42<00:00,  2.92it/s]
+:   0%|          | 0/53 [00:00<?, ?it/s]Eliminated instances percentage:  0.22897544544507448 111212/485694
+Eliminated anomalies percentage:  0.0640218681437255 7120/111212
+
+Starting epoch: 11 | phase: valid | ⏰: 11:25:32
+: 100%|██████████| 53/53 [00:05<00:00,  9.43it/s]
+
+Validation loss: 1.7892761612838168 Validation accuracy: 0.7909980358003187
+======== My contribution ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/train.pkl
+Length test 57506
+Nr secvente unice train: normale vs anormale
+3715 646
+: 100%|██████████| 105/105 [00:08<00:00, 11.89it/s]
+: 100%|██████████| 20/20 [00:01<00:00, 15.08it/s]
+------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------
+For g  34  Train metrics, TP:  0 FP:  0
+For g  33  Train metrics, TP:  0 FP:  0
+For g  32  Train metrics, TP:  0 FP:  0
+For g  31  Train metrics, TP:  0 FP:  0
+For g  30  train metrics, TP:  2 , FP:  0 , FN: 1668 , P: 100.0 , R: 0.11976047904191617 , F1: 0.23923444976076555
+For g  29  train metrics, TP:  3 , FP:  0 , FN: 1667 , P: 100.0 , R: 0.17964071856287425 , F1: 0.3586371787208607
+For g  28  train metrics, TP:  4 , FP:  0 , FN: 1666 , P: 100.0 , R: 0.23952095808383234 , F1: 0.4778972520908005
+For g  27  train metrics, TP:  52 , FP:  1 , FN: 1618 , P: 98.11320754716981 , R: 3.1137724550898205 , F1: 6.035983749274521
+For g  26  train metrics, TP:  54 , FP:  3 , FN: 1616 , P: 94.73684210526316 , R: 3.2335329341317367 , F1: 6.253618992472496
+For g  25  train metrics, TP:  59 , FP:  12 , FN: 1611 , P: 83.09859154929578 , R: 3.532934131736527 , F1: 6.777713957495692
+For g  24  train metrics, TP:  70 , FP:  23 , FN: 1600 , P: 75.26881720430107 , R: 4.191616766467066 , F1: 7.941009642654565
+For g  23  train metrics, TP:  70 , FP:  25 , FN: 1600 , P: 73.6842105263158 , R: 4.191616766467066 , F1: 7.93201133144476
+For g  22  train metrics, TP:  72 , FP:  28 , FN: 1598 , P: 72.0 , R: 4.311377245508982 , F1: 8.135593220338983
+For g  21  train metrics, TP:  76 , FP:  28 , FN: 1594 , P: 73.07692307692308 , R: 4.550898203592815 , F1: 8.568207440811726
+For g  20  train metrics, TP:  82 , FP:  30 , FN: 1588 , P: 73.21428571428571 , R: 4.910179640718563 , F1: 9.20314253647587
+For g  19  train metrics, TP:  122 , FP:  31 , FN: 1548 , P: 79.73856209150327 , R: 7.3053892215568865 , F1: 13.384530992868898
+For g  18  train metrics, TP:  173 , FP:  57 , FN: 1497 , P: 75.21739130434783 , R: 10.359281437125748 , F1: 18.210526315789473
+For g  17  train metrics, TP:  402 , FP:  71 , FN: 1268 , P: 84.98942917547569 , R: 24.07185628742515 , F1: 37.5174988334111
+For g  16  train metrics, TP:  471 , FP:  134 , FN: 1199 , P: 77.85123966942149 , R: 28.20359281437126 , F1: 41.40659340659341
+For g  15  train metrics, TP:  516 , FP:  177 , FN: 1154 , P: 74.45887445887446 , R: 30.898203592814372 , F1: 43.67329665679222
+For g  14  train metrics, TP:  579 , FP:  202 , FN: 1091 , P: 74.13572343149808 , R: 34.67065868263473 , F1: 47.24602203182374
+For g  13  train metrics, TP:  743 , FP:  203 , FN: 927 , P: 78.54122621564483 , R: 44.49101796407186 , F1: 56.80428134556575
+For g  12  train metrics, TP:  746 , FP:  205 , FN: 924 , P: 78.44374342797056 , R: 44.67065868263473 , F1: 56.924837848149565
+For g  11  train metrics, TP:  903 , FP:  207 , FN: 767 , P: 81.35135135135135 , R: 54.07185628742515 , F1: 64.96402877697842
+For g  10  train metrics, TP:  905 , FP:  208 , FN: 765 , P: 81.31176999101527 , R: 54.191616766467064 , F1: 65.03772906934962
+For g  9  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  8  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  7  train metrics, TP:  1658 , FP:  229 , FN: 12 , P: 87.86433492315845 , R: 99.2814371257485 , F1: 93.22462749508013
+For g  6  train metrics, TP:  1658 , FP:  5309 , FN: 12 , P: 23.797904406487728 , R: 99.2814371257485 , F1: 38.39296051869862
+For g  5  train metrics, TP:  1658 , FP:  8113 , FN: 12 , P: 16.96858049329649 , R: 99.2814371257485 , F1: 28.983480464994315
+For g  4  train metrics, TP:  1660 , FP:  8176 , FN: 10 , P: 16.87677917852786 , R: 99.40119760479043 , F1: 28.854510690074747
+For g  3  train metrics, TP:  1669 , FP:  14778 , FN: 1 , P: 10.147747309539733 , R: 99.94011976047904 , F1: 18.424683998454487
+For g  2  train metrics, TP:  1669 , FP:  19723 , FN: 1 , P: 7.801982049364248 , R: 99.94011976047904 , F1: 14.474026537160695
+For g  1  train metrics, TP:  1669 , FP:  23522 , FN: 1 , P: 6.625382080901909 , R: 99.94011976047904 , F1: 12.426938684337888
+Ce a dat pe train
+10 229 12 87.86433492315845 99.2814371257485
+
+[0, 0, 0, 0, 2, 3, 4, 53, 57, 71, 93, 95, 100, 104, 112, 153, 230, 473, 605, 693, 781, 946, 951, 1110, 1113, 1887, 1887, 1887, 6967, 9771, 9836, 16447, 21392, 25191]
+Changes in number of anomalies
+Pentru g 33 anomalies diff:0
+Pentru g 32 anomalies diff:0
+Pentru g 31 anomalies diff:0
+Pentru g 30 anomalies diff:2
+Pentru g 29 anomalies diff:1
+Pentru g 28 anomalies diff:1
+Pentru g 27 anomalies diff:49
+Pentru g 26 anomalies diff:4
+Pentru g 25 anomalies diff:14
+Pentru g 24 anomalies diff:22
+Pentru g 23 anomalies diff:2
+Pentru g 22 anomalies diff:5
+Pentru g 21 anomalies diff:4
+Pentru g 20 anomalies diff:8
+Pentru g 19 anomalies diff:41
+Pentru g 18 anomalies diff:77
+Pentru g 17 anomalies diff:243
+Pentru g 16 anomalies diff:132
+Pentru g 15 anomalies diff:88
+Pentru g 14 anomalies diff:88
+Pentru g 13 anomalies diff:165
+Pentru g 12 anomalies diff:5
+Pentru g 11 anomalies diff:159
+Pentru g 10 anomalies diff:3
+Pentru g 9 anomalies diff:774
+Pentru g 8 anomalies diff:0
+Pentru g 7 anomalies diff:0
+Pentru g 6 anomalies diff:5080
+Pentru g 5 anomalies diff:2804
+Pentru g 4 anomalies diff:65
+Pentru g 3 anomalies diff:6611
+Pentru g 2 anomalies diff:4945
+Pentru g 1 anomalies diff:3799
+elapsed_time: 53.31442832946777
+======== Their approach ===========
+model_path: dataset/hdfs/deeplog/deeplog.pth
+Loading dataset/hdfs/test.pkl
+Length test 517555
+Nr secvente unice test: normale vs anormale
+13084 3694
+: 100%|██████████| 390/390 [00:36<00:00, 10.80it/s]
+: 100%|██████████| 121/121 [00:10<00:00, 11.80it/s]
+------------------------NORMAL TEST SEQUENCES----------------------------
+For g  34  test metrics, TP:  0 FP:  0
+For g  33  test metrics, TP:  0 FP:  0
+For g  32  test metrics, TP:  0 FP:  0
+For g  31  test metrics, TP:  0 FP:  0
+For g  30  test metrics, TP:  43 , FP:  0 , FN: 15125 , P: 100.0 , R: 0.2834915611814346 , F1: 0.565380316875945
+For g  29  test metrics, TP:  62 , FP:  0 , FN: 15106 , P: 100.0 , R: 0.40875527426160335 , F1: 0.8141825344714378
+For g  28  test metrics, TP:  68 , FP:  0 , FN: 15100 , P: 100.0 , R: 0.44831223628691985 , F1: 0.8926227356261487
+For g  27  test metrics, TP:  399 , FP:  4 , FN: 14769 , P: 99.0074441687345 , R: 2.6305379746835444 , F1: 5.124911694817289
+For g  26  test metrics, TP:  423 , FP:  19 , FN: 14745 , P: 95.70135746606334 , R: 2.7887658227848102 , F1: 5.4196028187059575
+For g  25  test metrics, TP:  452 , FP:  137 , FN: 14716 , P: 76.7402376910017 , R: 2.979957805907173 , F1: 5.737132702925684
+For g  24  test metrics, TP:  531 , FP:  215 , FN: 14637 , P: 71.17962466487936 , R: 3.5007911392405062 , F1: 6.673369360311675
+For g  23  test metrics, TP:  551 , FP:  221 , FN: 14617 , P: 71.37305699481865 , R: 3.6326476793248945 , F1: 6.9134253450439145
+For g  22  test metrics, TP:  560 , FP:  233 , FN: 14608 , P: 70.61790668348046 , R: 3.691983122362869 , F1: 7.017104191466699
+For g  21  test metrics, TP:  579 , FP:  234 , FN: 14589 , P: 71.21771217712177 , R: 3.8172468354430378 , F1: 7.246104749389899
+For g  20  test metrics, TP:  668 , FP:  255 , FN: 14500 , P: 72.37269772481041 , R: 4.404008438818566 , F1: 8.30277795040706
+For g  19  test metrics, TP:  1004 , FP:  289 , FN: 14164 , P: 77.64887857695282 , R: 6.6191983122362865 , F1: 12.19852985845331
+For g  18  test metrics, TP:  1380 , FP:  567 , FN: 13788 , P: 70.87827426810478 , R: 9.098101265822784 , F1: 16.1262050832603
+For g  17  test metrics, TP:  3590 , FP:  679 , FN: 11578 , P: 84.09463574607636 , R: 23.668248945147678 , F1: 36.93985697381283
+For g  16  test metrics, TP:  4241 , FP:  1277 , FN: 10927 , P: 76.8575570859007 , R: 27.960179324894515 , F1: 41.0035772986561
+For g  15  test metrics, TP:  4689 , FP:  1644 , FN: 10479 , P: 74.04073898626244 , R: 30.91376582278481 , F1: 43.616575973210544
+For g  14  test metrics, TP:  5292 , FP:  1936 , FN: 9876 , P: 73.2152739346984 , R: 34.889240506329116 , F1: 47.25843900696553
+For g  13  test metrics, TP:  6782 , FP:  1969 , FN: 8386 , P: 77.49971431836362 , R: 44.71255274261603 , F1: 56.708056356871104
+For g  12  test metrics, TP:  6814 , FP:  1978 , FN: 8354 , P: 77.50227479526842 , R: 44.92352320675106 , F1: 56.87813021702838
+For g  11  test metrics, TP:  8035 , FP:  1994 , FN: 7133 , P: 80.11765878951041 , R: 52.97336497890296 , F1: 63.77743382148669
+For g  10  test metrics, TP:  8047 , FP:  2004 , FN: 7121 , P: 80.06168540443737 , R: 53.05247890295359 , F1: 63.81696340061066
+For g  9  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  8  test metrics, TP:  15027 , FP:  2206 , FN: 141 , P: 87.19897870364997 , R: 99.07041139240506 , F1: 92.7563964075183
+For g  7  test metrics, TP:  15028 , FP:  2207 , FN: 140 , P: 87.19466202494922 , R: 99.07700421940929 , F1: 92.75684350214486
+For g  6  test metrics, TP:  15046 , FP:  48622 , FN: 122 , P: 23.631965822705283 , R: 99.19567510548524 , F1: 38.17037901466335
+For g  5  test metrics, TP:  15060 , FP:  73845 , FN: 108 , P: 16.939429728361734 , R: 99.2879746835443 , F1: 28.941223948574557
+For g  4  test metrics, TP:  15073 , FP:  74479 , FN: 95 , P: 16.831561550830802 , R: 99.37368143459915 , F1: 28.787242169595114
+For g  3  test metrics, TP:  15155 , FP:  133812 , FN: 13 , P: 10.173394107419764 , R: 99.91429324894514 , F1: 18.46650622962805
+For g  2  test metrics, TP:  15167 , FP:  177725 , FN: 1 , P: 7.862949215104826 , R: 99.99340717299577 , F1: 14.579448236085746
+For g  1  test metrics, TP:  15167 , FP:  212333 , FN: 1 , P: 6.666813186813187 , R: 99.99340717299577 , F1: 12.50020604282394
+Ce a dat pe validare
+8 2207 140 87.19466202494922 99.07700421940929
+
+Best threshold 7
+Confusion matrix
+TP: 15028, TN: 500180, FP: 2207, FN: 140, FNR: 0.009229957805907173, FPR: 0.004393027685827858
+Precision: 87.195%, Recall: 99.077%, F1-measure: 92.757%, Specificity: 0.996
+--------------------------UNIQUE TEST SEQUENCES------------------------------------
+Ce a dat pe validare
+8 725 116 83.15128979781548 96.85977260422307
+
+Best threshold 7
+Confusion matrix
+TP: 3578, TN: 12359, FP: 725, FN: 116, FNR: 0.03140227395776936, FPR: 0.0554111892387649
+Precision: 83.151%, Recall: 96.860%, F1-measure: 89.484%, Specificity: 0.945, Lead time: 15.582
+elapsed_time: 459.89786100387573
+Log saved
+
+Starting EPOCH: 12 | phase: train | ⏰: 11:34:20 | Learning rate: 0.001000
+Train loss: 0.00554312 - Train acc: 0.79: 100%|██████████| 475/475 [02:44<00:00,  2.88it/s]
+Eliminated instances percentage:  0.2284277755129773 110946/485694
+Eliminated anomalies percentage:  0.06376976186613308 7075/110946
+
+Starting epoch: 12 | phase: valid | ⏰: 11:37:05

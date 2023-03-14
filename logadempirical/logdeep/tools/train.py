@@ -45,6 +45,38 @@ def mean_selection(losses):
     return torch.where(upper_limit)[0], torch.where(torch.logical_not(upper_limit))[0]
 
 
+def skewness_fn(x, device, dim=1):
+    """Calculates skewness of data "x" along dimension "dim"."""
+    std, mean = torch.std_mean(x, dim)
+    n = torch.Tensor([x.shape[dim]]).to(device)
+    eps = 1e-6  # for stability
+
+    sample_bias_adjustment = torch.sqrt(n * (n - 1)) / (n - 2)
+    skewness = sample_bias_adjustment * (
+        (torch.sum((x.T - mean.unsqueeze(dim).T).T.pow(3), dim) / n)
+        / std.pow(3).clamp(min=eps)
+    )
+    return skewness
+
+
+def kurtosis_fn(x, device, dim=1):
+    """Calculates kurtosis of data "x" along dimension "dim"."""
+    std, mean = torch.std_mean(x, dim)
+    n = torch.Tensor([x.shape[dim]]).to(device)
+    eps = 1e-6  # for stability
+
+    sample_bias_adjustment = (n - 1) / ((n - 2) * (n - 3))
+    kurtosis = sample_bias_adjustment * (
+        (n + 1)
+        * (
+            (torch.sum((x.T - mean.unsqueeze(dim).T).T.pow(4), dim) / n)
+            / std.pow(4).clamp(min=eps)
+        )
+        - 3 * (n - 1)
+    )
+    return kurtosis
+
+
 class Trainer():
     def __init__(self, options):
         self.model_name = options['model_name']
@@ -258,7 +290,7 @@ class Trainer():
             print("Failed to save logs")
 
     def train(self, epoch):
-        mean_selection_activated = False
+        mean_selection_activated = True
         self.log['train']['epoch'].append(epoch)
         start = time.strftime("%H:%M:%S")
         lr = self.optimizer.state_dict()['param_groups'][0]['lr']
@@ -273,6 +305,8 @@ class Trainer():
         num_batch = len(self.train_loader)
         total_losses = 0
         acc = 0
+        skewness = 0
+        kurtosis = 0
         total_log = 0
         no_not_selected = 0
         no_trained = 0
@@ -282,6 +316,7 @@ class Trainer():
             del log['idx']
             features = [x.to(self.device) for x in log['features']]
             output, _ = self.model(features=features, device=self.device)
+
             if isinstance(output, dict):
                 loss = output['loss']
                 total_log += len(label)
@@ -300,7 +335,7 @@ class Trainer():
                 loss = self.criterion(output, label)
                 if mean_selection_activated:
                     selected, not_selected = mean_selection(loss)
-                    if epoch > 5:
+                    if epoch > 10:
                         loss = loss[selected].mean()
                     else:
                         loss = loss.mean()
@@ -319,9 +354,12 @@ class Trainer():
                     normals_not_selected += len(not_selected_normal)
                 else:
                     loss = loss.mean()
+
                 predicted = output.argmax(dim=1).cpu().numpy()
                 label = np.array([y.cpu() for y in label])
                 acc += (predicted == label).sum()
+                skewness += skewness_fn(output, self.device).sum()
+                kurtosis += kurtosis_fn(output, self.device).sum()
                 total_log += len(label)
 
                 total_losses += float(loss)
@@ -332,12 +370,22 @@ class Trainer():
                     self.optimizer.step()
                     self.optimizer.zero_grad()
                 tbar.set_description(
-                    "Train loss: {0:.8f} - Train acc: {1:.2f}".format(total_losses / (i + 1), acc / total_log))
+                    "Train loss: {0:.8f} - Train acc: {1:.2f} - Train kurtosis: {1:.2f} - Train skewness: {1:.2f}".format(total_losses / (i + 1), acc / total_log, kurtosis / total_log, skewness / total_log))
 
         self.log['train']['loss'].append(total_losses / num_batch)
+        self.log['train']['acc'].append(acc / total_log)
+        self.log['train']['kurtosis'].append(kurtosis / total_log)
+        self.log['train']['skewness'].append(skewness / total_log)
+
         if mean_selection_activated:
-            print("Eliminated instances percentage: ", no_not_selected / no_trained, str(no_not_selected) + "/" + str(no_trained))
-            print("Eliminated anomalies percentage: ", anomalies_not_selected / (normals_not_selected+ anomalies_not_selected), str(anomalies_not_selected) + "/" + str(normals_not_selected + anomalies_not_selected))
+            if normals_not_selected + anomalies_not_selected == 0:
+                print("Eliminated instances percentage: ", no_not_selected / no_trained,
+                      str(no_not_selected) + "/" + str(no_trained))
+                print("Eliminated anomalies percentage: ", 0, str(anomalies_not_selected) + "/" + str(normals_not_selected + anomalies_not_selected))
+
+            else:
+                print("Eliminated instances percentage: ", no_not_selected / no_trained, str(no_not_selected) + "/" + str(no_trained))
+                print("Eliminated anomalies percentage: ", anomalies_not_selected / (normals_not_selected + anomalies_not_selected), str(anomalies_not_selected) + "/" + str(normals_not_selected + anomalies_not_selected))
 
     def valid(self, epoch):
         self.model.eval()
@@ -349,6 +397,8 @@ class Trainer():
         self.log['valid']['time'].append(start)
         total_losses = 0
         acc = 0
+        skewness = 0
+        kurtosis = 0
         total_log = 0
         tbar = tqdm(self.valid_loader, desc="\r")
         num_batch = len(self.valid_loader)
@@ -368,14 +418,19 @@ class Trainer():
                     predicted = torch.max(output.softmax(dim=-1), 1).indices.cpu().numpy()
                     label = np.array([y.cpu() for y in label])
                     acc += (predicted == label).sum()
+                    skewness += skewness_fn(output, self.device).sum()
+                    kurtosis += kurtosis_fn(output, self.device).sum()
                     total_log += len(label)
 
                 total_losses += float(loss)
         if total_log:
-            print("\nValidation loss:", total_losses / num_batch, "Validation accuracy:", acc / total_log)
+            print("\nValidation loss:", total_losses / num_batch, "Validation accuracy:", acc / total_log, "Validation kurtosis:", kurtosis / total_log, "Validation skewness:", skewness / total_log)
         else:
             print("\nValidation loss:", total_losses / num_batch)
         self.log['valid']['loss'].append(total_losses / num_batch)
+        self.log['valid']['acc'].append(acc / total_log)
+        self.log['valid']['kurtosis'].append(kurtosis / total_log)
+        self.log['valid']['skewness'].append(skewness / total_log)
 
         if total_losses / num_batch < self.best_loss:
             self.best_loss = total_losses / num_batch
@@ -491,7 +546,7 @@ class Trainer():
                 #                      suffix=self.model_name)
                 n_val_epoch += 1
                 print("======== My contribution ===========")
-                predicter.compute_elbow()
+                predicter.compute_elbow(epoch)
                 print("======== Their approach ===========")
                 predicter.predict_semi_supervised()
                 # print("======== My contribution ===========")

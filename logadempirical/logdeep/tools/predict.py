@@ -55,6 +55,19 @@ def generate(output_dir, name, is_neural):
     return normal_iter, abnormal_iter
 
 
+def create_plot(anomalies_per_thresold, epoch):
+    x = range(34)
+    reversed_list = anomalies_per_thresold[::-1]
+
+    plt.plot(x, reversed_list, 'r-', label='Number anomalies')
+
+    plt.legend()
+    plt.title("elbow " + str(epoch))
+    plt.savefig(f"runs/2023-03-14-v3/{epoch}_elbow.png")
+    plt.close()
+    # plt.show()
+
+
 class Predicter():
     def __init__(self, options):
         self.data_dir = options['data_dir']
@@ -309,7 +322,7 @@ class Predicter():
         print()
         return no_anomalies_predicted
 
-    def compute_elbow(self):
+    def compute_elbow(self, epoch):
         with open(self.vocab_path, 'rb') as f:
             vocab = pickle.load(f)
         if self.model_name == "deeplog":
@@ -341,6 +354,7 @@ class Predicter():
                                                  train_abnormal_results, num_abnormal,
                                                  threshold_range=self.num_candidates)
         print(anomalies_per_thresold)
+        create_plot(anomalies_per_thresold, epoch)
         print("Changes in number of anomalies")
         for idx in range(1, len(anomalies_per_thresold)):
             print("Pentru g " + str(34-idx) + " anomalies diff:" + str(anomalies_per_thresold[idx] - anomalies_per_thresold[idx-1]))
