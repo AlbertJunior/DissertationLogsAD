@@ -22,7 +22,7 @@ from sklearn.ensemble import IsolationForest as iForest
 
 from logadempirical.logdeep.dataset.log import log_dataset
 from logadempirical.logdeep.dataset.sample import sliding_window, load_features
-from logadempirical.logdeep.tools.utils import plot_train_valid_loss
+from logadempirical.logdeep.tools.utils import plot_train_valid_loss, plot_next_token_histogram_of_probabilities
 from logadempirical.logdeep.models.lstm import deeplog, loganomaly, robustlog
 from logadempirical.logdeep.models.autoencoder import AutoEncoder
 from logadempirical.logdeep.models.cnn import TextCNN
@@ -47,6 +47,7 @@ def mean_selection(losses):
 
 def skewness_fn(x, device, dim=1):
     """Calculates skewness of data "x" along dimension "dim"."""
+    x = torch.FloatTensor(x)
     std, mean = torch.std_mean(x, dim)
     n = torch.Tensor([x.shape[dim]]).to(device)
     eps = 1e-6  # for stability
@@ -61,6 +62,7 @@ def skewness_fn(x, device, dim=1):
 
 def kurtosis_fn(x, device, dim=1):
     """Calculates kurtosis of data "x" along dimension "dim"."""
+    x = torch.FloatTensor(x)
     std, mean = torch.std_mean(x, dim)
     n = torch.Tensor([x.shape[dim]]).to(device)
     eps = 1e-6  # for stability
@@ -83,6 +85,7 @@ class Trainer():
         self.model_dir = options['model_dir']
         self.model_path = options['model_path']
         self.data_dir = options['output_dir']
+        self.run_dir = options['run_dir']
         self.vocab_path = options["vocab_path"]
         self.scale_path = options["scale_path"]
         self.emb_dir = options['data_dir']
@@ -237,6 +240,7 @@ class Trainer():
             raise NotImplementedError
 
         self.criterion = nn.CrossEntropyLoss(reduction="none")
+        self.softmax_function = torch.nn.Softmax(dim=1)
         self.time_criterion = nn.MSELoss()
 
         self.start_epoch = 0
@@ -244,9 +248,9 @@ class Trainer():
         self.best_score = -1
         self.log = {
             "train": {key: []
-                      for key in ["epoch", "lr", "time", "loss"]},
+                      for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]},
             "valid": {key: []
-                      for key in ["epoch", "lr", "time", "loss"]}
+                      for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]}
         }
         if options['resume_path'] is not None:
             if os.path.isfile(options['resume_path']):
@@ -283,7 +287,7 @@ class Trainer():
     def save_log(self):
         try:
             for key, values in self.log.items():
-                pd.DataFrame(values).to_csv(self.model_dir + key + "_log.csv",
+                pd.DataFrame(values).to_csv(self.run_dir + "/" + key + "_log.csv",
                                             index=False)
             print("Log saved")
         except:
@@ -305,6 +309,7 @@ class Trainer():
         num_batch = len(self.train_loader)
         total_losses = 0
         acc = 0
+        probabilities_real_next_token = []
         skewness = 0
         kurtosis = 0
         total_log = 0
@@ -316,6 +321,7 @@ class Trainer():
             del log['idx']
             features = [x.to(self.device) for x in log['features']]
             output, _ = self.model(features=features, device=self.device)
+            probab_output = self.softmax_function(output)
 
             if isinstance(output, dict):
                 loss = output['loss']
@@ -332,6 +338,13 @@ class Trainer():
             else:
                 label = label.view(-1).to(self.device)
                 label = label - 1
+
+                for idx in range(probab_output.size()[0]):
+                    probabilities_real_next_token.append(probab_output[idx][label[idx].item()].item())
+
+                skewness = skewness_fn(probabilities_real_next_token, self.device, dim=0).item()
+                kurtosis = kurtosis_fn(probabilities_real_next_token, self.device, dim=0).item()
+
                 loss = self.criterion(output, label)
                 if mean_selection_activated:
                     selected, not_selected = mean_selection(loss)
@@ -358,8 +371,6 @@ class Trainer():
                 predicted = output.argmax(dim=1).cpu().numpy()
                 label = np.array([y.cpu() for y in label])
                 acc += (predicted == label).sum()
-                skewness += skewness_fn(output, self.device).sum()
-                kurtosis += kurtosis_fn(output, self.device).sum()
                 total_log += len(label)
 
                 total_losses += float(loss)
@@ -370,12 +381,13 @@ class Trainer():
                     self.optimizer.step()
                     self.optimizer.zero_grad()
                 tbar.set_description(
-                    "Train loss: {0:.8f} - Train acc: {1:.2f} - Train kurtosis: {1:.2f} - Train skewness: {1:.2f}".format(total_losses / (i + 1), acc / total_log, kurtosis / total_log, skewness / total_log))
+                    "Train loss: {0:.8f} - Train acc: {1:.2f} - Train kurtosis: {2:.2f} - Train skewness: {3:.2f}".format(total_losses / (i + 1), acc / total_log, kurtosis, skewness))
 
+        plot_next_token_histogram_of_probabilities("train", epoch, probabilities_real_next_token, self.run_dir)
         self.log['train']['loss'].append(total_losses / num_batch)
         self.log['train']['acc'].append(acc / total_log)
-        self.log['train']['kurtosis'].append(kurtosis / total_log)
-        self.log['train']['skewness'].append(skewness / total_log)
+        self.log['train']['kurtosis'].append(kurtosis)
+        self.log['train']['skewness'].append(skewness)
 
         if mean_selection_activated:
             if normals_not_selected + anomalies_not_selected == 0:
@@ -397,8 +409,7 @@ class Trainer():
         self.log['valid']['time'].append(start)
         total_losses = 0
         acc = 0
-        skewness = 0
-        kurtosis = 0
+        probabilities_real_next_token = []
         total_log = 0
         tbar = tqdm(self.valid_loader, desc="\r")
         num_batch = len(self.valid_loader)
@@ -408,6 +419,7 @@ class Trainer():
                 del log['idx']
                 features = [x.to(self.device) for x in log['features']]
                 output, _ = self.model(features=features, device=self.device)
+                probab_output = self.softmax_function(output)
                 if isinstance(output, dict):
                     loss = output['loss']
                 else:
@@ -418,19 +430,27 @@ class Trainer():
                     predicted = torch.max(output.softmax(dim=-1), 1).indices.cpu().numpy()
                     label = np.array([y.cpu() for y in label])
                     acc += (predicted == label).sum()
-                    skewness += skewness_fn(output, self.device).sum()
-                    kurtosis += kurtosis_fn(output, self.device).sum()
+
+                    for idx in range(probab_output.size()[0]):
+                        probabilities_real_next_token.append(probab_output[idx][label[idx].item()].item())
+
+
+
                     total_log += len(label)
 
                 total_losses += float(loss)
+
+        skewness = skewness_fn(probabilities_real_next_token, self.device, dim=0).item()
+        kurtosis = kurtosis_fn(probabilities_real_next_token, self.device, dim=0).item()
         if total_log:
-            print("\nValidation loss:", total_losses / num_batch, "Validation accuracy:", acc / total_log, "Validation kurtosis:", kurtosis / total_log, "Validation skewness:", skewness / total_log)
+            print("\nValidation loss:", total_losses / num_batch, "Validation accuracy:", acc / total_log, "Validation kurtosis:", kurtosis, "Validation skewness:", skewness)
         else:
             print("\nValidation loss:", total_losses / num_batch)
         self.log['valid']['loss'].append(total_losses / num_batch)
         self.log['valid']['acc'].append(acc / total_log)
-        self.log['valid']['kurtosis'].append(kurtosis / total_log)
-        self.log['valid']['skewness'].append(skewness / total_log)
+        self.log['valid']['kurtosis'].append(kurtosis)
+        self.log['valid']['skewness'].append(skewness)
+        plot_next_token_histogram_of_probabilities("valid", epoch, probabilities_real_next_token, self.run_dir)
 
         if total_losses / num_batch < self.best_loss:
             self.best_loss = total_losses / num_batch
@@ -548,12 +568,12 @@ class Trainer():
                 print("======== My contribution ===========")
                 predicter.compute_elbow(epoch)
                 print("======== Their approach ===========")
-                predicter.predict_semi_supervised()
+                predicter.predict_semi_supervised(epoch)
                 # print("======== My contribution ===========")
                 # predicter.predict_semi_supervised_ramona()
             self.save_log()
 
 
-        plot_train_valid_loss(self.model_dir)
+        plot_train_valid_loss(self.run_dir)
         if self.model_name == "autoencoder":
             return self.train_autoencoder2()  # self.model, val_loss / n_val_epoch

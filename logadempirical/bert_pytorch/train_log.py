@@ -24,6 +24,7 @@ class Trainer():
         self.model_path = options["model_path"]
         self.vocab_path = options["vocab_path"]
         self.output_path = options["output_dir"]
+        self.run_dir = options["run_dir"]
 
         self.window_size = options["window_size"]
         self.adaptive_window = options["adaptive_window"]
@@ -113,7 +114,7 @@ class Trainer():
                                    deepsvdd_loss=self.deepsvdd_loss)
 
         self.start_iteration(surfix_log="log")
-        plot_train_valid_loss(self.model_dir)
+        plot_train_valid_loss(self.run_dir)
 
     def start_iteration(self, surfix_log):
         print("Training Start")

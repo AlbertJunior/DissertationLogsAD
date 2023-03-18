@@ -33,6 +33,8 @@ def arg_parser():
     parser.add_argument("--data_dir", default="./dataset/", metavar="DIR", help="data directory")
     parser.add_argument("--output_dir", default="./experimental_results/RQ1/random/", metavar="DIR",
                         help="output directory")
+    parser.add_argument("--run_dir", default="./runs/default", metavar="DIR",
+                        help="run directory")
     parser.add_argument("--folder", default='bgl', metavar="DIR")
 
     parser.add_argument('--log_file', help="log file name")
@@ -144,6 +146,9 @@ def main():
     args.data_dir = os.path.expanduser(args.data_dir + args.folder)
 
     args.output_dir += args.folder
+    if not os.path.exists(args.run_dir):
+        os.makedirs(args.run_dir, exist_ok=True)
+
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir, exist_ok=True)
 
@@ -185,6 +190,16 @@ def main():
     if not os.path.exists(options["model_dir"]):
         os.mkdir(options["model_dir"])
 
+    if not os.path.exists(os.path.join(options["run_dir"], 'Histograms')):
+        os.mkdir(os.path.join(options["run_dir"], 'Histograms'))
+    if not os.path.exists(os.path.join(options["run_dir"], 'Metrics')):
+        os.mkdir(os.path.join(options["run_dir"], 'Metrics'))
+    if not os.path.exists(os.path.join(options["run_dir"], 'Metrics', 'Unique')):
+        os.mkdir(os.path.join(options["run_dir"], 'Metrics', 'Unique'))
+    if not os.path.exists(os.path.join(options["run_dir"], 'Metrics', 'Normal')):
+        os.mkdir(os.path.join(options["run_dir"], 'Metrics', 'Normal'))
+    if not os.path.exists(os.path.join(options["run_dir"], 'Metrics', 'Train')):
+        os.mkdir(os.path.join(options["run_dir"], 'Metrics', 'Train'))
 
     print("Save options parameters")
     save_parameters(options, options["model_dir"] + "parameters.txt")

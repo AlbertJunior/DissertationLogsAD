@@ -23,12 +23,12 @@ def seed_everything(seed=1234):
 
 
 def plot_train_valid_loss(save_dir):
-    train_loss = pd.read_csv(save_dir + "train_log.csv")
-    valid_loss = pd.read_csv(save_dir + "valid_log.csv")
+    train_loss = pd.read_csv(save_dir + "/train_log.csv")
+    valid_loss = pd.read_csv(save_dir + "/valid_log.csv")
     sns.lineplot(x="epoch",y="loss" , data = train_loss, label="train loss")
     sns.lineplot(x="epoch",y="loss" , data = valid_loss, label="valid loss")
     plt.title("epoch vs train loss vs valid loss")
     plt.legend()
-    plt.savefig(save_dir+"train_valid_loss.png")
+    plt.savefig(save_dir+"/train_valid_loss.png")
     plt.show()
     print("plot done")

@@ -55,17 +55,7 @@ def generate(output_dir, name, is_neural):
     return normal_iter, abnormal_iter
 
 
-def create_plot(anomalies_per_thresold, epoch):
-    x = range(34)
-    reversed_list = anomalies_per_thresold[::-1]
 
-    plt.plot(x, reversed_list, 'r-', label='Number anomalies')
-
-    plt.legend()
-    plt.title("elbow " + str(epoch))
-    plt.savefig(f"runs/2023-03-14-v3/{epoch}_elbow.png")
-    plt.close()
-    # plt.show()
 
 
 class Predicter():
@@ -73,6 +63,7 @@ class Predicter():
         self.data_dir = options['data_dir']
         self.output_dir = options['output_dir']
         self.model_dir = options['model_dir']
+        self.run_dir = options["run_dir"]
         self.vocab_path = options["vocab_path"]
         self.model_path = options['model_path']
         self.model_name = options['model_name']
@@ -111,6 +102,16 @@ class Predicter():
 
         self.lower_bound = 0
         self.upper_bound = 3
+
+    def create_plot(self, title, anomalies_per_thresold, epoch):
+        x = range(self.num_candidates)
+        reversed_list = anomalies_per_thresold[::-1]
+
+        plt.plot(x, reversed_list, 'r-', label=title)
+        plt.legend()
+        plt.title("elbow " + str(epoch))
+        plt.savefig(self.run_dir + f"/{title}_{epoch}.png")
+        plt.close()
 
     def detect_logkey_anomaly(self, output, label):
         num_anomaly = []
@@ -157,57 +158,95 @@ class Predicter():
         return total_errors
 
     def find_best_threshold(self, test_normal_results, num_normal_session_logs, test_abnormal_results,
-                            num_abnormal_session_logs, threshold_range):
+                            num_abnormal_session_logs, epoch, threshold_range):
         test_abnormal_length = sum(num_abnormal_session_logs)
         test_normal_length = sum(num_normal_session_logs)
         res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
         # print(threshold_range)
+        fps, tps, tns, fns, ps, rs, f1s = [], [], [], [], [], [], []
         for th in range(threshold_range, 0, -1):
             FP = self.compute_anomaly(test_normal_results, num_normal_session_logs, th + 1)
             TP = self.compute_anomaly(test_abnormal_results, num_abnormal_session_logs, th + 1)
-            if TP == 0:
-                print("For g ", th, " test metrics, TP: ", TP, "FP: ", FP)
+            TN = test_normal_length - FP
+            FN = test_abnormal_length - TP
+            fps.append(FP)
+            tps.append(TP)
+            tns.append(TN)
+            fns.append(FN)
+            if TP + FP == 0:
+                print("For g ", th, " test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN, ", P:100, R:0, F1:0")
+                ps.append(100)
+                rs.append(0)
+                f1s.append(0)
                 continue
 
             # Compute precision, recall and F1-measure
-            TN = test_normal_length - FP
-            FN = test_abnormal_length - TP
             P = 100 * TP / (TP + FP)
             R = 100 * TP / (TP + FN)
             F1 = 2 * P * R / (P + R)
             # print(th + 1, FP, FN, P, R)
+            ps.append(P)
+            rs.append(R)
+            f1s.append(F1)
             print("For g ", th, " test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
             if F1 > res[-1]:
                 res = [th, TP, TN, FP, FN, P, R, F1]
         print("Ce a dat pe validare")
         print(res[0] + 1, res[3], res[4], res[5], res[6])
         print()
+        self.create_plot("Metrics/Normal/Recall", rs, epoch)
+        self.create_plot("Metrics/Normal/Precision", ps, epoch)
+        self.create_plot("Metrics/Normal/F1Score", f1s, epoch)
+        self.create_plot("Metrics/Normal/TP", tps, epoch)
+        self.create_plot("Metrics/Normal/TN", tns, epoch)
+        self.create_plot("Metrics/Normal/FP", fps, epoch)
+        self.create_plot("Metrics/Normal/FN", fns, epoch)
         return res
 
     def find_best_threshold_unique(self, test_normal_results, num_normal_session_logs, test_abnormal_results,
-                            num_abnormal_session_logs, threshold_range):
+                            num_abnormal_session_logs, epoch, threshold_range):
         test_abnormal_length = len(num_abnormal_session_logs)
         test_normal_length = len(num_normal_session_logs)
         res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
         # print(threshold_range)
+        fps, tps, tns, fns, ps, rs, f1s = [], [], [], [], [], [], []
         for th in range(threshold_range, 0, -1):
             FP = self.compute_anomaly_unique(test_normal_results, num_normal_session_logs, th + 1)
             TP = self.compute_anomaly_unique(test_abnormal_results, num_abnormal_session_logs, th + 1)
-            if TP == 0:
+            TN = test_normal_length - FP
+            FN = test_abnormal_length - TP
+            fps.append(FP)
+            tps.append(TP)
+            tns.append(TN)
+            fns.append(FN)
+            if TP + FP == 0:
+                print("For g ", th, " test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN, ", P:100, R:0, F1:0")
+                ps.append(100)
+                rs.append(0)
+                f1s.append(0)
                 continue
 
             # Compute precision, recall and F1-measure
-            TN = test_normal_length - FP
-            FN = test_abnormal_length - TP
             P = 100 * TP / (TP + FP)
             R = 100 * TP / (TP + FN)
             F1 = 2 * P * R / (P + R)
             # print(th + 1, FP, FN, P, R)
+            ps.append(P)
+            rs.append(R)
+            f1s.append(F1)
+            print("For g ", th, " test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
             if F1 > res[-1]:
                 res = [th, TP, TN, FP, FN, P, R, F1]
         print("Ce a dat pe validare")
         print(res[0] + 1, res[3], res[4], res[5], res[6])
         print()
+        self.create_plot("Metrics/Unique/Recall", rs, epoch)
+        self.create_plot("Metrics/Unique/Precisiton", ps, epoch)
+        self.create_plot("Metrics/Unique/F1Score", f1s, epoch)
+        self.create_plot("Metrics/Unique/TP", tps, epoch)
+        self.create_plot("Metrics/Unique/TN", tns, epoch)
+        self.create_plot("Metrics/Unique/FP", fps, epoch)
+        self.create_plot("Metrics/Unique/FN", fns, epoch)
         return res
 
     def compute_metrics_on_threshold(self, test_normal_results, num_normal_session_logs, test_abnormal_results, num_abnormal_session_logs, th):
@@ -290,36 +329,53 @@ class Predicter():
                              label[i]))
         return test_results, num_sess
 
-    def find_elbow(self, test_normal_results, num_normal_session_logs, test_abnormal_results, num_abnormal_session_logs, threshold_range):
+    def find_elbow(self, test_normal_results, num_normal_session_logs, test_abnormal_results, num_abnormal_session_logs, epoch, threshold_range):
         test_abnormal_length = sum(num_abnormal_session_logs)
         test_normal_length = sum(num_normal_session_logs)
         res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
-        # print(threshold_range)
         no_anomalies_predicted = []
+        fps, tps, tns, fns, ps, rs, f1s = [], [], [], [], [], [], []
+
         for th in range(threshold_range, 0, -1):
             FP = self.compute_anomaly(test_normal_results, num_normal_session_logs, th + 1)
             TP = self.compute_anomaly(test_abnormal_results, num_abnormal_session_logs, th + 1)
+            TN = test_normal_length - FP
+            FN = test_abnormal_length - TP
+            fps.append(FP)
+            tps.append(TP)
+            tns.append(TN)
+            fns.append(FN)
             anomalies = FP + TP
             no_anomalies_predicted.append(anomalies)
-            if TP == 0:
-                print("For g ", th, " Train metrics, TP: ", TP, "FP: ", FP)
+            if TP + FP == 0:
+                print("For g ", th, " Train metrics, TP: ", TP, "FP: ", FP, ", FN:", FN, ", P:100, R:0, F1:0")
+                ps.append(100)
+                rs.append(0)
+                f1s.append(0)
                 continue
 
             # Compute precision, recall and F1-measure
-            TN = test_normal_length - FP
-            FN = test_abnormal_length - TP
             P = 100 * TP / (TP + FP)
             R = 100 * TP / (TP + FN)
             F1 = 2 * P * R / (P + R)
             # print(th + 1, FP, FN, P, R)
-            print("For g ", th, " train metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:",
-                  F1)
+            ps.append(P)
+            rs.append(R)
+            f1s.append(F1)
+            print("For g ", th, " train metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
             if F1 > res[-1]:
                 res = [th, TP, TN, FP, FN, P, R, F1]
 
         print("Ce a dat pe train")
         print(res[0] + 1, res[3], res[4], res[5], res[6])
         print()
+        self.create_plot("Metrics/Train/Recall", rs, epoch)
+        self.create_plot("Metrics/Train/Precision", ps, epoch)
+        self.create_plot("Metrics/Train/F1Score", f1s, epoch)
+        self.create_plot("Metrics/Train/TP", tps, epoch)
+        self.create_plot("Metrics/Train/TN", tns, epoch)
+        self.create_plot("Metrics/Train/FP", fps, epoch)
+        self.create_plot("Metrics/Train/FN", fns, epoch)
         return no_anomalies_predicted
 
     def compute_elbow(self, epoch):
@@ -352,16 +408,17 @@ class Predicter():
         print("------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------")
         anomalies_per_thresold = self.find_elbow(train_normal_results, num_normal,
                                                  train_abnormal_results, num_abnormal,
+                                                 epoch,
                                                  threshold_range=self.num_candidates)
         print(anomalies_per_thresold)
-        create_plot(anomalies_per_thresold, epoch)
+        self.create_plot("Number anomalies", anomalies_per_thresold, epoch)
         print("Changes in number of anomalies")
         for idx in range(1, len(anomalies_per_thresold)):
             print("Pentru g " + str(34-idx) + " anomalies diff:" + str(anomalies_per_thresold[idx] - anomalies_per_thresold[idx-1]))
         elapsed_time = time.time() - start_time
         print('elapsed_time: {}'.format(elapsed_time))
 
-    def predict_semi_supervised(self):
+    def predict_semi_supervised(self, epoch):
 
         with open(self.vocab_path, 'rb') as f:
             vocab = pickle.load(f)
@@ -392,22 +449,11 @@ class Predicter():
         print("------------------------NORMAL TEST SEQUENCES----------------------------")
         TH, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold(test_normal_results, num_normal,
                                                                 test_abnormal_results, num_abnormal,
+                                                                epoch,
                                                                 threshold_range=self.num_candidates)
         FPR = FP / (FP + TN)
         FNR = FN / (TP + FN)
         SP = TN / (TN + FP)
-        # find lead time
-        # lead_time = []
-        # no_detection = 0
-        # for pred in test_abnormal_results:
-        #     for i, p in enumerate(pred):
-        #         if p[1] not in p[0][:TH]:
-        #             lead_time.append(i + self.history_size + 1)
-        #             no_detection += 1
-        #             break
-        #
-        # with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
-        #     [f.write(str(i) + "\n") for i in lead_time]
 
         print('Best threshold', TH)
         print("Confusion matrix")
@@ -417,6 +463,7 @@ class Predicter():
         print("--------------------------UNIQUE TEST SEQUENCES------------------------------------")
         TH, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold_unique(test_normal_results, num_normal,
                                                                 test_abnormal_results, num_abnormal,
+                                                                epoch,
                                                                 threshold_range=self.num_candidates)
         FPR = FP / (FP + TN)
         FNR = FN / (TP + FN)
@@ -519,18 +566,6 @@ class Predicter():
             FPR = FP / (FP + TN)
             FNR = FN / (TP + FN)
             SP = TN / (TN + FP)
-            # find lead time
-            # lead_time = []
-            # no_detection = 0
-            # for pred in test_abnormal_results:
-            #     for i, p in enumerate(pred):
-            #         if p[1] not in p[0][:TH]:
-            #             lead_time.append(i + self.history_size + 1)
-            #             no_detection += 1
-            #             break
-            #
-            # with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
-            #     [f.write(str(i) + "\n") for i in lead_time]
 
             print('Best threshold', TH)
             print("Confusion matrix")
@@ -549,18 +584,6 @@ class Predicter():
             FPR = FP / (FP + TN)
             FNR = FN / (TP + FN)
             SP = TN / (TN + FP)
-            # find lead time
-            # lead_time = []
-            # no_detection = 0
-            # for pred in test_abnormal_results:
-            #     for i, p in enumerate(pred):
-            #         if p[1] not in p[0][:TH]:
-            #             lead_time.append(i + self.history_size + 1)
-            #             no_detection += 1
-            #             break
-            #
-            # with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
-            #     [f.write(str(i) + "\n") for i in lead_time]
 
             print('Best threshold', TH)
             print("Confusion matrix")

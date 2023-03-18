@@ -54,16 +54,40 @@ def train_val_split(logs_meta, labels, val_ratio=0.1):
     return train_logs, train_labels, val_logs, val_labels
 
 
+def plot_next_token_histogram_of_probabilities(phase, epoch, probabilities, save_dir):
+    plt.hist(probabilities, bins=100)
+    plt.title(str(epoch) + " Histogram of next token probailities " + phase)
+    plt.savefig(save_dir + "/Histograms/" + str(epoch) + "_Histogram_next_token_probabilities_" + phase +".png")
+    plt.close()
+
+
 def plot_train_valid_loss(save_dir):
-    train_loss = pd.read_csv(save_dir + "train_log.csv")
-    valid_loss = pd.read_csv(save_dir + "valid_log.csv")
+    train_loss = pd.read_csv(save_dir + "/train_log.csv")
+    valid_loss = pd.read_csv(save_dir + "/valid_log.csv")
     sns.lineplot(x="epoch",y="loss" , data = train_loss, label="train loss")
     sns.lineplot(x="epoch",y="loss" , data = valid_loss, label="valid loss")
     plt.title("epoch vs train loss vs valid loss")
-    # plt.legend
-    plt.savefig(save_dir+"train_valid_loss.png")
-    # plt.show()
+    plt.savefig(save_dir+"/train_valid_loss.png")
+    plt.close()
+
+    sns.lineplot(x="epoch", y="acc", data=train_loss, label="train acc")
+    sns.lineplot(x="epoch", y="acc", data=valid_loss, label="valid acc")
+    plt.title("epoch vs train acc vs valid acc")
+    plt.savefig(save_dir + "/train_valid_acc.png")
+    plt.close()
+
+    sns.lineplot(x="epoch", y="skewness", data=train_loss, label="train skewness")
+    sns.lineplot(x="epoch", y="skewness", data=valid_loss, label="valid skewness")
+    plt.title("epoch vs train skewness vs valid skewness")
+    plt.savefig(save_dir + "/train_valid_skewness.png")
+    plt.close()
+
+    sns.lineplot(x="epoch", y="kurtosis", data=train_loss, label="train kurtosis")
+    sns.lineplot(x="epoch", y="kurtosis", data=valid_loss, label="valid kurtosis")
+    plt.title("epoch vs train kurtosis vs valid kurtosis")
+    plt.savefig(save_dir + "/train_valid_kurtosis.png")
     print("plot done")
+    plt.close()
 
 
 def plot_sequence_len(save_dir):
@@ -86,3 +110,6 @@ def plot_sequence_len(save_dir):
     plt.legend()
     plt.show()
     plt.close()
+
+if __name__ == "__main__":
+    plot_train_valid_loss("./../../../runs/2023-03-14-v4/")
