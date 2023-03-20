@@ -223,8 +223,7 @@ def evaluate_online(data, config, vocab, logger, vec={}, outputFile=None, thresh
                 else:
                     FP += 1
                 break
-    with open("{0}/plelog-leadtime.txt".format(config.save_dir), mode="w", encoding="utf8") as f:
-        [f.write(str(x) + "\n") for x in lead_time]
+
     TN = TN - FP
     FN = FN - TP
     logger.info('TP: %d, TN: %d, FN: %d, FP: %d' % (TP, TN, FN, FP))

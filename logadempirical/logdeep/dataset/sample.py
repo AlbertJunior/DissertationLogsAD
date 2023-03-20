@@ -88,6 +88,8 @@ def load_features(data_path, only_normal=False, min_len=0):
                 label = seq['Label'].tolist()
                 if max(label) > 0:
                     no_abnormal += 1
+                else:
+                    no_normal += 1
             else:
                 label = seq['Label']
                 if label > 0:
@@ -198,7 +200,11 @@ def sliding_window(data_iter, vocab, history_size, is_train=True, data_dir="data
 
             result_logs.append(([sequential_pattern, quantitative_pattern, semantic_pattern], idx))
             labels.append(label)
-            anomaly_label.append(lbls)
+            if not isinstance(lbls, int):
+                label = max(lbls[i: i + history_size])
+            else:
+                label = lbls
+            anomaly_label.append(label)
         num_sessions += 1
 
     if sample_ratio != 1:

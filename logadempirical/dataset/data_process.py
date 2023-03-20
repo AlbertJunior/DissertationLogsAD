@@ -26,7 +26,7 @@ def _count_anomaly(log_path):
     print("total size {}, abnormal size {}".format(total_size, total_size - normal_size))
 
 
-def sample_raw_data(data_file, output_file, sample_window_size, sample_step_size):
+def sample_raw_data(data_file, output_file, sample_size, sample_step_size):
     """
     only sample supercomputer dataset such as bgl
     """
@@ -39,14 +39,14 @@ def sample_raw_data(data_file, output_file, sample_window_size, sample_step_size
             labels.append(line.split()[0] != '-')
             sample_data.append(line)
 
-            if len(labels) == sample_window_size:
+            if len(labels) == sample_size:
                 abnormal_rate = sum(np.array(labels)) / len(labels)
                 print(f"{idx + 1} lines, abnormal rate {abnormal_rate}")
                 break
 
             idx += 1
             if idx % sample_step_size == 0:
-                print(f"Process {round(idx / sample_window_size * 100, 4)} % raw data", end='\r')
+                print(f"Process {round(idx / sample_size * 100, 4)} % raw data", end='\r')
 
     with open(output_file, "w") as f:
         f.writelines(sample_data)
@@ -181,16 +181,7 @@ def _file_generator2(filename, df):
 
 
 def process_instance(data_dir, output_dir, train_file, test_file):
-    """
-    creating log sequences by sliding window
-    :param data_dir:
-    :param output_dir:
-    :param log_file:
-    :param window_size:
-    :param step_size:
-    :param train_size:
-    :return:
-    """
+
     ########
     # count anomaly
     ########

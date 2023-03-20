@@ -38,7 +38,7 @@ def arg_parser():
     parser.add_argument("--folder", default='bgl', metavar="DIR")
 
     parser.add_argument('--log_file', help="log file name")
-    parser.add_argument("--sample_size", help="sample raw log")
+    parser.add_argument("--sample_size", type=int, help="sample raw log")
     parser.add_argument("--sample_log_file", default=None, help="if sampling raw logs, new log file name")
 
     parser.add_argument("--parser_type", default=None, help="parse type drain or spell")
@@ -175,9 +175,9 @@ def main():
                         window_size=args.window_size, step_size=args.step_size,
                         train_size=args.train_size, random_sample=args.random_sample, session_type=args.session_level)
 
-    if args.is_instance:
-        process_instance(data_dir=args.data_dir, output_dir=args.output_dir, train_file=args.train_file,
-                         test_file=args.test_file)
+    # if args.is_instance:
+    #     process_instance(data_dir=args.data_dir, output_dir=args.output_dir, train_file=args.train_file,
+    #                      test_file=args.test_file)
 
     # if options['session_level'] == "entry":
     #     options["output_dir"] = options["output_dir"] + str(options["window_size"]) + "/"

@@ -26,10 +26,10 @@ def session_window(raw_data, id_regex, label_dict, window_size=20):
     results = []
 
     for k, v in data_dict.items():
-        if len(v['Seq']) > window_size:
+        # if len(v['Seq']) > window_size:
             # print(window_size)
-            v['Seq'] = v['Seq'][-window_size:]
-            v['EventId'] = v['EventId'][-window_size:]
+            # v['Seq'] = v['Seq'][-window_size:]
+            # v['EventId'] = v['EventId'][-window_size:]
         results.append({"SessionId": k, "EventId": v['EventId'], "Seq": v['Seq'], "Label": label_dict[k]})
     results = shuffle(results)
     return results
@@ -73,6 +73,7 @@ def sliding_window(raw_data, para):
     label_data, time_data = raw_data.iloc[:, 1], raw_data.iloc[:, 0]
     # print(label_data[:10])
     logkey_data, deltaT_data, log_template_data = raw_data.iloc[:, 2], raw_data.iloc[:, 3], raw_data.iloc[:, 4]
+    content_data = raw_data.iloc[:, 5]
     new_data = []
     start_end_index_pair = set()
 
@@ -119,17 +120,18 @@ def sliding_window(raw_data, para):
     for (start_index, end_index) in start_end_index_pair:
         dt = deltaT_data[start_index: end_index].values
         dt[0] = 0
-        new_data.append([
-            time_data[start_index: end_index].values,
-            label_data[start_index:end_index],
-            logkey_data[start_index: end_index].values,
-            dt,
-            log_template_data[start_index: end_index]
-        ])
+        new_data.append({
+            "timestamp": time_data[start_index: end_index].values,
+            "Label": label_data[start_index:end_index],
+            "EventId": logkey_data[start_index: end_index].values,
+            "deltaT": dt,
+            "EventTemplate": log_template_data[start_index: end_index],
+            "Seq": content_data[start_index: end_index].values
+        })
 
     assert len(start_end_index_pair) == len(new_data)
     print('there are %d instances (sliding windows) in this dataset\n' % len(start_end_index_pair))
-    return pd.DataFrame(new_data, columns=raw_data.columns)
+    return pd.DataFrame(new_data)
 
 
 def fixed_window(raw_data, para):

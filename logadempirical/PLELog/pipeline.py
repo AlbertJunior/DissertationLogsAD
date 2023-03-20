@@ -318,7 +318,7 @@ def run_PLELog(options):
     argparser.add_argument('--hdbscan_option', default=0, type=int,
                            help='Different strategies of HDBSCAN clustering. 0 for PLELog_noP, 1 for PLELog, -1 for upperbound.')
     # argparser.add_argument('--dataset', default='bgl', type=str, help='Choose dataset, bgl, hdfs, spirit, '
-    #                                                                   'or tdb (thunderbird)')
+    #                                                                   'or tdb (tbird)')
     argparser.add_argument('--train_ratio', default=7, type=int, help='Ratio of train data.')
     argparser.add_argument('--dev_ratio', default=1, type=int, help='Ratio of dev data.')
     argparser.add_argument('--test_ratio', default=2, type=int, help='Ratio of test data.')

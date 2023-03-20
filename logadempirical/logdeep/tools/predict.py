@@ -173,7 +173,7 @@ class Predicter():
             tps.append(TP)
             tns.append(TN)
             fns.append(FN)
-            if TP + FP == 0:
+            if TP == 0:
                 print("For g ", th, " test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN, ", P:100, R:0, F1:0")
                 ps.append(100)
                 rs.append(0)
@@ -219,7 +219,7 @@ class Predicter():
             tps.append(TP)
             tns.append(TN)
             fns.append(FN)
-            if TP + FP == 0:
+            if TP == 0:
                 print("For g ", th, " test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN, ", P:100, R:0, F1:0")
                 ps.append(100)
                 rs.append(0)
@@ -347,7 +347,7 @@ class Predicter():
             fns.append(FN)
             anomalies = FP + TP
             no_anomalies_predicted.append(anomalies)
-            if TP + FP == 0:
+            if TP == 0:
                 print("For g ", th, " Train metrics, TP: ", TP, "FP: ", FP, ", FN:", FN, ", P:100, R:0, F1:0")
                 ps.append(100)
                 rs.append(0)
@@ -414,7 +414,7 @@ class Predicter():
         self.create_plot("Number anomalies", anomalies_per_thresold, epoch)
         print("Changes in number of anomalies")
         for idx in range(1, len(anomalies_per_thresold)):
-            print("Pentru g " + str(34-idx) + " anomalies diff:" + str(anomalies_per_thresold[idx] - anomalies_per_thresold[idx-1]))
+            print("Pentru g " + str(self.num_candidates-idx) + " anomalies diff:" + str(anomalies_per_thresold[idx] - anomalies_per_thresold[idx-1]))
         elapsed_time = time.time() - start_time
         print('elapsed_time: {}'.format(elapsed_time))
 
@@ -468,24 +468,11 @@ class Predicter():
         FPR = FP / (FP + TN)
         FNR = FN / (TP + FN)
         SP = TN / (TN + FP)
-        # find lead time
-        lead_time = []
-        no_detection = 0
-        for pred in test_abnormal_results:
-            for i, p in enumerate(pred):
-                if p[1] not in p[0][:TH]:
-                    lead_time.append(i + self.history_size + 1)
-                    no_detection += 1
-                    break
-
-        with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
-            [f.write(str(i) + "\n") for i in lead_time]
 
         print('Best threshold', TH)
         print("Confusion matrix")
         print("TP: {}, TN: {}, FP: {}, FN: {}, FNR: {}, FPR: {}".format(TP, TN, FP, FN, FNR, FPR))
-        print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}, '
-              'Lead time: {:.3f}'.format(P, R, F1, SP, sum(lead_time) / no_detection))
+        print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}'.format(P, R, F1, SP))
 
         elapsed_time = time.time() - start_time
         print('elapsed_time: {}'.format(elapsed_time))
@@ -676,10 +663,7 @@ class Predicter():
         SP = TN / (TN + FP)
         print("Confusion matrix")
         print("TP: {}, TN: {}, FP: {}, FN: {}, FNR: {}, FPR: {}".format(TP, TN, FP, FN, FNR, FPR))
-        with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
-            [f.write(str(i) + "\n") for i in lead_time]
-        print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, '
-              'Specificity: {:.3f}, Lead time: {}'.format(P, R, F1, SP, sum(lead_time) / len(lead_time)))
+        print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}'.format(P, R, F1, SP))
 
         elapsed_time = time.time() - start_time
         print('elapsed_time: {}'.format(elapsed_time))
@@ -770,12 +754,9 @@ class Predicter():
         FPR = FP / (FP + TN)
         FNR = FN / (TP + FN)
         SP = TN / (TN + FP)
-        with open(self.output_dir + self.model_name + "-leadtime.txt", mode="w") as f:
-            [f.write(str(i) + "\n") for i in lead_time]
         print("Confusion matrix")
         print("TP: {}, TN: {}, FP: {}, FN: {}, FNR: {}, FPR: {}".format(TP, TN, FP, FN, FNR, FPR))
-        print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}, '
-              'Lead time: {:.3f}'.format(P, R, F1, SP, sum(lead_time) / len(lead_time)))
+        print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}'.format(P, R, F1, SP))
 
         elapsed_time = time.time() - start_time
         print('elapsed_time: {}'.format(elapsed_time))
