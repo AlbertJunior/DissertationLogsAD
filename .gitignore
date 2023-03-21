@@ -2,8 +2,6 @@
 *.log
 .ipynb_checkpoints
 output/*
-dataset/*/
-dataset/**/
 experimental_results/*
 
 # Editors
