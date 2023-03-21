@@ -2,7 +2,7 @@ import math
 import torch
 from torch import nn, einsum
 
-from einops import rearrange
+# from einops import rearrange
 
 # translated from tensorflow code
 # https://gist.github.com/aravindsrinivas/56359b79f0ce4449bcb04ab4b56a57a2

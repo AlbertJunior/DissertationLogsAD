@@ -1,11 +1,11 @@
 from .vocab import Vocab
 import torch
-from transformers import BertTokenizer, BertModel
+# from transformers import BertTokenizer, BertModel
 import re
 import string
 
-bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-bert_model = BertModel.from_pretrained('bert-base-uncased')
+# bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+# bert_model = BertModel.from_pretrained('bert-base-uncased')
 
 
 def clean(s):
