@@ -358,8 +358,10 @@ class Trainer():
                 loss = self.criterion(output, label)
                 if mean_selection_activated:
                     T = (self.max_epoch + 1) / (epoch + 1) - 1
+                    T = T.to(self.device)
                     selected, not_selected = mean_selection(loss, T)
-
+                    selected = selected.to(self.device)
+                    not_selected = selected.to(self.device)
                     if epoch > 1:
                         loss = loss[selected].mean()
                     else:
