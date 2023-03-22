@@ -28,21 +28,29 @@ from logadempirical.logdeep.models.autoencoder import AutoEncoder
 from logadempirical.logdeep.models.cnn import TextCNN
 from logadempirical.neural_log.transformers import NeuralLog
 
+def sa_value(losses, ul, T):
+    return torch.exp(-torch.abs(losses - ul) / T)
 
-def mean_selection(losses):
+def mean_selection(losses, T):
     Q1 = torch.quantile(losses, 0.25)
     Q3 = torch.quantile(losses, 0.75)
 
     IQR = Q3 - Q1
     ul = Q3 + 1.5 * IQR
     ll = Q1 - 1.5 * IQR
+
+    sa_verdict = torch.rand(losses.shape[0]) > sa_value(losses, ul, T)
     # stddev = losses.std()
 
     # limit = 1.5 * stddev
     # lower_limit = (losses >= (mean - limit))
-    upper_limit = (losses <= ul)
+    upper_limit = torch.logical_and(losses > ul, sa_verdict)
+    print(losses > ul)
+    print(sa_verdict)
+
+
     # return torch.where(torch.logical_and(lower_limit, upper_limit))[0]
-    return torch.where(upper_limit)[0], torch.where(torch.logical_not(upper_limit))[0]
+    return torch.where(torch.logical_not(upper_limit))[0], torch.where(upper_limit)[0]
 
 
 def skewness_fn(x, device, dim=1):
@@ -349,9 +357,10 @@ class Trainer():
 
                 loss = self.criterion(output, label)
                 if mean_selection_activated:
-                    selected, not_selected = mean_selection(loss)
+                    T = (self.max_epoch + 1) / (epoch + 1) - 1
+                    selected, not_selected = mean_selection(loss, T)
 
-                    if epoch > 10:
+                    if epoch > 1:
                         loss = loss[selected].mean()
                     else:
                         loss = loss.mean()
