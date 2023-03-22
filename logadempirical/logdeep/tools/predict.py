@@ -24,8 +24,13 @@ from logadempirical.logdeep.models.cnn import TextCNN
 from logadempirical.logdeep.models.autoencoder import AutoEncoder
 from logadempirical.neural_log.transformers import NeuralLog
 
+global_cache = dict()
+
 
 def generate(output_dir, name, is_neural):
+    global global_cache
+    if name in global_cache:
+        return global_cache[name]
     print("Loading", output_dir + name)
     with open(output_dir + name, 'rb') as f:
         data_iter = pickle.load(f)
@@ -52,10 +57,8 @@ def generate(output_dir, name, is_neural):
             else:
                 abnormal_iter[key] += 1
 
-    return normal_iter, abnormal_iter
-
-
-
+    global_cache[name] = (normal_iter, abnormal_iter)
+    return global_cache[name]
 
 
 class Predicter():
@@ -312,7 +315,8 @@ class Predicter():
         data_loader = DataLoader(dataset,
                                  batch_size=min(len(dataset), 512),
                                  shuffle=False,
-                                 pin_memory=True)
+                                 pin_memory=True,
+                                 num_workers=4)
         tbar = tqdm(data_loader, desc="\r")
         with torch.no_grad():
             for _, (log, label, anomaly) in enumerate(tbar):

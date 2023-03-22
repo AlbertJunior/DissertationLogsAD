@@ -188,11 +188,13 @@ class Trainer():
         self.train_loader = DataLoader(train_dataset,
                                        batch_size=self.batch_size,
                                        shuffle=True,
-                                       pin_memory=True)
+                                       pin_memory=True,
+                                       num_workers=4)
         self.valid_loader = DataLoader(valid_dataset,
                                        batch_size=self.batch_size,
                                        shuffle=False,
-                                       pin_memory=True)
+                                       pin_memory=True,
+                                       num_workers=4)
 
         self.num_train_log = len(train_dataset)
         self.num_valid_log = len(valid_dataset)
@@ -348,6 +350,7 @@ class Trainer():
                 loss = self.criterion(output, label)
                 if mean_selection_activated:
                     selected, not_selected = mean_selection(loss)
+
                     if epoch > 10:
                         loss = loss[selected].mean()
                     else:
@@ -356,7 +359,7 @@ class Trainer():
                     no_not_selected += len(not_selected)
                     no_trained += (len(selected)+len(not_selected))
 
-
+                    anomaly_label = anomaly_label.to(self.device)
                     labels_for_not_selected = anomaly_label[not_selected]
                     not_selected_anomalies_condition = (labels_for_not_selected == 1)
                     not_selected_normal_condition = (labels_for_not_selected == 0)
