@@ -141,6 +141,7 @@ class Predicter():
     def compute_anomaly(self, results, num, threshold=0):
         # print(num)
         total_errors = 0
+
         for i, line in enumerate(results):
             for seq in line:
                 # print("George: Ramona found this bug. It was seq[1] before..")
