@@ -45,8 +45,8 @@ def mean_selection(losses, T):
     # limit = 1.5 * stddev
     # lower_limit = (losses >= (mean - limit))
     upper_limit = torch.logical_and(losses > ul, sa_verdict)
-    print(losses > ul)
-    print(sa_verdict)
+    # print(losses > ul)
+    # print(sa_verdict)
 
 
     # return torch.where(torch.logical_and(lower_limit, upper_limit))[0]

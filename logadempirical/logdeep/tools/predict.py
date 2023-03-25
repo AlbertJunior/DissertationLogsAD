@@ -61,6 +61,13 @@ def generate(output_dir, name, is_neural):
     return global_cache[name]
 
 
+def prepare_compute_anomaly(v):
+    for i, line in enumerate(v):
+        a = torch.stack([x[0] for x in line])
+        b = torch.stack([x[1] - 1 for x in line]).unsqueeze(dim=1)
+        v[i] = a, b
+
+
 class Predicter():
     def __init__(self, options):
         self.data_dir = options['data_dir']
@@ -139,15 +146,18 @@ class Predicter():
         return num_anomaly
 
     def compute_anomaly(self, results, num, threshold=0):
-        # print(num)
         total_errors = 0
+        for i, (a, b) in enumerate(results):
+            # a = torch.stack([x[0] for x in line])
+            # b = torch.stack([x[1] - 1 for x in line])
+            # for seq in line:
+            #     # print("George: Ramona found this bug. It was seq[1] before..")
+            #     if (seq[1] - 1) not in seq[0][:threshold]:
+            #         total_errors += num[i]
+            #         break
+            if not torch.all(torch.any(a[:,:threshold] == b, dim=1)):
+                total_errors += num[i]
 
-        for i, line in enumerate(results):
-            for seq in line:
-                # print("George: Ramona found this bug. It was seq[1] before..")
-                if (seq[1] - 1) not in seq[0][:threshold]:
-                    total_errors += num[i]
-                    break
         return total_errors
 
     def compute_anomaly_unique(self, results, num, threshold=0):
@@ -168,6 +178,10 @@ class Predicter():
         res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
         # print(threshold_range)
         fps, tps, tns, fns, ps, rs, f1s = [], [], [], [], [], [], []
+        prepare_compute_anomaly(test_normal_results)
+        prepare_compute_anomaly(test_abnormal_results)
+
+
         for th in range(threshold_range, 0, -1):
             FP = self.compute_anomaly(test_normal_results, num_normal_session_logs, th + 1)
             TP = self.compute_anomaly(test_abnormal_results, num_abnormal_session_logs, th + 1)
@@ -258,6 +272,9 @@ class Predicter():
         test_normal_length = sum(num_normal_session_logs)
         res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
         # print(threshold_range)
+        prepare_compute_anomaly(test_normal_results)
+        prepare_compute_anomaly(test_abnormal_results)
+
         FP = self.compute_anomaly(test_normal_results, num_normal_session_logs, th + 1)
         TP = self.compute_anomaly(test_abnormal_results, num_abnormal_session_logs, th + 1)
 
@@ -340,7 +357,8 @@ class Predicter():
         res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
         no_anomalies_predicted = []
         fps, tps, tns, fns, ps, rs, f1s = [], [], [], [], [], [], []
-
+        prepare_compute_anomaly(test_normal_results)
+        prepare_compute_anomaly(test_abnormal_results)
         for th in range(threshold_range, 0, -1):
             FP = self.compute_anomaly(test_normal_results, num_normal_session_logs, th + 1)
             TP = self.compute_anomaly(test_abnormal_results, num_abnormal_session_logs, th + 1)
