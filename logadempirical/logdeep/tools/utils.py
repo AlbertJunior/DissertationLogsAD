@@ -86,6 +86,18 @@ def plot_train_valid_loss(save_dir):
     sns.lineplot(x="epoch", y="kurtosis", data=valid_loss, label="valid kurtosis")
     plt.title("epoch vs train kurtosis vs valid kurtosis")
     plt.savefig(save_dir + "/train_valid_kurtosis.png")
+    plt.close()
+
+    sns.lineplot(x="epoch", y="elim_no", data=train_loss, label="train eliminated number")
+    sns.lineplot(x="epoch", y="an_elim_no", data=train_loss, label="train anomalies eliminated number")
+    plt.title("epoch vs eliminated number vs anomalies eliminated number")
+    plt.savefig(save_dir + "/train_valid_eliminated_no.png")
+    plt.close()
+
+    sns.lineplot(x="epoch", y="elim_per", data=train_loss, label="train eliminated percentage")
+    sns.lineplot(x="epoch", y="an_elim_per", data=train_loss, label="train anomalies eliminated percentage")
+    plt.title("epoch vs eliminated percentage vs anomalies eliminated percentage")
+    plt.savefig(save_dir + "/train_valid_eliminated_percentage.png")
     print("plot done")
     plt.close()
 

@@ -107,6 +107,7 @@ class Trainer():
         self.hidden_size = options["hidden_size"]
         self.embedding_dim = options["embedding_dim"]
         self.num_layers = options["num_layers"]
+        self.num_workers = options["num_workers"]
 
         self.max_epoch = options['max_epoch']
         self.n_epochs_stop = options["n_epochs_stop"]
@@ -128,6 +129,7 @@ class Trainer():
 
         self.is_logkey = options["is_logkey"]
         self.is_time = options["is_time"]
+        self.mean_selection_activated = options['mean_selection_activated']
 
         # transformers' parameters
         self.num_encoder_layers = options["num_encoder_layers"]
@@ -197,12 +199,12 @@ class Trainer():
                                        batch_size=self.batch_size,
                                        shuffle=True,
                                        pin_memory=True,
-                                       num_workers=4)
+                                       num_workers=self.num_workers)
         self.valid_loader = DataLoader(valid_dataset,
                                        batch_size=self.batch_size,
                                        shuffle=False,
                                        pin_memory=True,
-                                       num_workers=4)
+                                       num_workers=self.num_workers)
 
         self.num_train_log = len(train_dataset)
         self.num_valid_log = len(valid_dataset)
@@ -256,12 +258,22 @@ class Trainer():
         self.start_epoch = 0
         self.best_loss = 1e10
         self.best_score = -1
-        self.log = {
-            "train": {key: []
-                      for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]},
-            "valid": {key: []
-                      for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]}
-        }
+        if self.mean_selection_activated:
+            self.log = {
+                "train": {key: []
+                          for key in
+                          ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness",
+                           "elim_no", "elim_per", "an_elim_no", "an_elim_per"]},
+                "valid": {key: []
+                          for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]}
+            }
+        else:
+            self.log = {
+                "train": {key: []
+                          for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]},
+                "valid": {key: []
+                          for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]}
+            }
         if options['resume_path'] is not None:
             if os.path.isfile(options['resume_path']):
                 self.resume(options['resume_path'], load_optimizer=True)
@@ -304,7 +316,6 @@ class Trainer():
             print("Failed to save logs")
 
     def train(self, epoch):
-        mean_selection_activated = True
         self.log['train']['epoch'].append(epoch)
         start = time.strftime("%H:%M:%S")
         lr = self.optimizer.state_dict()['param_groups'][0]['lr']
@@ -356,8 +367,9 @@ class Trainer():
                 kurtosis = kurtosis_fn(probabilities_real_next_token, self.device, dim=0).item()
 
                 loss = self.criterion(output, label)
-                if mean_selection_activated:
-                    T = (self.max_epoch + 1) / (epoch + 1) - 1
+                TEMP_INIT = 1
+                if self.mean_selection_activated:
+                    T = (self.max_epoch - 1 - epoch) * TEMP_INIT
                     selected, not_selected = mean_selection(loss, T)
                     selected = selected.to(self.device)
                     not_selected = not_selected.to(self.device)
@@ -395,22 +407,29 @@ class Trainer():
                     self.optimizer.zero_grad()
                 tbar.set_description(
                     "Train loss: {0:.8f} - Train acc: {1:.2f} - Train kurtosis: {2:.2f} - Train skewness: {3:.2f}".format(total_losses / (i + 1), acc / total_log, kurtosis, skewness))
-
         plot_next_token_histogram_of_probabilities("train", epoch, probabilities_real_next_token, self.run_dir)
         self.log['train']['loss'].append(total_losses / num_batch)
         self.log['train']['acc'].append(acc / total_log)
         self.log['train']['kurtosis'].append(kurtosis)
         self.log['train']['skewness'].append(skewness)
 
-        if mean_selection_activated:
-            if normals_not_selected + anomalies_not_selected == 0:
-                print("Eliminated instances percentage: ", no_not_selected / no_trained,
-                      str(no_not_selected) + "/" + str(no_trained))
-                print("Eliminated anomalies percentage: ", 0, str(anomalies_not_selected) + "/" + str(normals_not_selected + anomalies_not_selected))
+        if self.mean_selection_activated:
+            print("Eliminated instances percentage: ", no_not_selected / no_trained,
+                  str(no_not_selected) + "/" + str(no_trained))
+            self.log['train']['elim_no'].append(no_not_selected)
+            self.log['train']['elim_per'].append(no_not_selected / no_trained)
 
+            if normals_not_selected + anomalies_not_selected == 0:
+                print("Eliminated anomalies percentage: ", 0,
+                      str(anomalies_not_selected) + "/" + str(normals_not_selected + anomalies_not_selected))
+                self.log['train']['an_elim_no'].append(0)
+                self.log['train']['an_elim_per'].append(0)
             else:
-                print("Eliminated instances percentage: ", no_not_selected / no_trained, str(no_not_selected) + "/" + str(no_trained))
-                print("Eliminated anomalies percentage: ", anomalies_not_selected / (normals_not_selected + anomalies_not_selected), str(anomalies_not_selected) + "/" + str(normals_not_selected + anomalies_not_selected))
+                print("Eliminated anomalies percentage: ", anomalies_not_selected / (normals_not_selected + anomalies_not_selected),
+                      str(anomalies_not_selected) + "/" + str(normals_not_selected + anomalies_not_selected))
+                self.log['train']['an_elim_no'].append(anomalies_not_selected)
+                self.log['train']['an_elim_per'].append(anomalies_not_selected / no_trained)
+
 
     def valid(self, epoch):
         self.model.eval()

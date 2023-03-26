@@ -40,6 +40,7 @@ def arg_parser():
     parser.add_argument('--log_file', help="log file name")
     parser.add_argument("--sample_size", type=int, help="sample raw log")
     parser.add_argument("--sample_log_file", default=None, help="if sampling raw logs, new log file name")
+    parser.add_argument("--mean_selection_activated", action='store_true')
 
     parser.add_argument("--parser_type", default=None, help="parse type drain or spell")
     parser.add_argument("--log_format", default=None, help="log format",

@@ -93,6 +93,7 @@ class Predicter():
         self.hidden_size = options["hidden_size"]
         self.embedding_dim = options["embedding_dim"]
         self.num_layers = options["num_layers"]
+        self.num_workers = options["num_workers"]
 
         self.batch_size = options['batch_size']
 
@@ -148,8 +149,7 @@ class Predicter():
     def compute_anomaly(self, results, num, threshold=0):
         total_errors = 0
         for i, (a, b) in enumerate(results):
-            # a = torch.stack([x[0] for x in line])
-            # b = torch.stack([x[1] - 1 for x in line])
+
             # for seq in line:
             #     # print("George: Ramona found this bug. It was seq[1] before..")
             #     if (seq[1] - 1) not in seq[0][:threshold]:
@@ -163,12 +163,15 @@ class Predicter():
     def compute_anomaly_unique(self, results, num, threshold=0):
         # print(num)
         total_errors = 0
-        for i, line in enumerate(results):
-            for seq in line:
-                # print("George: Ramona found this bug. It was seq[1] before..")
-                if (seq[1] - 1) not in seq[0][:threshold]:
-                    total_errors += 1
-                    break
+        for i, (a, b) in enumerate(results):
+
+            # for seq in line:
+            #     # print("George: Ramona found this bug. It was seq[1] before..")
+            #     if (seq[1] - 1) not in seq[0][:threshold]:
+            #         total_errors += num[i]
+            #         break
+            if not torch.all(torch.any(a[:, :threshold] == b, dim=1)):
+                total_errors += 1
         return total_errors
 
     def find_best_threshold(self, test_normal_results, num_normal_session_logs, test_abnormal_results,
@@ -334,7 +337,7 @@ class Predicter():
                                  batch_size=min(len(dataset), 512),
                                  shuffle=False,
                                  pin_memory=True,
-                                 num_workers=4)
+                                 num_workers=self.num_workers)
         tbar = tqdm(data_loader, desc="\r")
         with torch.no_grad():
             for _, (log, label, anomaly) in enumerate(tbar):
