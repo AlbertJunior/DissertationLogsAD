@@ -28,28 +28,27 @@ from logadempirical.logdeep.models.autoencoder import AutoEncoder
 from logadempirical.logdeep.models.cnn import TextCNN
 from logadempirical.neural_log.transformers import NeuralLog
 
+
 def sa_value(losses, ul, T):
-    return torch.exp(-torch.abs(losses - ul) / T)
+    return torch.exp(-torch.abs(losses - ul) / (1 + 0.05 * T))
+
 
 def mean_selection(losses, T):
     Q1 = torch.quantile(losses, 0.25)
+    Q2 = torch.quantile(losses, 0.5)
     Q3 = torch.quantile(losses, 0.75)
 
     IQR = Q3 - Q1
-    ul = Q3 + 1.5 * IQR
+    #     ul = Q3 + 2.5 * IQR
+    ul = Q2
     ll = Q1 - 1.5 * IQR
+    #     print("Median: ", Q2)
 
     sa_verdict = torch.rand(losses.shape[0], device=losses.device) > sa_value(losses, ul, T)
-    # stddev = losses.std()
 
-    # limit = 1.5 * stddev
-    # lower_limit = (losses >= (mean - limit))
     upper_limit = torch.logical_and(losses > ul, sa_verdict)
-    # print(losses > ul)
-    # print(sa_verdict)
+    #     upper_limit = losses > ul
 
-
-    # return torch.where(torch.logical_and(lower_limit, upper_limit))[0]
     return torch.where(torch.logical_not(upper_limit))[0], torch.where(upper_limit)[0]
 
 
@@ -62,8 +61,8 @@ def skewness_fn(x, device, dim=1):
 
     sample_bias_adjustment = torch.sqrt(n * (n - 1)) / (n - 2)
     skewness = sample_bias_adjustment * (
-        (torch.sum((x.T - mean.unsqueeze(dim).T).T.pow(3), dim) / n)
-        / std.pow(3).clamp(min=eps)
+            (torch.sum((x.T - mean.unsqueeze(dim).T).T.pow(3), dim) / n)
+            / std.pow(3).clamp(min=eps)
     )
     return skewness
 
@@ -77,12 +76,12 @@ def kurtosis_fn(x, device, dim=1):
 
     sample_bias_adjustment = (n - 1) / ((n - 2) * (n - 3))
     kurtosis = sample_bias_adjustment * (
-        (n + 1)
-        * (
-            (torch.sum((x.T - mean.unsqueeze(dim).T).T.pow(4), dim) / n)
-            / std.pow(4).clamp(min=eps)
-        )
-        - 3 * (n - 1)
+            (n + 1)
+            * (
+                    (torch.sum((x.T - mean.unsqueeze(dim).T).T.pow(4), dim) / n)
+                    / std.pow(4).clamp(min=eps)
+            )
+            - 3 * (n - 1)
     )
     return kurtosis
 
@@ -163,22 +162,23 @@ class Trainer():
             n_train = int(len(data))
             print("Nr secvente train from train.pkl", n_train)
             train_logs, train_labels, anomaly_labels = sliding_window(data,
-                                                      vocab=vocab,
-                                                      history_size=self.history_size,
-                                                      data_dir=self.emb_dir,
-                                                      is_predict_logkey=self.is_predict_logkey,
-                                                      semantics=self.semantics,
-                                                      sample_ratio=self.train_ratio,
-                                                      e_name=self.embeddings,
-                                                      in_size=self.input_size
-                                                      )
+                                                                      vocab=vocab,
+                                                                      history_size=self.history_size,
+                                                                      data_dir=self.emb_dir,
+                                                                      is_predict_logkey=self.is_predict_logkey,
+                                                                      semantics=self.semantics,
+                                                                      sample_ratio=self.train_ratio,
+                                                                      e_name=self.embeddings,
+                                                                      in_size=self.input_size
+                                                                      )
 
             train_logs, train_labels, anomaly_labels = shuffle(train_logs, train_labels, anomaly_labels)
             # train_logs = train_logs[:200000]
             # train_labels = train_labels[:200000]
             n_val = int(len(train_logs) * self.valid_ratio)
             val_logs, val_labels, val_anomaly = train_logs[-n_val:], train_labels[-n_val:], anomaly_labels[-n_val:]
-            train_logs, train_labels, anomaly_labels = train_logs[:-n_val], train_labels[:-n_val], anomaly_labels[:-n_val]
+            train_logs, train_labels, anomaly_labels = train_logs[:-n_val], train_labels[:-n_val], anomaly_labels[
+                                                                                                   :-n_val]
             del data
             gc.collect()
         else:
@@ -336,8 +336,13 @@ class Trainer():
         total_log = 0
         no_not_selected = 0
         no_trained = 0
+        no_anomalies = 0
+
         anomalies_not_selected = 0
         normals_not_selected = 0
+
+        anomalies_selected = 0
+        normals_selected = 0
         for i, (log, label, anomaly_label) in enumerate(tbar):
             del log['idx']
             features = [x.to(self.device) for x in log['features']]
@@ -369,27 +374,43 @@ class Trainer():
                 loss = self.criterion(output, label)
                 TEMP_INIT = 1
                 if self.mean_selection_activated:
-                    T = (self.max_epoch - 1 - epoch) * TEMP_INIT
-                    selected, not_selected = mean_selection(loss, T)
+                    T = (self.max_epoch - 1 - epoch) / (self.max_epoch - 1) * TEMP_INIT
+                    selected, not_selected = mean_selection(loss, epoch)
                     selected = selected.to(self.device)
                     not_selected = not_selected.to(self.device)
-                    if epoch > 1:
+                    if epoch > 0:
                         loss = loss[selected].mean()
                     else:
                         loss = loss.mean()
-                    # print("Eliminated", len(not_selected) / (len(selected)+len(not_selected)), str(len(not_selected)) + "/" + str(len(selected)+len(not_selected)))
+
                     no_not_selected += len(not_selected)
-                    no_trained += (len(selected)+len(not_selected))
+                    no_selected = len(selected)
+                    no_trained += (len(not_selected) + len(selected))
 
                     anomaly_label = anomaly_label.to(self.device)
+
                     labels_for_not_selected = anomaly_label[not_selected]
+                    labels_for_selected = anomaly_label[selected]
+
                     not_selected_anomalies_condition = (labels_for_not_selected == 1)
                     not_selected_normal_condition = (labels_for_not_selected == 0)
+
+                    selected_anomalies_condition = (labels_for_selected == 1)
+                    selected_normal_condition = (labels_for_selected == 0)
+
                     not_selected_anomalies = torch.where(not_selected_anomalies_condition)[0]
                     not_selected_normal = torch.where(not_selected_normal_condition)[0]
 
+                    selected_anomalies = torch.where(selected_anomalies_condition)[0]
+                    selected_normal = torch.where(selected_normal_condition)[0]
+
                     anomalies_not_selected += len(not_selected_anomalies)
                     normals_not_selected += len(not_selected_normal)
+
+                    anomalies_selected += len(selected_anomalies)
+                    normals_selected += len(selected_normal)
+
+                    no_anomalies += (len(selected_anomalies) + len(not_selected_anomalies))
                 else:
                     loss = loss.mean()
 
@@ -406,7 +427,8 @@ class Trainer():
                     self.optimizer.step()
                     self.optimizer.zero_grad()
                 tbar.set_description(
-                    "Train loss: {0:.8f} - Train acc: {1:.2f} - Train kurtosis: {2:.2f} - Train skewness: {3:.2f}".format(total_losses / (i + 1), acc / total_log, kurtosis, skewness))
+                    "Train loss: {0:.8f} - Train acc: {1:.2f} - Train kurtosis: {2:.2f} - Train skewness: {3:.2f}".format(
+                        total_losses / (i + 1), acc / total_log, kurtosis, skewness))
         plot_next_token_histogram_of_probabilities("train", epoch, probabilities_real_next_token, self.run_dir)
         self.log['train']['loss'].append(total_losses / num_batch)
         self.log['train']['acc'].append(acc / total_log)
@@ -421,15 +443,14 @@ class Trainer():
 
             if normals_not_selected + anomalies_not_selected == 0:
                 print("Eliminated anomalies percentage: ", 0,
-                      str(anomalies_not_selected) + "/" + str(normals_not_selected + anomalies_not_selected))
+                      str(anomalies_not_selected) + "/" + str(no_anomalies))
                 self.log['train']['an_elim_no'].append(0)
                 self.log['train']['an_elim_per'].append(0)
             else:
-                print("Eliminated anomalies percentage: ", anomalies_not_selected / (normals_not_selected + anomalies_not_selected),
-                      str(anomalies_not_selected) + "/" + str(normals_not_selected + anomalies_not_selected))
+                print("Eliminated anomalies percentage: ", anomalies_not_selected / no_anomalies,
+                      str(anomalies_not_selected) + "/" + str(no_anomalies))
                 self.log['train']['an_elim_no'].append(anomalies_not_selected)
-                self.log['train']['an_elim_per'].append(anomalies_not_selected / no_trained)
-
+                self.log['train']['an_elim_per'].append(anomalies_not_selected / no_anomalies)
 
     def valid(self, epoch):
         self.model.eval()
@@ -466,8 +487,6 @@ class Trainer():
                     for idx in range(probab_output.size()[0]):
                         probabilities_real_next_token.append(probab_output[idx][label[idx].item()].item())
 
-
-
                     total_log += len(label)
 
                 total_losses += float(loss)
@@ -475,7 +494,8 @@ class Trainer():
         skewness = skewness_fn(probabilities_real_next_token, self.device, dim=0).item()
         kurtosis = kurtosis_fn(probabilities_real_next_token, self.device, dim=0).item()
         if total_log:
-            print("\nValidation loss:", total_losses / num_batch, "Validation accuracy:", acc / total_log, "Validation kurtosis:", kurtosis, "Validation skewness:", skewness)
+            print("\nValidation loss:", total_losses / num_batch, "Validation accuracy:", acc / total_log,
+                  "Validation kurtosis:", kurtosis, "Validation skewness:", skewness)
         else:
             print("\nValidation loss:", total_losses / num_batch)
         self.log['valid']['loss'].append(total_losses / num_batch)
@@ -598,13 +618,12 @@ class Trainer():
                 #                      suffix=self.model_name)
                 n_val_epoch += 1
                 print("======== My contribution ===========")
-                predicter.compute_elbow(epoch)
+                elbow_g, elbow_loss, elbow_g_loss = predicter.compute_elbow(epoch)
                 print("======== Their approach ===========")
-                predicter.predict_semi_supervised(epoch)
+                predicter.predict_semi_supervised(epoch, elbow_g, elbow_loss, elbow_g_loss)
                 # print("======== My contribution ===========")
                 # predicter.predict_semi_supervised_ramona()
             self.save_log()
-
 
         plot_train_valid_loss(self.run_dir)
         if self.model_name == "autoencoder":

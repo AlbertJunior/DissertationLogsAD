@@ -61,6 +61,21 @@ def plot_next_token_histogram_of_probabilities(phase, epoch, probabilities, save
     plt.close()
 
 
+def plot_losses(losses_normal, losses_anomalies, epoch, save_dir):
+    normals = []
+    anomalies = []
+    for i, loss in enumerate(losses_normal):
+        normals.append(torch.tensor(loss).mean().item())
+    for i, loss in enumerate(losses_anomalies):
+        anomalies.append(torch.tensor(loss).mean().item())
+
+    plt.hist(normals, bins=100, color='red')
+    plt.hist(anomalies, bins=100, color='green')
+
+    plt.title("Losses hist")
+    plt.savefig(save_dir + f"/losses_{epoch}.png")
+    plt.close()
+
 def plot_train_valid_loss(save_dir):
     train_loss = pd.read_csv(save_dir + "/train_log.csv")
     valid_loss = pd.read_csv(save_dir + "/valid_log.csv")
