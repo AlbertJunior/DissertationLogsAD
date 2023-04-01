@@ -123,11 +123,12 @@ class Predicter():
         nonreversed_list = np.array(anomalies_per_thresold)
 
         ax = plt.axes(projection='3d')
-        ax.plot_trisurf(x, y, nonreversed_list, cmap=cm.jet, linewidth=0)
+        surf = ax.plot_trisurf(x, y, nonreversed_list, cmap=cm.jet, linewidth=0)
         # plt.plot(x, reversed_list, 'r-', label=title)
         ax.set_xlabel('G')
         ax.set_ylabel('Min_Loss')
         ax.set_zlabel(title, fontsize=30, rotation=60)
+        ax.azim = 60
         # ax.legend()
 
         plt.title("elbow " + str(epoch))
@@ -204,7 +205,7 @@ class Predicter():
 
         for th in range(1, threshold_range):
             # for th_loss in np.arange(5.0, -0.1, -0.1):
-            for th_loss in np.arange(0.0, 5.0, 0.1):
+            for th_loss in np.arange(0.0, 5.0, 0.01):
 
                 x.append(th)
                 y.append(th_loss)
@@ -272,7 +273,7 @@ class Predicter():
         x, y = [], []
         for th in range(1, threshold_range):
             # for th_loss in np.arange(5.0, -0.1, -0.1):
-            for th_loss in np.arange(0.0, 5.0, 0.1):
+            for th_loss in np.arange(0.0, 5.0, 0.01):
 
                 x.append(th)
                 y.append(th_loss)
@@ -423,7 +424,7 @@ class Predicter():
 
     def find_elbow(self, test_normal_results, num_normal_session_logs, train_normal_results_losses,
                         test_abnormal_results, num_abnormal_session_logs, train_abnormal_results_losses,
-                   epoch, threshold_range):
+                   epoch, x_values, y_values, threshold_range):
 
         test_abnormal_length = sum(num_abnormal_session_logs)
         test_normal_length = sum(num_normal_session_logs)
@@ -435,9 +436,9 @@ class Predicter():
         x, y = [], []
         # prepare_compute_anomaly_losses(train_normal_results_losses)
         # prepare_compute_anomaly_losses(train_abnormal_results_losses)
-        for th in range(1, threshold_range):
+        for th in x_values:
             # for th_loss in np.arange(5.0, -0.1, -0.1):
-            for th_loss in np.arange(0.0, 5.0, 0.1):
+            for th_loss in y_values:
                 x.append(th)
                 y.append(th_loss)
                 FP = self.compute_anomaly(test_normal_results, train_normal_results_losses, num_normal_session_logs, th, th_loss)
@@ -511,23 +512,23 @@ class Predicter():
             self.semi_supervised_helper(model, train_abnormal, vocab, 'test_abnormal')
 
         print("------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------")
+        x_values = range(1, self.num_candidates)
+        y_values = np.arange(0.0, 5.0, 0.01)
         anomalies_per_thresold, x, y = self.find_elbow(train_normal_results, num_normal, train_normal_results_losses,
                                                  train_abnormal_results, num_abnormal, train_abnormal_results_losses,
-                                                 epoch,
+                                                 epoch, x_values, y_values,
                                                  threshold_range=self.num_candidates)
-        print(anomalies_per_thresold)
+        # print(anomalies_per_thresold)
         mx_g_loss = -1
         mx_g = -1
         mx_loss = -1
         elbow_g_loss = None
         elbow_g = None
         elbow_loss = None
-        x_values = range(self.num_candidates)
-        y_values = y[:self.num_candidates]
         for x_i in range(1, len(x_values)):
             for y_i in range(1, len(y_values)):
-                diff_g = anomalies_per_thresold[len(x_values) * x_i + y_i] - anomalies_per_thresold[len(x_values) * (x_i-1) + y_i]
-                diff_loss = anomalies_per_thresold[len(x_values) * x_i + y_i] - anomalies_per_thresold[len(x_values) * x_i + (y_i - 1)]
+                diff_g = - anomalies_per_thresold[len(y_values) * x_i + y_i] + anomalies_per_thresold[len(y_values) * (x_i - 1) + y_i]
+                diff_loss = - anomalies_per_thresold[len(y_values) * x_i + y_i] + anomalies_per_thresold[len(y_values) * x_i + (y_i - 1)]
                 if diff_g > mx_g and y_i == 1:
                     mx_g = diff_g
                     elbow_g = x_values[x_i]
