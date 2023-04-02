@@ -535,8 +535,11 @@ class Predicter():
                 if diff_loss > mx_loss and x_i == 1:
                     mx_loss = diff_loss
                     elbow_loss = y_values[y_i]
-                if diff_g + diff_loss > mx_g_loss:
-                    mx_g_loss = diff_g + diff_loss
+                if diff_g > diff_loss and diff_g > mx_g_loss:
+                    mx_g_loss = diff_g
+                    elbow_g_loss = (x_values[x_i], y_values[y_i])
+                if diff_loss >= diff_g and diff_loss > mx_g_loss:
+                    mx_g_loss = diff_loss
                     elbow_g_loss = (x_values[x_i], y_values[y_i])
 
         print("1. G: diff ", mx_g, " at g ", elbow_g)
