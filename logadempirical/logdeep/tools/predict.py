@@ -24,6 +24,7 @@ from logadempirical.logdeep.dataset.sample import sliding_window
 from logadempirical.logdeep.models.lstm import deeplog, loganomaly, robustlog
 from logadempirical.logdeep.models.cnn import TextCNN
 from logadempirical.logdeep.models.autoencoder import AutoEncoder
+from logadempirical.logdeep.tools.train import mean_selection
 from logadempirical.logdeep.tools.utils import plot_losses
 from logadempirical.neural_log.transformers import NeuralLog
 
@@ -65,10 +66,32 @@ def generate(output_dir, name, is_neural):
 
 
 def prepare_compute_anomaly(v):
-    for i, line in enumerate(v):
-        a = torch.stack([x[0] for x in line])
-        b = torch.stack([x[1] - 1 for x in line]).unsqueeze(dim=1)
-        v[i] = a, b
+    v_new = []
+    for idx, line in enumerate(v):
+        maxi = 0
+        for window, target in line:
+            for i in range(len(window)):
+                if window[i] == target:
+                    break
+            if i > maxi:
+                maxi = i
+        v_new.append(maxi)
+    return torch.Tensor(v_new)
+
+
+def prepare_compute_anomaly_losses(v):
+    return torch.stack([torch.stack(x).mean() for x in v])
+
+
+def mean_selection_IQR(losses):
+    Q1 = torch.quantile(losses, 0.25)
+    Q3 = torch.quantile(losses, 0.75)
+
+    IQR = Q3 - Q1
+    ul = Q3 + 1.5 * IQR
+    ll = Q1 - 1.5 * IQR
+
+    return ul
 
 
 class Predicter():
@@ -118,13 +141,23 @@ class Predicter():
         self.lower_bound = 0
         self.upper_bound = 3
 
-    def create_plot(self, title, anomalies_per_thresold, x, y, epoch):
+    def create_plot(self, title, anomalies_per_thresold, x, epoch, elbow_g):
+        x_no = range(len(x))
+        plt.plot(x_no, anomalies_per_thresold, 'r-', label='Number anomalies')
+        plt.plot([elbow_g], [0], marker='o', color="green")
+        plt.legend()
+        plt.title("elbow " + str(epoch))
+        plt.savefig(self.run_dir + f"/{title}_{epoch}.png")
+        plt.close()
+
+    def create_plot_3d(self, title, anomalies_per_thresold, x, y, epoch, elbow_g, elbow_loss, elbow_g_loss):
         # reversed_list = np.array(anomalies_per_thresold[::-1])
         nonreversed_list = np.array(anomalies_per_thresold)
 
         ax = plt.axes(projection='3d')
         surf = ax.plot_trisurf(x, y, nonreversed_list, cmap=cm.jet, linewidth=0)
         # plt.plot(x, reversed_list, 'r-', label=title)
+        # ax.plot(x, y, **{'color': 'lightsteelblue', 'marker': 'o'})
         ax.set_xlabel('G')
         ax.set_ylabel('Min_Loss')
         ax.set_zlabel(title, fontsize=30, rotation=60)
@@ -134,6 +167,7 @@ class Predicter():
         plt.title("elbow " + str(epoch))
         plt.savefig(self.run_dir + f"/{title}_{epoch}.png")
         plt.close()
+
 
     def detect_logkey_anomaly(self, output, label):
         num_anomaly = []
@@ -158,78 +192,89 @@ class Predicter():
         return num_anomaly
 
     def compute_anomaly(self, results, losses, num, threshold=0, th_loss=0):
-        total_errors = 0
-
-        for i, (ranking, loss) in enumerate(zip(results, losses)):
-            a, b = ranking
-            # for seq in line:
-            #     # print("George: Ramona found this bug. It was seq[1] before..")
-            #     if (seq[1] - 1) not in seq[0][:threshold]:
-            #         total_errors += num[i]
-            #         break
-            if not torch.all(torch.any(a[:, :threshold] == b, dim=1)) and torch.Tensor.float(torch.tensor(loss)).mean() > th_loss:
-                total_errors += num[i]
-
-        return total_errors
+        indices = torch.logical_and(results >= threshold, losses > th_loss)
+        return num[indices].sum().item()
 
     def compute_anomaly_unique(self, results, losses, num, threshold=0, th_loss=0):
-        # print(num)
-        total_errors = 0
-        for i, (ranking, loss) in enumerate(zip(results, losses)):
-            a, b = ranking
+        indices = torch.logical_and(results >= threshold, losses >= th_loss)
+        return len(num[indices])
 
-            # for seq in line:
-            #     # print("George: Ramona found this bug. It was seq[1] before..")
-            #     if (seq[1] - 1) not in seq[0][:threshold]:
-            #         total_errors += num[i]
-            #         break
-            if not torch.all(torch.any(a[:, :threshold] == b, dim=1)) and torch.tensor(loss).mean() > th_loss:
-                total_errors += 1
-        return total_errors
 
-    def find_best_threshold(self, test_normal_results, num_normal_session_logs, test_normal_results_losses,
-                            test_abnormal_results, num_abnormal_session_logs, test_abnormal_results_losses,
-                            epoch, threshold_range,
-                            elbow_g, elbow_loss, elbow_g_loss):
-        test_abnormal_length = sum(num_abnormal_session_logs)
-        test_normal_length = sum(num_normal_session_logs)
+    def find_best_threshold_train(self, train_normal_results, train_num_normal, train_normal_results_losses,
+                                        train_abnormal_results, train_num_abnormal, train_abnormal_results_losses,
+                                        epoch, threshold_range,
+                                       elbow_g, elbow_loss, trainer):
+        train_abnormal_length = sum(train_num_abnormal).item()
+        train_normal_length = sum(train_num_normal).item()
         res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
-        # print(threshold_range)
+        res_g = [0, 0, 0, 0, 0, 0, 0, 0]
+        res_loss = [0, 0, 0, 0, 0, 0, 0, 0]
+
         fps, tps, tns, fns, ps, rs, f1s = [], [], [], [], [], [], []
-        prepare_compute_anomaly(test_normal_results)
-        prepare_compute_anomaly(test_abnormal_results)
+        train_normal_results = prepare_compute_anomaly(train_normal_results)
+        train_abnormal_results = prepare_compute_anomaly(train_abnormal_results)
 
-        # prepare_compute_anomaly_losses(test_normal_results_losses)
-        # prepare_compute_anomaly_losses(test_abnormal_results_losses)
+        train_normal_results_losses = prepare_compute_anomaly_losses(train_normal_results_losses)
+        train_abnormal_results_losses = prepare_compute_anomaly_losses(train_abnormal_results_losses)
         x, y = [], []
-
+        plot_losses(train_normal_results_losses, train_abnormal_results_losses, epoch, self.run_dir + '/Train_Losses/', elbow_loss)
+        ok1 = ok2 = ok3 = 0
         for th in range(1, threshold_range):
-            # for th_loss in np.arange(5.0, -0.1, -0.1):
-            for th_loss in np.arange(0.0, 5.0, 0.01):
+            x.append(th)
+            ok = 0
+            for th_loss in np.arange(0.0, 20.0, 0.01):
+                FP = self.compute_anomaly(train_normal_results, train_normal_results_losses, train_num_normal, th, th_loss)
+                TP = self.compute_anomaly(train_abnormal_results, train_abnormal_results_losses, train_num_abnormal, th, th_loss)
 
-                x.append(th)
-                y.append(th_loss)
-                FP = self.compute_anomaly(test_normal_results, test_normal_results_losses, num_normal_session_logs, th, th_loss)
-                TP = self.compute_anomaly(test_abnormal_results, test_abnormal_results_losses, num_abnormal_session_logs, th, th_loss)
-
-                plot_losses(test_normal_results_losses, test_abnormal_results_losses, epoch, self.run_dir)
-                TN = test_normal_length - FP
-                FN = test_abnormal_length - TP
-                fps.append(FP)
-                tps.append(TP)
-                tns.append(TN)
-                fns.append(FN)
+                TN = train_normal_length - FP
+                FN = train_abnormal_length - TP
+                if ok == 0:
+                    fps.append(FP)
+                    tps.append(TP)
+                    tns.append(TN)
+                    fns.append(FN)
                 if TP == 0:
-                    if th == elbow_g and th_loss < 0.05:
-                        print("1. For ELBOW G", th, "test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN, ", P:100, R:0, F1:0")
-                    if th_loss == elbow_loss and th == 1:
-                        print("2. For ELBOW LOSS", th_loss, "test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN,", P:100, R:0, F1:0")
-                    if th_loss == elbow_g_loss[1] and th == elbow_g_loss[0]:
-                        print("3. For ELBOW G", th, "& LOSS", th_loss, " test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN,", P:100, R:0, F1:0")
-
-                    ps.append(100)
-                    rs.append(0)
-                    f1s.append(0)
+                    if th == elbow_g and th_loss < 0.001 and ok1 == 0:
+                        ok1 = 1
+                        trainer.log["train_metrics_g"]["epoch"].append(epoch)
+                        trainer.log["train_metrics_g"]["g"].append(th)
+                        trainer.log["train_metrics_g"]["th"].append(th_loss)
+                        trainer.log["train_metrics_g"]["f1"].append(0)
+                        trainer.log["train_metrics_g"]["p"].append(100)
+                        trainer.log["train_metrics_g"]["r"].append(0)
+                        trainer.log["train_metrics_g"]["tp"].append(TP)
+                        trainer.log["train_metrics_g"]["fp"].append(FP)
+                        trainer.log["train_metrics_g"]["fn"].append(FN)
+                        print("1. For ELBOW G", th, "train metrics, TP: ", TP, "FP: ", FP, ", FN:", FN, ", P:100, R:0, F1:0")
+                    if abs(th_loss - elbow_loss) < 0.006 and th == 1 and ok2 == 0:
+                        ok2 = 1
+                        trainer.log["train_metrics_loss"]["epoch"].append(epoch)
+                        trainer.log["train_metrics_loss"]["g"].append(th)
+                        trainer.log["train_metrics_loss"]["th"].append(elbow_loss)
+                        trainer.log["train_metrics_loss"]["f1"].append(0)
+                        trainer.log["train_metrics_loss"]["p"].append(100)
+                        trainer.log["train_metrics_loss"]["r"].append(0)
+                        trainer.log["train_metrics_loss"]["tp"].append(TP)
+                        trainer.log["train_metrics_loss"]["fp"].append(FP)
+                        trainer.log["train_metrics_loss"]["fn"].append(FN)
+                        print("2. For ELBOW LOSS", th_loss, "train metrics, TP: ", TP, "FP: ", FP, ", FN:", FN,", P:100, R:0, F1:0")
+                    if abs(th_loss - elbow_loss) < 0.006 and th == elbow_g and ok3 == 0:
+                        ok3 = 1
+                        trainer.log["train_metrics_both"]["epoch"].append(epoch)
+                        trainer.log["train_metrics_both"]["g"].append(th)
+                        trainer.log["train_metrics_both"]["th"].append(elbow_loss)
+                        trainer.log["train_metrics_both"]["f1"].append(0)
+                        trainer.log["train_metrics_both"]["p"].append(100)
+                        trainer.log["train_metrics_both"]["r"].append(0)
+                        trainer.log["train_metrics_both"]["tp"].append(TP)
+                        trainer.log["train_metrics_both"]["fp"].append(FP)
+                        trainer.log["train_metrics_both"]["fn"].append(FN)
+                        print("3. For ELBOW G", th, "& LOSS", th_loss, " train metrics, TP: ", TP, "FP: ", FP, ", FN:", FN,", P:100, R:0, F1:0")
+                    if ok == 0:
+                        ps.append(100)
+                        rs.append(0)
+                        f1s.append(0)
+                        ok = 1
                     continue
 
                 # Compute precision, recall and F1-measure
@@ -237,96 +282,429 @@ class Predicter():
                 R = 100 * TP / (TP + FN)
                 F1 = 2 * P * R / (P + R)
                 # print(th + 1, FP, FN, P, R)
-                ps.append(P)
-                rs.append(R)
-                f1s.append(F1)
-                if th == elbow_g and th_loss < 0.05:
+                if ok == 0:
+                    ps.append(P)
+                    rs.append(R)
+                    f1s.append(F1)
+                ok = 1
+                if th == elbow_g and th_loss < 0.001 and ok1 == 0:
+                    ok1 = 1
+                    trainer.log["train_metrics_g"]["epoch"].append(epoch)
+                    trainer.log["train_metrics_g"]["g"].append(th)
+                    trainer.log["train_metrics_g"]["th"].append(th_loss)
+                    trainer.log["train_metrics_g"]["f1"].append(F1)
+                    trainer.log["train_metrics_g"]["p"].append(P)
+                    trainer.log["train_metrics_g"]["r"].append(R)
+                    trainer.log["train_metrics_g"]["tp"].append(TP)
+                    trainer.log["train_metrics_g"]["fp"].append(FP)
+                    trainer.log["train_metrics_g"]["fn"].append(FN)
+                    print("1. For ELBOW G", th, "train metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
+                if abs(th_loss - elbow_loss) < 0.006 and th == 1 and ok2 == 0:
+                    ok2 = 1
+                    trainer.log["train_metrics_loss"]["epoch"].append(epoch)
+                    trainer.log["train_metrics_loss"]["g"].append(th)
+                    trainer.log["train_metrics_loss"]["th"].append(elbow_loss)
+                    trainer.log["train_metrics_loss"]["f1"].append(F1)
+                    trainer.log["train_metrics_loss"]["p"].append(P)
+                    trainer.log["train_metrics_loss"]["r"].append(R)
+                    trainer.log["train_metrics_loss"]["tp"].append(TP)
+                    trainer.log["train_metrics_loss"]["fp"].append(FP)
+                    trainer.log["train_metrics_loss"]["fn"].append(FN)
+                    print("2. For ELBOW LOSS", th_loss, "train metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
+                if abs(th_loss - elbow_loss) < 0.006 and th == elbow_g and ok3 == 0:
+                    ok3 = 1
+                    trainer.log["train_metrics_both"]["epoch"].append(epoch)
+                    trainer.log["train_metrics_both"]["g"].append(th)
+                    trainer.log["train_metrics_both"]["th"].append(elbow_loss)
+                    trainer.log["train_metrics_both"]["f1"].append(F1)
+                    trainer.log["train_metrics_both"]["p"].append(P)
+                    trainer.log["train_metrics_both"]["r"].append(R)
+                    trainer.log["train_metrics_both"]["tp"].append(TP)
+                    trainer.log["train_metrics_both"]["fp"].append(FP)
+                    trainer.log["train_metrics_both"]["fn"].append(FN)
+                    print("3. For ELBOW G", th, "& LOSS", th_loss, "train metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
+                if F1 > res[-1]:
+                    res = [th, th_loss, TP, TN, FP, FN, P, R, F1]
+                if th_loss < 0.001 and F1 > res_g[-1]:
+                    res_g = [th, th_loss, TP, TN, FP, FN, P, R, F1]
+                if th == 1 and F1 > res_loss[-1]:
+                    res_loss = [th, th_loss, TP, TN, FP, FN, P, R, F1]
+
+        trainer.log["train_metrics_both_best"]["epoch"].append(epoch)
+        trainer.log["train_metrics_both_best"]["g"].append(res[0])
+        trainer.log["train_metrics_both_best"]["th"].append(res[1])
+        trainer.log["train_metrics_both_best"]["f1"].append(res[8])
+        trainer.log["train_metrics_both_best"]["p"].append(res[6])
+        trainer.log["train_metrics_both_best"]["r"].append(res[7])
+        trainer.log["train_metrics_both_best"]["tp"].append(res[2])
+        trainer.log["train_metrics_both_best"]["fp"].append(res[4])
+        trainer.log["train_metrics_both_best"]["fn"].append(res[5])
+
+        trainer.log["train_metrics_g_best"]["epoch"].append(epoch)
+        trainer.log["train_metrics_g_best"]["g"].append(res_g[0])
+        trainer.log["train_metrics_g_best"]["th"].append(res_g[1])
+        trainer.log["train_metrics_g_best"]["f1"].append(res_g[8])
+        trainer.log["train_metrics_g_best"]["p"].append(res_g[6])
+        trainer.log["train_metrics_g_best"]["r"].append(res_g[7])
+        trainer.log["train_metrics_g_best"]["tp"].append(res_g[2])
+        trainer.log["train_metrics_g_best"]["fp"].append(res_g[4])
+        trainer.log["train_metrics_g_best"]["fn"].append(res_g[5])
+
+        trainer.log["train_metrics_loss_best"]["epoch"].append(epoch)
+        trainer.log["train_metrics_loss_best"]["g"].append(res_loss[0])
+        trainer.log["train_metrics_loss_best"]["th"].append(res_loss[1])
+        trainer.log["train_metrics_loss_best"]["f1"].append(res_loss[8])
+        trainer.log["train_metrics_loss_best"]["p"].append(res_loss[6])
+        trainer.log["train_metrics_loss_best"]["r"].append(res_loss[7])
+        trainer.log["train_metrics_loss_best"]["tp"].append(res_loss[2])
+        trainer.log["train_metrics_loss_best"]["fp"].append(res_loss[4])
+        trainer.log["train_metrics_loss_best"]["fn"].append(res_loss[5])
+
+        if trainer.verbose:
+            self.create_plot("Metrics/Train_Normal/Recall", rs, x, epoch, elbow_g)
+            self.create_plot("Metrics/Train_Normal/Precision", ps, x, epoch, elbow_g)
+            self.create_plot("Metrics/Train_Normal/F1Score", f1s, x, epoch, elbow_g)
+            self.create_plot("Metrics/Train_Normal/TP", tps, x, epoch, elbow_g)
+            self.create_plot("Metrics/Train_Normal/TN", tns, x, epoch, elbow_g)
+            self.create_plot("Metrics/Train_Normal/FP", fps, x, epoch, elbow_g)
+            self.create_plot("Metrics/Train_Normal/FN", fns, x, epoch, elbow_g)
+        return res
+
+    def find_best_threshold(self, test_normal_results, num_normal_session_logs, test_normal_results_losses,
+                            test_abnormal_results, num_abnormal_session_logs, test_abnormal_results_losses,
+                            epoch, threshold_range,
+                            elbow_g, elbow_loss, trainer):
+        test_abnormal_length = sum(num_abnormal_session_logs).item()
+        test_normal_length = sum(num_normal_session_logs).item()
+        res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
+        res_g = [0, 0, 0, 0, 0, 0, 0, 0]
+        res_loss = [0, 0, 0, 0, 0, 0, 0, 0]
+        # print(threshold_range)
+        fps, tps, tns, fns, ps, rs, f1s = [], [], [], [], [], [], []
+        test_normal_results = prepare_compute_anomaly(test_normal_results)
+        test_abnormal_results = prepare_compute_anomaly(test_abnormal_results)
+
+        test_normal_results_losses = prepare_compute_anomaly_losses(test_normal_results_losses)
+        test_abnormal_results_losses = prepare_compute_anomaly_losses(test_abnormal_results_losses)
+
+        plot_losses(test_normal_results_losses, test_abnormal_results_losses, epoch, self.run_dir + '/Test_Losses/', elbow_loss)
+
+        x, y = [], []
+        ok1 = ok2 = ok3 = 0
+        for th in range(1, threshold_range):
+            x.append(th)
+            ok = 0
+            for th_loss in np.arange(0.0, 20.0, 0.01):
+                FP = self.compute_anomaly(test_normal_results, test_normal_results_losses, num_normal_session_logs, th, th_loss)
+                TP = self.compute_anomaly(test_abnormal_results, test_abnormal_results_losses, num_abnormal_session_logs, th, th_loss)
+                TN = test_normal_length - FP
+                FN = test_abnormal_length - TP
+                if ok == 0:
+                    fps.append(FP)
+                    tps.append(TP)
+                    tns.append(TN)
+                    fns.append(FN)
+                if TP == 0:
+                    if th == elbow_g and th_loss < 0.001 and ok1 == 0:
+                        ok1 = 1
+                        trainer.log["test_normal_metrics_g"]["epoch"].append(epoch)
+                        trainer.log["test_normal_metrics_g"]["g"].append(th)
+                        trainer.log["test_normal_metrics_g"]["th"].append(th_loss)
+                        trainer.log["test_normal_metrics_g"]["f1"].append(0)
+                        trainer.log["test_normal_metrics_g"]["p"].append(100)
+                        trainer.log["test_normal_metrics_g"]["r"].append(0)
+                        trainer.log["test_normal_metrics_g"]["tp"].append(TP)
+                        trainer.log["test_normal_metrics_g"]["fp"].append(FP)
+                        trainer.log["test_normal_metrics_g"]["fn"].append(FN)
+                        print("1. For ELBOW G", th, "test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN, ", P:100, R:0, F1:0")
+                    if abs(th_loss - elbow_loss) < 0.006 and th == 1 and ok2 == 0:
+                        ok2 = 1
+                        trainer.log["test_normal_metrics_loss"]["epoch"].append(epoch)
+                        trainer.log["test_normal_metrics_loss"]["g"].append(th)
+                        trainer.log["test_normal_metrics_loss"]["th"].append(th_loss)
+                        trainer.log["test_normal_metrics_loss"]["f1"].append(0)
+                        trainer.log["test_normal_metrics_loss"]["p"].append(100)
+                        trainer.log["test_normal_metrics_loss"]["r"].append(0)
+                        trainer.log["test_normal_metrics_loss"]["tp"].append(TP)
+                        trainer.log["test_normal_metrics_loss"]["fp"].append(FP)
+                        trainer.log["test_normal_metrics_loss"]["fn"].append(FN)
+                        print("2. For ELBOW LOSS", th_loss, "test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN,", P:100, R:0, F1:0")
+                    if abs(th_loss - elbow_loss) < 0.006 and th == elbow_g and ok3 == 0:
+                        ok3 = 1
+                        trainer.log["test_normal_metrics_both"]["epoch"].append(epoch)
+                        trainer.log["test_normal_metrics_both"]["g"].append(th)
+                        trainer.log["test_normal_metrics_both"]["th"].append(th_loss)
+                        trainer.log["test_normal_metrics_both"]["f1"].append(0)
+                        trainer.log["test_normal_metrics_both"]["p"].append(100)
+                        trainer.log["test_normal_metrics_both"]["r"].append(0)
+                        trainer.log["test_normal_metrics_both"]["tp"].append(TP)
+                        trainer.log["test_normal_metrics_both"]["fp"].append(FP)
+                        trainer.log["test_normal_metrics_both"]["fn"].append(FN)
+                        print("3. For ELBOW G", th, "& LOSS", th_loss, " test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN,", P:100, R:0, F1:0")
+                    if ok == 0:
+                        ps.append(100)
+                        rs.append(0)
+                        f1s.append(0)
+                        ok = 1
+                    continue
+
+                # Compute precision, recall and F1-measure
+                P = 100 * TP / (TP + FP)
+                R = 100 * TP / (TP + FN)
+                F1 = 2 * P * R / (P + R)
+                # print(th + 1, FP, FN, P, R)
+                if ok == 0:
+                    ps.append(P)
+                    rs.append(R)
+                    f1s.append(F1)
+                ok = 1
+                if th == elbow_g and th_loss < 0.001 and ok1 == 0:
+                    ok1 = 1
+                    trainer.log["test_normal_metrics_g"]["epoch"].append(epoch)
+                    trainer.log["test_normal_metrics_g"]["g"].append(th)
+                    trainer.log["test_normal_metrics_g"]["th"].append(th_loss)
+                    trainer.log["test_normal_metrics_g"]["f1"].append(F1)
+                    trainer.log["test_normal_metrics_g"]["p"].append(P)
+                    trainer.log["test_normal_metrics_g"]["r"].append(R)
+                    trainer.log["test_normal_metrics_g"]["tp"].append(TP)
+                    trainer.log["test_normal_metrics_g"]["fp"].append(FP)
+                    trainer.log["test_normal_metrics_g"]["fn"].append(FN)
                     print("1. For ELBOW G", th, "test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
-                if th_loss == elbow_loss and th == 1:
+                if abs(th_loss - elbow_loss) < 0.006 and th == 1 and ok2 == 0:
+                    ok2 = 1
+                    trainer.log["test_normal_metrics_loss"]["epoch"].append(epoch)
+                    trainer.log["test_normal_metrics_loss"]["g"].append(th)
+                    trainer.log["test_normal_metrics_loss"]["th"].append(th_loss)
+                    trainer.log["test_normal_metrics_loss"]["f1"].append(F1)
+                    trainer.log["test_normal_metrics_loss"]["p"].append(P)
+                    trainer.log["test_normal_metrics_loss"]["r"].append(R)
+                    trainer.log["test_normal_metrics_loss"]["tp"].append(TP)
+                    trainer.log["test_normal_metrics_loss"]["fp"].append(FP)
+                    trainer.log["test_normal_metrics_loss"]["fn"].append(FN)
                     print("2. For ELBOW LOSS", th_loss, "test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
-                if th_loss == elbow_g_loss[1] and th == elbow_g_loss[0]:
+                if abs(th_loss - elbow_loss) < 0.006 and th == elbow_g and ok3 == 0:
+                    ok3 = 1
+                    trainer.log["test_normal_metrics_both"]["epoch"].append(epoch)
+                    trainer.log["test_normal_metrics_both"]["g"].append(th)
+                    trainer.log["test_normal_metrics_both"]["th"].append(th_loss)
+                    trainer.log["test_normal_metrics_both"]["f1"].append(F1)
+                    trainer.log["test_normal_metrics_both"]["p"].append(P)
+                    trainer.log["test_normal_metrics_both"]["r"].append(R)
+                    trainer.log["test_normal_metrics_both"]["tp"].append(TP)
+                    trainer.log["test_normal_metrics_both"]["fp"].append(FP)
+                    trainer.log["test_normal_metrics_both"]["fn"].append(FN)
                     print("3. For ELBOW G", th, "& LOSS", th_loss, "test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
 
                 if F1 > res[-1]:
-                    res = [th, TP, TN, FP, FN, P, R, F1]
-        print("Ce a dat pe validare BEST")
-        print(res[0] + 1, res[3], res[4], res[5], res[6])
-        print()
-        self.create_plot("Metrics/Normal/Recall", rs, x, y, epoch)
-        self.create_plot("Metrics/Normal/Precision", ps, x, y, epoch)
-        self.create_plot("Metrics/Normal/F1Score", f1s, x, y, epoch)
-        self.create_plot("Metrics/Normal/TP", tps, x, y, epoch)
-        self.create_plot("Metrics/Normal/TN", tns, x, y, epoch)
-        self.create_plot("Metrics/Normal/FP", fps, x, y, epoch)
-        self.create_plot("Metrics/Normal/FN", fns, x, y, epoch)
+                    res = [th, th_loss, TP, TN, FP, FN, P, R, F1]
+                if th_loss < 0.001 and F1 > res_g[-1]:
+                    res_g = [th, th_loss, TP, TN, FP, FN, P, R, F1]
+                if th == 1 and F1 > res_loss[-1]:
+                    res_loss = [th, th_loss, TP, TN, FP, FN, P, R, F1]
+
+        trainer.log["test_normal_metrics_both_best"]["epoch"].append(epoch)
+        trainer.log["test_normal_metrics_both_best"]["g"].append(res[0])
+        trainer.log["test_normal_metrics_both_best"]["th"].append(res[1])
+        trainer.log["test_normal_metrics_both_best"]["f1"].append(res[8])
+        trainer.log["test_normal_metrics_both_best"]["p"].append(res[6])
+        trainer.log["test_normal_metrics_both_best"]["r"].append(res[7])
+        trainer.log["test_normal_metrics_both_best"]["tp"].append(res[2])
+        trainer.log["test_normal_metrics_both_best"]["fp"].append(res[4])
+        trainer.log["test_normal_metrics_both_best"]["fn"].append(res[5])
+
+        trainer.log["test_normal_metrics_g_best"]["epoch"].append(epoch)
+        trainer.log["test_normal_metrics_g_best"]["g"].append(res_g[0])
+        trainer.log["test_normal_metrics_g_best"]["th"].append(res_g[1])
+        trainer.log["test_normal_metrics_g_best"]["f1"].append(res_g[8])
+        trainer.log["test_normal_metrics_g_best"]["p"].append(res_g[6])
+        trainer.log["test_normal_metrics_g_best"]["r"].append(res_g[7])
+        trainer.log["test_normal_metrics_g_best"]["tp"].append(res_g[2])
+        trainer.log["test_normal_metrics_g_best"]["fp"].append(res_g[4])
+        trainer.log["test_normal_metrics_g_best"]["fn"].append(res_g[5])
+
+        trainer.log["test_normal_metrics_loss_best"]["epoch"].append(epoch)
+        trainer.log["test_normal_metrics_loss_best"]["g"].append(res_loss[0])
+        trainer.log["test_normal_metrics_loss_best"]["th"].append(res_loss[1])
+        trainer.log["test_normal_metrics_loss_best"]["f1"].append(res_loss[8])
+        trainer.log["test_normal_metrics_loss_best"]["p"].append(res_loss[6])
+        trainer.log["test_normal_metrics_loss_best"]["r"].append(res_loss[7])
+        trainer.log["test_normal_metrics_loss_best"]["tp"].append(res_loss[2])
+        trainer.log["test_normal_metrics_loss_best"]["fp"].append(res_loss[4])
+        trainer.log["test_normal_metrics_loss_best"]["fn"].append(res_loss[5])
+
+        if trainer.verbose:
+            self.create_plot("Metrics/Normal/Recall", rs, x, epoch, elbow_g)
+            self.create_plot("Metrics/Normal/Precision", ps, x, epoch, elbow_g)
+            self.create_plot("Metrics/Normal/F1Score", f1s, x, epoch, elbow_g)
+            self.create_plot("Metrics/Normal/TP", tps, x, epoch, elbow_g)
+            self.create_plot("Metrics/Normal/TN", tns, x, epoch, elbow_g)
+            self.create_plot("Metrics/Normal/FP", fps, x, epoch, elbow_g)
+            self.create_plot("Metrics/Normal/FN", fns, x, epoch, elbow_g)
         return res
 
     def find_best_threshold_unique(self, test_normal_results, num_normal_session_logs, test_normal_results_losses,
                                    test_abnormal_results, num_abnormal_session_logs, test_abnormal_results_losses,
                                    epoch, threshold_range,
-                                   elbow_g, elbow_loss, elbow_g_loss):
+                                   elbow_g, elbow_loss, trainer):
         test_abnormal_length = len(num_abnormal_session_logs)
         test_normal_length = len(num_normal_session_logs)
         res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
+        res_g = [0, 0, 0, 0, 0, 0, 0, 0]
+        res_loss = [0, 0, 0, 0, 0, 0, 0, 0]
         # print(threshold_range)
         fps, tps, tns, fns, ps, rs, f1s = [], [], [], [], [], [], []
         x, y = [], []
-        for th in range(1, threshold_range):
-            # for th_loss in np.arange(5.0, -0.1, -0.1):
-            for th_loss in np.arange(0.0, 5.0, 0.01):
+        test_normal_results = prepare_compute_anomaly(test_normal_results)
+        test_abnormal_results = prepare_compute_anomaly(test_abnormal_results)
 
-                x.append(th)
-                y.append(th_loss)
+        test_normal_results_losses = prepare_compute_anomaly_losses(test_normal_results_losses)
+        test_abnormal_results_losses = prepare_compute_anomaly_losses(test_abnormal_results_losses)
+        ok1 = ok2 = ok3 = 0
+        for th in range(1, threshold_range):
+            x.append(th)
+            ok = 0
+            for th_loss in np.arange(0.0, 20.0, 0.01):
                 FP = self.compute_anomaly_unique(test_normal_results, test_normal_results_losses, num_normal_session_logs, th, th_loss)
                 TP = self.compute_anomaly_unique(test_abnormal_results, test_abnormal_results_losses, num_abnormal_session_logs, th, th_loss)
                 TN = test_normal_length - FP
                 FN = test_abnormal_length - TP
-                fps.append(FP)
-                tps.append(TP)
-                tns.append(TN)
-                fns.append(FN)
+                if ok == 0:
+                    fps.append(FP)
+                    tps.append(TP)
+                    tns.append(TN)
+                    fns.append(FN)
                 if TP == 0:
-                    if th == elbow_g and th_loss < 0.05:
+                    if th == elbow_g and th_loss < 0.001 and ok1 == 0:
+                        ok1 = 1
+                        trainer.log["test_unique_metrics_g"]["epoch"].append(epoch)
+                        trainer.log["test_unique_metrics_g"]["g"].append(th)
+                        trainer.log["test_unique_metrics_g"]["th"].append(th_loss)
+                        trainer.log["test_unique_metrics_g"]["f1"].append(0)
+                        trainer.log["test_unique_metrics_g"]["p"].append(100)
+                        trainer.log["test_unique_metrics_g"]["r"].append(0)
+                        trainer.log["test_unique_metrics_g"]["tp"].append(TP)
+                        trainer.log["test_unique_metrics_g"]["fp"].append(FP)
+                        trainer.log["test_unique_metrics_g"]["fn"].append(FN)
                         print("1. For ELBOW G", th, "test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN, ", P:100, R:0, F1:0")
-                    if th_loss == elbow_loss and th == 1:
+                    if abs(th_loss - elbow_loss) < 0.006 and th == 1 and ok2 == 0:
+                        ok2 = 1
+                        trainer.log["test_unique_metrics_loss"]["epoch"].append(epoch)
+                        trainer.log["test_unique_metrics_loss"]["g"].append(th)
+                        trainer.log["test_unique_metrics_loss"]["th"].append(th_loss)
+                        trainer.log["test_unique_metrics_loss"]["f1"].append(0)
+                        trainer.log["test_unique_metrics_loss"]["p"].append(100)
+                        trainer.log["test_unique_metrics_loss"]["r"].append(0)
+                        trainer.log["test_unique_metrics_loss"]["tp"].append(TP)
+                        trainer.log["test_unique_metrics_loss"]["fp"].append(FP)
+                        trainer.log["test_unique_metrics_loss"]["fn"].append(FN)
                         print("2. For ELBOW LOSS", th_loss, "test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN,", P:100, R:0, F1:0")
-                    if th_loss == elbow_g_loss[1] and th == elbow_g_loss[0]:
+                    if abs(th_loss - elbow_loss) < 0.006 and th == elbow_g and ok3 == 0:
+                        ok3 = 1
+                        trainer.log["test_unique_metrics_both"]["epoch"].append(epoch)
+                        trainer.log["test_unique_metrics_both"]["g"].append(th)
+                        trainer.log["test_unique_metrics_both"]["th"].append(th_loss)
+                        trainer.log["test_unique_metrics_both"]["f1"].append(0)
+                        trainer.log["test_unique_metrics_both"]["p"].append(100)
+                        trainer.log["test_unique_metrics_both"]["r"].append(0)
+                        trainer.log["test_unique_metrics_both"]["tp"].append(TP)
+                        trainer.log["test_unique_metrics_both"]["fp"].append(FP)
+                        trainer.log["test_unique_metrics_both"]["fn"].append(FN)
                         print("3. For ELBOW G", th, "& LOSS", th_loss, " test metrics, TP: ", TP, "FP: ", FP, ", FN:", FN,", P:100, R:0, F1:0")
-
-                    ps.append(100)
-                    rs.append(0)
-                    f1s.append(0)
+                    if ok == 0:
+                        ps.append(100)
+                        rs.append(0)
+                        f1s.append(0)
+                        ok = 1
                     continue
                 # Compute precision, recall and F1-measure
                 P = 100 * TP / (TP + FP)
                 R = 100 * TP / (TP + FN)
                 F1 = 2 * P * R / (P + R)
                 # print(th + 1, FP, FN, P, R)
-                ps.append(P)
-                rs.append(R)
-                f1s.append(F1)
-                if th == elbow_g and th_loss < 0.05:
-                    print("1. For ELBOW G", th, "test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:",
-                          R, ", F1:", F1)
-                if th_loss == elbow_loss and th == 1:
-                    print("2. For ELBOW LOSS", th_loss, "test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P,
-                          ", R:", R, ", F1:", F1)
-                if th_loss == elbow_g_loss[1] and th == elbow_g_loss[0]:
-                    print("3. For ELBOW G", th, "& LOSS", th_loss, "test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN,
-                          ", P:", P, ", R:", R, ", F1:", F1)
-
+                if ok == 0:
+                    ps.append(P)
+                    rs.append(R)
+                    f1s.append(F1)
+                ok = 1
+                if th == elbow_g and th_loss < 0.001 and ok1 == 0:
+                    ok1 = 1
+                    trainer.log["test_unique_metrics_g"]["epoch"].append(epoch)
+                    trainer.log["test_unique_metrics_g"]["g"].append(th)
+                    trainer.log["test_unique_metrics_g"]["th"].append(th_loss)
+                    trainer.log["test_unique_metrics_g"]["f1"].append(F1)
+                    trainer.log["test_unique_metrics_g"]["p"].append(P)
+                    trainer.log["test_unique_metrics_g"]["r"].append(R)
+                    trainer.log["test_unique_metrics_g"]["tp"].append(TP)
+                    trainer.log["test_unique_metrics_g"]["fp"].append(FP)
+                    trainer.log["test_unique_metrics_g"]["fn"].append(FN)
+                    print("1. For ELBOW G", th, "test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
+                if abs(th_loss - elbow_loss) < 0.006 and th == 1 and ok2 == 0:
+                    ok2 = 1
+                    trainer.log["test_unique_metrics_loss"]["epoch"].append(epoch)
+                    trainer.log["test_unique_metrics_loss"]["g"].append(th)
+                    trainer.log["test_unique_metrics_loss"]["th"].append(th_loss)
+                    trainer.log["test_unique_metrics_loss"]["f1"].append(F1)
+                    trainer.log["test_unique_metrics_loss"]["p"].append(P)
+                    trainer.log["test_unique_metrics_loss"]["r"].append(R)
+                    trainer.log["test_unique_metrics_loss"]["tp"].append(TP)
+                    trainer.log["test_unique_metrics_loss"]["fp"].append(FP)
+                    trainer.log["test_unique_metrics_loss"]["fn"].append(FN)
+                    print("2. For ELBOW LOSS", th_loss, "test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
+                if abs(th_loss - elbow_loss) < 0.006 and th == elbow_g and ok3 == 0:
+                    ok3 = 1
+                    trainer.log["test_unique_metrics_both"]["epoch"].append(epoch)
+                    trainer.log["test_unique_metrics_both"]["g"].append(th)
+                    trainer.log["test_unique_metrics_both"]["th"].append(th_loss)
+                    trainer.log["test_unique_metrics_both"]["f1"].append(F1)
+                    trainer.log["test_unique_metrics_both"]["p"].append(P)
+                    trainer.log["test_unique_metrics_both"]["r"].append(R)
+                    trainer.log["test_unique_metrics_both"]["tp"].append(TP)
+                    trainer.log["test_unique_metrics_both"]["fp"].append(FP)
+                    trainer.log["test_unique_metrics_both"]["fn"].append(FN)
+                    print("3. For ELBOW G", th, "& LOSS", th_loss, "test metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:", F1)
                 if F1 > res[-1]:
-                    res = [th, TP, TN, FP, FN, P, R, F1]
-        print("Ce a dat pe validare")
-        print(res[0] + 1, res[3], res[4], res[5], res[6])
-        print()
-        self.create_plot("Metrics/Unique/Recall", rs, x, y, epoch)
-        self.create_plot("Metrics/Unique/Precision", ps, x, y, epoch)
-        self.create_plot("Metrics/Unique/F1Score", f1s, x, y, epoch)
-        self.create_plot("Metrics/Unique/TP", tps, x, y, epoch)
-        self.create_plot("Metrics/Unique/TN", tns, x, y, epoch)
-        self.create_plot("Metrics/Unique/FP", fps, x, y, epoch)
-        self.create_plot("Metrics/Unique/FN", fns, x, y, epoch)
+                    res = [th, th_loss, TP, TN, FP, FN, P, R, F1]
+                if th_loss < 0.001 and F1 > res_g[-1]:
+                    res_g = [th, th_loss, TP, TN, FP, FN, P, R, F1]
+                if th == 1 and F1 > res_loss[-1]:
+                    res_loss = [th, th_loss, TP, TN, FP, FN, P, R, F1]
+        trainer.log["test_unique_metrics_both_best"]["epoch"].append(epoch)
+        trainer.log["test_unique_metrics_both_best"]["g"].append(res[0])
+        trainer.log["test_unique_metrics_both_best"]["th"].append(res[1])
+        trainer.log["test_unique_metrics_both_best"]["f1"].append(res[8])
+        trainer.log["test_unique_metrics_both_best"]["p"].append(res[6])
+        trainer.log["test_unique_metrics_both_best"]["r"].append(res[7])
+        trainer.log["test_unique_metrics_both_best"]["tp"].append(res[2])
+        trainer.log["test_unique_metrics_both_best"]["fp"].append(res[4])
+        trainer.log["test_unique_metrics_both_best"]["fn"].append(res[5])
+
+        trainer.log["test_unique_metrics_g_best"]["epoch"].append(epoch)
+        trainer.log["test_unique_metrics_g_best"]["g"].append(res_g[0])
+        trainer.log["test_unique_metrics_g_best"]["th"].append(res_g[1])
+        trainer.log["test_unique_metrics_g_best"]["f1"].append(res_g[8])
+        trainer.log["test_unique_metrics_g_best"]["p"].append(res_g[6])
+        trainer.log["test_unique_metrics_g_best"]["r"].append(res_g[7])
+        trainer.log["test_unique_metrics_g_best"]["tp"].append(res_g[2])
+        trainer.log["test_unique_metrics_g_best"]["fp"].append(res_g[4])
+        trainer.log["test_unique_metrics_g_best"]["fn"].append(res_g[5])
+
+        trainer.log["test_unique_metrics_loss_best"]["epoch"].append(epoch)
+        trainer.log["test_unique_metrics_loss_best"]["g"].append(res_loss[0])
+        trainer.log["test_unique_metrics_loss_best"]["th"].append(res_loss[1])
+        trainer.log["test_unique_metrics_loss_best"]["f1"].append(res_loss[8])
+        trainer.log["test_unique_metrics_loss_best"]["p"].append(res_loss[6])
+        trainer.log["test_unique_metrics_loss_best"]["r"].append(res_loss[7])
+        trainer.log["test_unique_metrics_loss_best"]["tp"].append(res_loss[2])
+        trainer.log["test_unique_metrics_loss_best"]["fp"].append(res_loss[4])
+        trainer.log["test_unique_metrics_loss_best"]["fn"].append(res_loss[5])
+        if trainer.verbose:
+            self.create_plot("Metrics/Unique/Recall", rs, x, epoch, elbow_g)
+            self.create_plot("Metrics/Unique/Precision", ps, x, epoch, elbow_g)
+            self.create_plot("Metrics/Unique/F1Score", f1s, x, epoch, elbow_g)
+            self.create_plot("Metrics/Unique/TP", tps, x, epoch, elbow_g)
+            self.create_plot("Metrics/Unique/TN", tns, x, epoch, elbow_g)
+            self.create_plot("Metrics/Unique/FP", fps, x, epoch, elbow_g)
+            self.create_plot("Metrics/Unique/FN", fns, x, epoch, elbow_g)
         return res
 
     def compute_metrics_on_threshold(self, test_normal_results, num_normal_session_logs,
@@ -336,8 +714,8 @@ class Predicter():
         test_normal_length = sum(num_normal_session_logs)
         res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
         # print(threshold_range)
-        prepare_compute_anomaly(test_normal_results)
-        prepare_compute_anomaly(test_abnormal_results)
+        test_normal_results = prepare_compute_anomaly(test_normal_results)
+        test_abnormal_results = prepare_compute_anomaly(test_abnormal_results)
 
         FP = self.compute_anomaly(test_normal_results, num_normal_session_logs, th)
         TP = self.compute_anomaly(test_abnormal_results, num_abnormal_session_logs, th)
@@ -389,7 +767,9 @@ class Predicter():
         l = data_type == "test_abnormal"
         sess_events = [(k, l, []) for (k, v) in logs.items()]
         num_sess = [logs[x] for (x, l, _) in sess_events]
-        seqs, labels, anomaly = sliding_window(sess_events, vocab, history_size=self.history_size, is_train=False,
+        seqs, labels, anomaly = sliding_window(sess_events, vocab,
+                                               history_size=self.history_size,
+                                               is_train=False,
                                                data_dir=self.data_dir, semantics=self.semantics)
 
         dataset = log_dataset(logs=seqs,
@@ -407,7 +787,7 @@ class Predicter():
                 del log['idx']
                 features = [x.to(self.device) for x in log['features']]
                 output, _ = model(features=features, device=self.device)
-                output = output.softmax(dim=-1)
+                # output = output.softmax(dim=-1)
 
                 label_for_loss = torch.tensor(label).view(-1).to(self.device)
                 label_for_loss = label_for_loss - 1
@@ -420,7 +800,7 @@ class Predicter():
                              label[i]))
                         test_results_losses[seq_idx[i]].append(
                             loss[i].clone().detach().cpu())
-        return test_results, test_results_losses, num_sess
+        return test_results, test_results_losses, torch.Tensor(num_sess)
 
     def find_elbow(self, test_normal_results, num_normal_session_logs, train_normal_results_losses,
                         test_abnormal_results, num_abnormal_session_logs, train_abnormal_results_losses,
@@ -431,31 +811,34 @@ class Predicter():
         res = [0, 0, 0, 0, 0, 0, 0, 0]  # th,tp, tn, fp, fn,  p, r, f1
         no_anomalies_predicted = []
         fps, tps, tns, fns, ps, rs, f1s = [], [], [], [], [], [], []
-        prepare_compute_anomaly(test_normal_results)
-        prepare_compute_anomaly(test_abnormal_results)
+        test_normal_results = prepare_compute_anomaly(test_normal_results)
+        test_abnormal_results = prepare_compute_anomaly(test_abnormal_results)
         x, y = [], []
-        # prepare_compute_anomaly_losses(train_normal_results_losses)
-        # prepare_compute_anomaly_losses(train_abnormal_results_losses)
+        train_normal_results_losses = prepare_compute_anomaly_losses(train_normal_results_losses)
+        train_abnormal_results_losses = prepare_compute_anomaly_losses(train_abnormal_results_losses)
         for th in x_values:
-            # for th_loss in np.arange(5.0, -0.1, -0.1):
+            x.append(th)
+            ok = 0
             for th_loss in y_values:
-                x.append(th)
-                y.append(th_loss)
+                # y.append(th_loss)
                 FP = self.compute_anomaly(test_normal_results, train_normal_results_losses, num_normal_session_logs, th, th_loss)
                 TP = self.compute_anomaly(test_abnormal_results, train_abnormal_results_losses, num_abnormal_session_logs, th, th_loss)
                 TN = test_normal_length - FP
                 FN = test_abnormal_length - TP
-                fps.append(FP)
-                tps.append(TP)
-                tns.append(TN)
-                fns.append(FN)
-                anomalies = FP + TP
-                no_anomalies_predicted.append(anomalies)
+                if ok == 0:
+                    fps.append(FP)
+                    tps.append(TP)
+                    tns.append(TN)
+                    fns.append(FN)
+                    anomalies = FP + TP
+                    no_anomalies_predicted.append(anomalies)
                 if TP == 0:
                     # print("For g ", th, " Train metrics, TP: ", TP, "FP: ", FP, ", FN:", FN, ", P:100, R:0, F1:0")
-                    ps.append(100)
-                    rs.append(0)
-                    f1s.append(0)
+                    if ok == 0:
+                        ps.append(100)
+                        rs.append(0)
+                        f1s.append(0)
+                        ok = 1
                     continue
 
                 # Compute precision, recall and F1-measure
@@ -463,24 +846,23 @@ class Predicter():
                 R = 100 * TP / (TP + FN)
                 F1 = 2 * P * R / (P + R)
                 # print(th + 1, FP, FN, P, R)
-                ps.append(P)
-                rs.append(R)
-                f1s.append(F1)
+                if ok == 0:
+                    ps.append(P)
+                    rs.append(R)
+                    f1s.append(F1)
+                    ok = 1
                 # print("For g ", th, " train metrics, TP: ", TP, ", FP: ", FP, ", FN:", FN, ", P:", P, ", R:", R, ", F1:",F1)
                 if F1 > res[-1]:
                     res = [th, TP, TN, FP, FN, P, R, F1]
 
-        print("Ce a dat pe train")
-        print(res[0], res[3], res[4], res[5], res[6])
-        print()
-        self.create_plot("Metrics/Train/Recall", rs, x, y, epoch)
-        self.create_plot("Metrics/Train/Precision", ps, x, y, epoch)
-        self.create_plot("Metrics/Train/F1Score", f1s, x, y, epoch)
-        self.create_plot("Metrics/Train/TP", tps, x, y, epoch)
-        self.create_plot("Metrics/Train/TN", tns, x, y, epoch)
-        self.create_plot("Metrics/Train/FP", fps, x, y, epoch)
-        self.create_plot("Metrics/Train/FN", fns, x, y, epoch)
-        return no_anomalies_predicted, x, y
+        # self.create_plot("Metrics/Train_Elbow/Recall", rs, x, y, epoch, 0)
+        # self.create_plot("Metrics/Train_Elbow/Precision", ps, x, y, epoch, 0)
+        # self.create_plot("Metrics/Train_Elbow/F1Score", f1s, x, y, epoch, 0)
+        # self.create_plot("Metrics/Train_Elbow/TP", tps, x, y, epoch, 0)
+        # self.create_plot("Metrics/Train_Elbow/TN", tns, x, y, epoch, 0)
+        # self.create_plot("Metrics/Train_Elbow/FP", fps, x, y, epoch, 0)
+        # self.create_plot("Metrics/Train_Elbow/FN", fns, x, y, epoch, 0)
+        return no_anomalies_predicted, x
 
     def compute_elbow(self, epoch):
         with open(self.vocab_path, 'rb') as f:
@@ -512,9 +894,9 @@ class Predicter():
             self.semi_supervised_helper(model, train_abnormal, vocab, 'test_abnormal')
 
         print("------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------")
-        x_values = range(1, self.num_candidates)
+        x_values = range(self.num_candidates)
         y_values = np.arange(0.0, 5.0, 0.01)
-        anomalies_per_thresold, x, y = self.find_elbow(train_normal_results, num_normal, train_normal_results_losses,
+        anomalies_per_thresold, x = self.find_elbow(train_normal_results, num_normal, train_normal_results_losses,
                                                  train_abnormal_results, num_abnormal, train_abnormal_results_losses,
                                                  epoch, x_values, y_values,
                                                  threshold_range=self.num_candidates)
@@ -522,40 +904,30 @@ class Predicter():
         mx_g_loss = -1
         mx_g = -1
         mx_loss = -1
-        elbow_g_loss = None
         elbow_g = None
         elbow_loss = None
+        train_normal_results_losses = prepare_compute_anomaly_losses(train_normal_results_losses)
+        train_abnormal_results_losses = prepare_compute_anomaly_losses(train_abnormal_results_losses)
         for x_i in range(1, len(x_values)):
-            for y_i in range(1, len(y_values)):
-                diff_g = - anomalies_per_thresold[len(y_values) * x_i + y_i] + anomalies_per_thresold[len(y_values) * (x_i - 1) + y_i]
-                diff_loss = - anomalies_per_thresold[len(y_values) * x_i + y_i] + anomalies_per_thresold[len(y_values) * x_i + (y_i - 1)]
-                if diff_g > mx_g and y_i == 1:
-                    mx_g = diff_g
-                    elbow_g = x_values[x_i]
-                if diff_loss > mx_loss and x_i == 1:
-                    mx_loss = diff_loss
-                    elbow_loss = y_values[y_i]
-                if diff_g > diff_loss and diff_g > mx_g_loss:
-                    mx_g_loss = diff_g
-                    elbow_g_loss = (x_values[x_i], y_values[y_i])
-                if diff_loss >= diff_g and diff_loss > mx_g_loss:
-                    mx_g_loss = diff_loss
-                    elbow_g_loss = (x_values[x_i], y_values[y_i])
+            # for y_i in range(1, len(y_values)):
+            diff_g = - anomalies_per_thresold[x_i] + anomalies_per_thresold[x_i - 1]
+            if diff_g > mx_g:
+                mx_g = diff_g
+                elbow_g = x_values[x_i]
 
+        elbow_loss = mean_selection_IQR(torch.cat((train_normal_results_losses, train_abnormal_results_losses)))
         print("1. G: diff ", mx_g, " at g ", elbow_g)
         print("2. Loss: diff ", mx_loss, " at loss ", elbow_loss)
-        print("3. G & Loss: diff ", mx_g_loss, " at (g,loss) ", elbow_g_loss)
-        self.create_plot("Number anomalies", anomalies_per_thresold, x, y, epoch)
+        self.create_plot("Number_anomalies/Epoch", anomalies_per_thresold, x, epoch, elbow_g)
+        # plot_losses(train_normal_results_losses, train_abnormal_results_losses, epoch, self.run_dir + '/Metrics/Elbow/', elbow_loss)
+
         print("Changes in number of anomalies")
 
-        # for idx in range(1, len(anomalies_per_thresold)):
-        #     print("Pentru g " + str(self.num_candidates - idx) + " anomalies diff:" + str(
-        #         anomalies_per_thresold[idx] - anomalies_per_thresold[idx - 1]))
         elapsed_time = time.time() - start_time
         print('elapsed_time: {}'.format(elapsed_time))
-        return elbow_g, elbow_loss, elbow_g_loss
+        return elbow_g, elbow_loss
 
-    def predict_semi_supervised(self, epoch, elbow_g, elbow_loss, elbow_g_loss):
+    def predict_semi_supervised(self, epoch, elbow_g, elbow_loss, trainer):
 
         with open(self.vocab_path, 'rb') as f:
             vocab = pickle.load(f)
@@ -576,6 +948,7 @@ class Predicter():
         print('model_path: {}'.format(self.model_path))
 
         test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural')
+        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural')
         print("Nr secvente unice test: normale vs anormale")
         print(len(test_normal), len(test_abnormal))
 
@@ -585,11 +958,33 @@ class Predicter():
             self.semi_supervised_helper(model, test_normal, vocab, 'test_normal')
         test_abnormal_results, test_abnormal_results_losses, num_abnormal = \
             self.semi_supervised_helper(model, test_abnormal, vocab, 'test_abnormal')
+
+        train_normal_results, train_normal_results_losses, train_num_normal = \
+            self.semi_supervised_helper(model, train_normal, vocab, 'test_normal')
+        train_abnormal_results, train_abnormal_results_losses, train_num_abnormal = \
+            self.semi_supervised_helper(model, train_abnormal, vocab, 'test_abnormal')
+
+        print("------------------------NORMAL TRAIN SEQUENCES----------------------------")
+        TH, th_loss, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold_train(train_normal_results, train_num_normal,
+                                                                train_normal_results_losses,
+                                                                train_abnormal_results, train_num_abnormal,
+                                                                train_abnormal_results_losses,
+                                                                epoch, self.num_candidates,
+                                                                elbow_g, elbow_loss, trainer)
+        FPR = FP / (FP + TN)
+        FNR = FN / (TP + FN)
+        SP = TN / (TN + FP)
+
+        print('Best threshold', TH)
+        print("Confusion matrix")
+        print("TP: {}, TN: {}, FP: {}, FN: {}, FNR: {}, FPR: {}".format(TP, TN, FP, FN, FNR, FPR))
+        print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}'.format(P, R, F1, SP))
+
         print("------------------------NORMAL TEST SEQUENCES----------------------------")
-        TH, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold(test_normal_results, num_normal, test_normal_results_losses,
+        TH, th_loss, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold(test_normal_results, num_normal, test_normal_results_losses,
                                                                 test_abnormal_results, num_abnormal, test_abnormal_results_losses,
                                                                 epoch, self.num_candidates,
-                                                                elbow_g, elbow_loss, elbow_g_loss)
+                                                                elbow_g, elbow_loss, trainer)
         FPR = FP / (FP + TN)
         FNR = FN / (TP + FN)
         SP = TN / (TN + FP)
@@ -600,10 +995,10 @@ class Predicter():
         print('Precision: {:.3f}%, Recall: {:.3f}%, F1-measure: {:.3f}%, Specificity: {:.3f}'.format(P, R, F1, SP))
 
         print("--------------------------UNIQUE TEST SEQUENCES------------------------------------")
-        TH, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold_unique(test_normal_results, num_normal, test_normal_results_losses,
+        TH, th_loss, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold_unique(test_normal_results, num_normal, test_normal_results_losses,
                                                                        test_abnormal_results, num_abnormal, test_abnormal_results_losses,
                                                                        epoch, self.num_candidates,
-                                                                       elbow_g, elbow_loss, elbow_g_loss)
+                                                                       elbow_g, elbow_loss, trainer)
         FPR = FP / (FP + TN)
         FNR = FN / (TP + FN)
         SP = TN / (TN + FP)

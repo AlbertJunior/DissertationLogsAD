@@ -37,20 +37,13 @@ def mean_selection(losses, T):
     Q1 = torch.quantile(losses, 0.25)
     Q2 = torch.quantile(losses, 0.5)
     Q3 = torch.quantile(losses, 0.75)
-
     IQR = Q3 - Q1
-    #     ul = Q3 + 2.5 * IQR
     ul = Q2
     ll = Q1 - 1.5 * IQR
-    #     print("Median: ", Q2)
 
     sa_verdict = torch.rand(losses.shape[0], device=losses.device) > sa_value(losses, ul, T)
-
     upper_limit = torch.logical_and(losses > ul, sa_verdict)
-    #     upper_limit = losses > ul
-
     return torch.where(torch.logical_not(upper_limit))[0], torch.where(upper_limit)[0]
-
 
 def skewness_fn(x, device, dim=1):
     """Calculates skewness of data "x" along dimension "dim"."""
@@ -129,6 +122,7 @@ class Trainer():
         self.is_logkey = options["is_logkey"]
         self.is_time = options["is_time"]
         self.mean_selection_activated = options['mean_selection_activated']
+        self.verbose = options['verbose']
 
         # transformers' parameters
         self.num_encoder_layers = options["num_encoder_layers"]
@@ -177,8 +171,7 @@ class Trainer():
             # train_labels = train_labels[:200000]
             n_val = int(len(train_logs) * self.valid_ratio)
             val_logs, val_labels, val_anomaly = train_logs[-n_val:], train_labels[-n_val:], anomaly_labels[-n_val:]
-            train_logs, train_labels, anomaly_labels = train_logs[:-n_val], train_labels[:-n_val], anomaly_labels[
-                                                                                                   :-n_val]
+            train_logs, train_labels, anomaly_labels = train_logs[:-n_val], train_labels[:-n_val], anomaly_labels[:-n_val]
             del data
             gc.collect()
         else:
@@ -265,14 +258,91 @@ class Trainer():
                           ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness",
                            "elim_no", "elim_per", "an_elim_no", "an_elim_per"]},
                 "valid": {key: []
-                          for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]}
+                          for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]},
+                  "train_metrics_both_best": {key: []
+                         for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "train_metrics_g_best": {key: []
+                                            for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "train_metrics_loss_best": {key: []
+                                            for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "train_metrics_g": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "train_metrics_loss": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "train_metrics_both": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+
+                "test_normal_metrics_both_best": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_normal_metrics_g_best": {key: []
+                                                  for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_normal_metrics_loss_best": {key: []
+                                                  for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_normal_metrics_g": {key: []
+                                 for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_normal_metrics_loss": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_normal_metrics_both": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+
+                "test_unique_metrics_both_best": {key: []
+                                     for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_unique_metrics_g_best": {key: []
+                                                  for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_unique_metrics_loss_best": {key: []
+                                                  for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_unique_metrics_g": {key: []
+                                       for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_unique_metrics_loss": {key: []
+                                          for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_unique_metrics_both": {key: []
+                                          for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]}
             }
         else:
             self.log = {
                 "train": {key: []
                           for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]},
                 "valid": {key: []
-                          for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]}
+                          for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]},
+
+                "train_metrics_both_best": {key: []
+                         for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "train_metrics_g_best": {key: []
+                                            for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "train_metrics_loss_best": {key: []
+                                            for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "train_metrics_g": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "train_metrics_loss": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "train_metrics_both": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+
+                "test_normal_metrics_both_best": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_normal_metrics_g_best": {key: []
+                                                  for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_normal_metrics_loss_best": {key: []
+                                                  for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_normal_metrics_g": {key: []
+                                 for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_normal_metrics_loss": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_normal_metrics_both": {key: []
+                                    for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+
+                "test_unique_metrics_both_best": {key: []
+                                     for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_unique_metrics_g_best": {key: []
+                                                  for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_unique_metrics_loss_best": {key: []
+                                                  for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_unique_metrics_g": {key: []
+                                       for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_unique_metrics_loss": {key: []
+                                          for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
+                "test_unique_metrics_both": {key: []
+                                          for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]}
             }
         if options['resume_path'] is not None:
             if os.path.isfile(options['resume_path']):
@@ -451,6 +521,9 @@ class Trainer():
                       str(anomalies_not_selected) + "/" + str(no_anomalies))
                 self.log['train']['an_elim_no'].append(anomalies_not_selected)
                 self.log['train']['an_elim_per'].append(anomalies_not_selected / no_anomalies)
+        # if len(self.log['train']['loss']) > 2 and self.log['train']['loss'][-2] - self.log['train']['loss'][-1] < self.log['train']['loss'][-2] * 0.01:
+        #     return True
+        # return False
 
     def valid(self, epoch):
         self.model.eval()
@@ -504,7 +577,7 @@ class Trainer():
         self.log['valid']['skewness'].append(skewness)
         plot_next_token_histogram_of_probabilities("valid", epoch, probabilities_real_next_token, self.run_dir)
 
-        if total_losses / num_batch < self.best_loss:
+        if total_losses / num_batch < 0.95 * self.best_loss:
             self.best_loss = total_losses / num_batch
             self.epochs_no_improve = 0
             self.save_checkpoint(epoch,
@@ -613,18 +686,18 @@ class Trainer():
             n_epoch += 1
             if epoch > 0:
                 val_loss += self.valid(epoch)
-                # self.save_checkpoint(epoch,
-                #                      save_optimizer=False,
-                #                      suffix=self.model_name)
+                self.save_checkpoint(epoch,
+                                     save_optimizer=False,
+                                     suffix=self.model_name)
                 n_val_epoch += 1
                 print("======== My contribution ===========")
-                elbow_g, elbow_loss, elbow_g_loss = predicter.compute_elbow(epoch)
+                elbow_g, elbow_loss = predicter.compute_elbow(epoch)
                 print("======== Their approach ===========")
-                predicter.predict_semi_supervised(epoch, elbow_g, elbow_loss, elbow_g_loss)
+                predicter.predict_semi_supervised(epoch, elbow_g, elbow_loss, self)
                 # print("======== My contribution ===========")
                 # predicter.predict_semi_supervised_ramona()
             self.save_log()
 
-        plot_train_valid_loss(self.run_dir)
+        plot_train_valid_loss(self.run_dir, self.mean_selection_activated)
         if self.model_name == "autoencoder":
             return self.train_autoencoder2()  # self.model, val_loss / n_val_epoch

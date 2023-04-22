@@ -3,20 +3,21 @@ dataset_name: hdfs
 device: cpu
 data_dir: ./dataset/hdfs/
 output_dir: dataset/hdfs/
-run_dir: runs/2023-03-22-hdfs
+run_dir: runs/2023-03-26-hdfs-temp1
 folder: hdfs/
-log_file: HDFS.log
-sample_size: None
-sample_log_file: None
-parser_type: None
-log_format: None
+log_file: sample_log_file.log
+sample_size: 100000
+sample_log_file: sample_log_file.log
+mean_selection_activated: True
+parser_type: drain
+log_format: <Date> <Time> <Pid> <Level> <Component> <Content>
 regex: []
 keep_para: False
 st: 0.3
 depth: 3
 max_child: 100
 tau: 0.5
-is_process: False
+is_process: True
 is_instance: False
 train_file: train_fixed100_instances.pkl
 test_file: test_fixed100_instances.pkl
@@ -48,7 +49,7 @@ scale: None
 hidden: 256
 layers: 4
 attn_heads: 4
-num_workers: 5
+num_workers: 0
 adam_beta1: 0.9
 adam_beta2: 0.999
 adam_weight_decay: 0.0

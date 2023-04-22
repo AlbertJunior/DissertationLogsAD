@@ -41,6 +41,7 @@ def arg_parser():
     parser.add_argument("--sample_size", type=int, help="sample raw log")
     parser.add_argument("--sample_log_file", default=None, help="if sampling raw logs, new log file name")
     parser.add_argument("--mean_selection_activated", action='store_true')
+    parser.add_argument("--verbose", action='store_true')
 
     parser.add_argument("--parser_type", default=None, help="parse type drain or spell")
     parser.add_argument("--log_format", default=None, help="log format",
@@ -195,12 +196,18 @@ def main():
         os.mkdir(os.path.join(options["run_dir"], 'Histograms'))
     if not os.path.exists(os.path.join(options["run_dir"], 'Metrics')):
         os.mkdir(os.path.join(options["run_dir"], 'Metrics'))
+    if not os.path.exists(os.path.join(options["run_dir"], 'Train_Losses')):
+        os.mkdir(os.path.join(options["run_dir"], 'Train_Losses'))
+    if not os.path.exists(os.path.join(options["run_dir"], 'Test_Losses')):
+        os.mkdir(os.path.join(options["run_dir"], 'Test_Losses'))
     if not os.path.exists(os.path.join(options["run_dir"], 'Metrics', 'Unique')):
         os.mkdir(os.path.join(options["run_dir"], 'Metrics', 'Unique'))
     if not os.path.exists(os.path.join(options["run_dir"], 'Metrics', 'Normal')):
         os.mkdir(os.path.join(options["run_dir"], 'Metrics', 'Normal'))
-    if not os.path.exists(os.path.join(options["run_dir"], 'Metrics', 'Train')):
-        os.mkdir(os.path.join(options["run_dir"], 'Metrics', 'Train'))
+    if not os.path.exists(os.path.join(options["run_dir"], 'Metrics', 'Train_Normal')):
+        os.mkdir(os.path.join(options["run_dir"], 'Metrics', 'Train_Normal'))
+    if not os.path.exists(os.path.join(options["run_dir"], 'Number_anomalies')):
+        os.mkdir(os.path.join(options["run_dir"], 'Number_anomalies'))
 
     print("Save options parameters")
     save_parameters(options, options["model_dir"] + "parameters.txt")
