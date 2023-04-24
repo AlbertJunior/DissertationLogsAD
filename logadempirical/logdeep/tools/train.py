@@ -87,7 +87,7 @@ class Trainer():
         self.data_dir = options['output_dir']
         self.run_dir = options['run_dir']
         self.vocab_path = options["vocab_path"]
-        self.scale_path = options["scale_path"]
+        # self.scale_path = options["scale_path"]
         self.emb_dir = options['data_dir']
 
         self.window_size = options['window_size']
@@ -132,6 +132,7 @@ class Trainer():
         self.dim_feedforward = options["dim_feedforward"]
         self.transformers_dropout = options["transformers_dropout"]
         self.random_sample = options["random_sample"]
+        self.anomalies_ratio = options["anomalies_ratio"]
 
         # detection model: predict the next log or classify normal/abnormal
         if self.model_name in ["cnn", "logrobust", "autoencoder", "neurallog"]:
@@ -151,7 +152,7 @@ class Trainer():
         if self.sample == 'sliding_window':
             print("Loading train dataset\n")
             # data = load_features(self.data_dir + "train.pkl", only_normal=self.is_predict_logkey)
-            data = load_features(self.data_dir + "train.pkl", only_normal=False)
+            data = load_features(self.data_dir + "train.pkl", anomalies_ratio=self.anomalies_ratio)
 
             n_train = int(len(data))
             print("Nr secvente train from train.pkl", n_train)
@@ -257,6 +258,19 @@ class Trainer():
                           for key in
                           ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness",
                            "elim_no", "elim_per", "an_elim_no", "an_elim_per"]},
+
+                "train_statistics": {key: []
+                          for key in
+                          ["total_sessions_no", "normal_sessions_no", "abnormal_sessions_no",
+                           "total_unique_sessions_no", "unique_normal_sessions_no", "unique_abnormal_sessions_no",
+                           "total_sequences_no", "normal_sequences_no", "abnormal_sequences_no"]},
+                "test_statistics": {key: []
+                          for key in
+                          ["total_sessions_no", "normal_sessions_no", "abnormal_sessions_no",
+                           "total_unique_sessions_no", "unique_normal_sessions_no",
+                           "unique_abnormal_sessions_no",
+                           "total_sequences_no", "normal_sequences_no", "abnormal_sequences_no"]},
+
                 "valid": {key: []
                           for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]},
                   "train_metrics_both_best": {key: []
@@ -668,7 +682,7 @@ class Trainer():
         from statistics import stdev
         return model_ae2, stdev(recst_value)  # * self.threshold_rate
 
-    def start_train(self, predicter):
+    def start_train(self, predicter, vocab_size):
         val_loss = 0
         n_epoch = 0
         n_val_epoch = 0
@@ -683,6 +697,7 @@ class Trainer():
                 self.optimizer.param_groups[0]['lr'] *= self.lr_decay_ratio
             self.train(epoch)
 
+            self.log["train_statistics"]['vocab_size'].append(vocab_size)
             n_epoch += 1
             if epoch > 0:
                 val_loss += self.valid(epoch)
@@ -691,13 +706,13 @@ class Trainer():
                                      suffix=self.model_name)
                 n_val_epoch += 1
                 print("======== My contribution ===========")
-                elbow_g, elbow_loss = predicter.compute_elbow(epoch)
+                elbow_g, elbow_loss = predicter.compute_elbow(epoch, self.run_dir + "/Csvs")
                 print("======== Their approach ===========")
-                predicter.predict_semi_supervised(epoch, elbow_g, elbow_loss, self)
+                predicter.predict_semi_supervised(epoch, elbow_g, elbow_loss, self.run_dir + "/Csvs", self)
                 # print("======== My contribution ===========")
                 # predicter.predict_semi_supervised_ramona()
             self.save_log()
 
-        plot_train_valid_loss(self.run_dir, self.mean_selection_activated)
+        plot_train_valid_loss(self.run_dir + "/Csvs", self.run_dir + "/Pngs", self.mean_selection_activated)
         if self.model_name == "autoencoder":
             return self.train_autoencoder2()  # self.model, val_loss / n_val_epoch

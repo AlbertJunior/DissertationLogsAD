@@ -70,7 +70,13 @@ def plot_losses(losses_normal, losses_anomalies, epoch, save_dir, elbow_loss):
     plt.savefig(save_dir + f"Losses_{epoch}.png")
     plt.close()
 
-def plot_train_valid_loss(save_dir, mean_selection_activated):
+def plot_train_valid_loss(save_dir, save_dir_photos, mean_selection_activated):
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
+
+    if not os.path.exists(save_dir_photos):
+        os.mkdir(save_dir_photos)
+
     train_loss = pd.read_csv(save_dir + "/train_log.csv")
     valid_loss = pd.read_csv(save_dir + "/valid_log.csv")
 
@@ -349,44 +355,44 @@ def plot_train_valid_loss(save_dir, mean_selection_activated):
     sns.lineplot(x="epoch",y="loss" , data = train_loss, label="train loss")
     sns.lineplot(x="epoch",y="loss" , data = valid_loss, label="valid loss")
     plt.title("epoch vs train loss vs valid loss")
-    plt.savefig(save_dir+"/train_valid_loss.png")
+    plt.savefig(save_dir_photos+"/train_valid_loss.png")
     plt.close()
 
     sns.lineplot(x="epoch", y="acc", data=train_loss, label="train acc")
     sns.lineplot(x="epoch", y="acc", data=valid_loss, label="valid acc")
     plt.title("epoch vs train acc vs valid acc")
-    plt.savefig(save_dir + "/train_valid_acc.png")
+    plt.savefig(save_dir_photos + "/train_valid_acc.png")
     plt.close()
 
     sns.lineplot(x="epoch", y="skewness", data=train_loss, label="train skewness")
     sns.lineplot(x="epoch", y="skewness", data=valid_loss, label="valid skewness")
     plt.title("epoch vs train skewness vs valid skewness")
-    plt.savefig(save_dir + "/train_valid_skewness.png")
+    plt.savefig(save_dir_photos + "/train_valid_skewness.png")
     plt.close()
 
     sns.lineplot(x="epoch", y="kurtosis", data=train_loss, label="train kurtosis")
     sns.lineplot(x="epoch", y="kurtosis", data=valid_loss, label="valid kurtosis")
     plt.title("epoch vs train kurtosis vs valid kurtosis")
-    plt.savefig(save_dir + "/train_valid_kurtosis.png")
+    plt.savefig(save_dir_photos + "/train_valid_kurtosis.png")
     plt.close()
 
     sns.lineplot(x="epoch", y="kurtosis", data=train_loss, label="train kurtosis")
     sns.lineplot(x="epoch", y="kurtosis", data=valid_loss, label="valid kurtosis")
     plt.title("epoch vs train kurtosis vs valid kurtosis")
-    plt.savefig(save_dir + "/train_valid_kurtosis.png")
+    plt.savefig(save_dir_photos + "/train_valid_kurtosis.png")
     plt.close()
 
     if mean_selection_activated:
         sns.lineplot(x="epoch", y="elim_no", data=train_loss, label="train eliminated number")
         sns.lineplot(x="epoch", y="an_elim_no", data=train_loss, label="train anomalies eliminated number")
         plt.title("epoch vs eliminated number vs anomalies eliminated number")
-        plt.savefig(save_dir + "/train_valid_eliminated_no.png")
+        plt.savefig(save_dir_photos + "/train_valid_eliminated_no.png")
         plt.close()
 
         sns.lineplot(x="epoch", y="elim_per", data=train_loss, label="train eliminated percentage")
         sns.lineplot(x="epoch", y="an_elim_per", data=train_loss, label="train anomalies eliminated percentage")
         plt.title("epoch vs eliminated percentage vs anomalies eliminated percentage")
-        plt.savefig(save_dir + "/train_valid_eliminated_percentage.png")
+        plt.savefig(save_dir_photos + "/train_valid_eliminated_percentage.png")
         print("plot done")
         plt.close()
 

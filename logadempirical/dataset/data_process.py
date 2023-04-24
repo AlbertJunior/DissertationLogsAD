@@ -1,5 +1,7 @@
 import os
 import gc
+from os.path import dirname
+
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -128,7 +130,7 @@ def process_dataset(data_dir, output_dir, log_file, dataset_name, window_type, w
         if dataset_name == "hdfs":
             id_regex = r'(blk_-?\d+)'
             label_dict = {}
-            blk_label_file = os.path.join(data_dir, "anomaly_label.csv")
+            blk_label_file = os.path.join(dirname(dirname(data_dir)), "anomaly_label.csv")
             blk_df = pd.read_csv(blk_label_file)
             for _, row in tqdm(enumerate(blk_df.to_dict("records"))):
                 label_dict[row["BlockId"]] = 1 if row["Label"] == "Anomaly" else 0

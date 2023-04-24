@@ -60,48 +60,52 @@ def isint(x):
         return a == b
 
 
-def load_features(data_path, only_normal=False, min_len=0):
+def load_features(data_path, anomalies_ratio, min_len=0):
     with open(data_path, 'rb') as f:
         data = pickle.load(f)
-    if only_normal:
-        logs = []
-        for seq in data:
-            if len(seq['EventId']) < min_len:
-                continue
-            if not isinstance(seq['Label'], int):
-                label = max(seq['Label'].tolist())
+    no_abnormal = 0
+    no_normal = 0
+    for seq in data:
+        if len(seq['EventId']) < min_len:
+            continue
+        if not isinstance(seq['Label'], int):
+            label = seq['Label'].tolist()
+            if max(label) > 0:
+                no_abnormal += 1
             else:
-                label = seq['Label']
-            if label == 0:
+                no_normal += 1
+        else:
+            label = seq['Label']
+            if label > 0:
+                no_abnormal += 1
+            else:
+                no_normal += 1
+    logs = []
+    num_anomalies = anomalies_ratio * (no_abnormal + no_normal)
+    nr = 0
+    for seq in data:
+        if len(seq['EventId']) < min_len:
+            continue
+        if not isinstance(seq['Label'], int):
+            label = max(seq['Label'].tolist())
+        else:
+            label = seq['Label']
+
+        if label > 0:
+            nr += 1
+            if nr <= num_anomalies:
                 try:
                     logs.append((seq['EventId'], label, seq['Seq'].tolist()))
                 except:
                     logs.append((seq['EventId'], label, seq['Seq']))
-    else:
-        logs = []
-        no_abnormal = 0
-        no_normal = 0
-        for seq in data:
-            if len(seq['EventId']) < min_len:
-                continue
-            if not isinstance(seq['Label'], int):
-                label = seq['Label'].tolist()
-                if max(label) > 0:
-                    no_abnormal += 1
-                else:
-                    no_normal += 1
-            else:
-                label = seq['Label']
-                if label > 0:
-                    no_abnormal += 1
-                else:
-                    no_normal += 1
+        else:
             try:
                 logs.append((seq['EventId'], label, seq['Seq'].tolist()))
             except:
                 logs.append((seq['EventId'], label, seq['Seq']))
-        print("Secvente de train normale:", no_normal)
-        print("Secvente de train anormale:", no_abnormal)
+
+    print("Secvente de train normale:", no_normal)
+    print("Secvente de train anormale:", no_abnormal)
     return logs
 
 

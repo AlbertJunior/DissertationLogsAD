@@ -31,7 +31,7 @@ from logadempirical.neural_log.transformers import NeuralLog
 global_cache = dict()
 
 
-def generate(output_dir, name, is_neural):
+def generate(output_dir, name, is_neural, anomalies_ratio):
     global global_cache
     if name in global_cache:
         return global_cache[name]
@@ -41,6 +41,23 @@ def generate(output_dir, name, is_neural):
     print("Length test", len(data_iter))
     normal_iter = {}
     abnormal_iter = {}
+    anomalies = 0
+    normals = 0
+    for seq in data_iter:
+        if not isinstance(seq['Label'], int):
+            label = max(seq['Label'].tolist())
+        else:
+            label = seq['Label']
+        if is_neural:
+            key = tuple(seq['Seq'])
+        else:
+            key = tuple(seq['EventId'])
+        if label != 0:
+            anomalies += 1
+        else:
+            normals += 1
+    total_anomalies = anomalies_ratio * (anomalies + normals)
+    nr = 0
     for seq in data_iter:
         if not isinstance(seq['Label'], int):
             label = max(seq['Label'].tolist())
@@ -55,13 +72,15 @@ def generate(output_dir, name, is_neural):
                 normal_iter[key] = 1
             else:
                 normal_iter[key] += 1
-        else:
+        elif nr < total_anomalies:
+            nr += 1
             if key not in abnormal_iter:
                 abnormal_iter[key] = 1
             else:
                 abnormal_iter[key] += 1
 
     global_cache[name] = (normal_iter, abnormal_iter)
+
     return global_cache[name]
 
 
@@ -103,6 +122,7 @@ class Predicter():
         self.vocab_path = options["vocab_path"]
         self.model_path = options['model_path']
         self.model_name = options['model_name']
+        self.anomalies_ratio = options['anomalies_ratio']
 
         self.device = options['device']
         self.window_size = options['window_size']
@@ -800,7 +820,7 @@ class Predicter():
                              label[i]))
                         test_results_losses[seq_idx[i]].append(
                             loss[i].clone().detach().cpu())
-        return test_results, test_results_losses, torch.Tensor(num_sess)
+        return test_results, test_results_losses, torch.Tensor(num_sess), len(labels)
 
     def find_elbow(self, test_normal_results, num_normal_session_logs, train_normal_results_losses,
                         test_abnormal_results, num_abnormal_session_logs, train_abnormal_results_losses,
@@ -864,7 +884,7 @@ class Predicter():
         # self.create_plot("Metrics/Train_Elbow/FN", fns, x, y, epoch, 0)
         return no_anomalies_predicted, x
 
-    def compute_elbow(self, epoch):
+    def compute_elbow(self, epoch, info_dir):
         with open(self.vocab_path, 'rb') as f:
             vocab = pickle.load(f)
         if self.model_name == "deeplog":
@@ -883,14 +903,15 @@ class Predicter():
         model.eval()
         print('model_path: {}'.format(self.model_path))
 
-        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural')
+        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural', self.anomalies_ratio)
         print("Nr secvente unice train: normale vs anormale")
         print(len(train_normal), len(train_abnormal))
 
+
         start_time = time.time()
-        train_normal_results, train_normal_results_losses, num_normal = \
+        train_normal_results, train_normal_results_losses, num_normal, train_normal_no = \
             self.semi_supervised_helper(model, train_normal, vocab, 'test_normal')
-        train_abnormal_results, train_abnormal_results_losses, num_abnormal = \
+        train_abnormal_results, train_abnormal_results_losses, num_abnormal, train_abnormal_no = \
             self.semi_supervised_helper(model, train_abnormal, vocab, 'test_abnormal')
 
         print("------------------------JUST NORMAL FOR ELBOW TRAIN SEQUENCES----------------------------")
@@ -927,7 +948,7 @@ class Predicter():
         print('elapsed_time: {}'.format(elapsed_time))
         return elbow_g, elbow_loss
 
-    def predict_semi_supervised(self, epoch, elbow_g, elbow_loss, trainer):
+    def predict_semi_supervised(self, epoch, elbow_g, elbow_loss, info_dir, trainer):
 
         with open(self.vocab_path, 'rb') as f:
             vocab = pickle.load(f)
@@ -954,15 +975,40 @@ class Predicter():
 
         # Test the model
         start_time = time.time()
-        test_normal_results, test_normal_results_losses, num_normal = \
+        test_normal_results, test_normal_results_losses, num_normal, test_normal_no = \
             self.semi_supervised_helper(model, test_normal, vocab, 'test_normal')
-        test_abnormal_results, test_abnormal_results_losses, num_abnormal = \
+        test_abnormal_results, test_abnormal_results_losses, num_abnormal, test_abnormal_no = \
             self.semi_supervised_helper(model, test_abnormal, vocab, 'test_abnormal')
 
-        train_normal_results, train_normal_results_losses, train_num_normal = \
+        train_normal_results, train_normal_results_losses, train_num_normal, train_normal_no = \
             self.semi_supervised_helper(model, train_normal, vocab, 'test_normal')
-        train_abnormal_results, train_abnormal_results_losses, train_num_abnormal = \
+        train_abnormal_results, train_abnormal_results_losses, train_num_abnormal, train_abnormal_no = \
             self.semi_supervised_helper(model, train_abnormal, vocab, 'test_abnormal')
+
+        trainer.log["train_statistics"]["total_sessions_no"].append(sum(train_normal) + sum(train_abnormal))
+        trainer.log["train_statistics"]["normal_sessions_no"].append(sum(train_normal))
+        trainer.log["train_statistics"]["abnormal_sessions_no"].append(sum(train_abnormal))
+
+        trainer.log["train_statistics"]["total_unique_sessions_no"].append(len(train_normal) + len(train_abnormal))
+        trainer.log["train_statistics"]["unique_normal_sessions_no"].append(len(train_normal))
+        trainer.log["train_statistics"]["unique_abnormal_sessions_no"].append(len(train_abnormal))
+
+        trainer.log["train_statistics"]["total_sequences_no"].append(train_normal_no + train_abnormal_no)
+        trainer.log["train_statistics"]["normal_sequences_no"].append(train_normal_no)
+        trainer.log["train_statistics"]["abnormal_sequences_no"].append(train_abnormal_no)
+
+
+        trainer.log["test_statistics"]["total_sessions_no"].append(sum(test_normal) + sum(test_abnormal))
+        trainer.log["test_statistics"]["normal_sessions_no"].append(sum(test_normal))
+        trainer.log["test_statistics"]["abnormal_sessions_no"].append(sum(test_abnormal))
+
+        trainer.log["test_statistics"]["total_unique_sessions_no"].append(len(test_normal) + len(test_abnormal))
+        trainer.log["test_statistics"]["unique_normal_sessions_no"].append(len(test_normal))
+        trainer.log["test_statistics"]["unique_abnormal_sessions_no"].append(len(test_abnormal))
+
+        trainer.log["test_statistics"]["total_sequences_no"].append(test_normal_no + test_abnormal_no)
+        trainer.log["test_statistics"]["normal_sequences_no"].append(test_normal_no)
+        trainer.log["test_statistics"]["abnormal_sequences_no"].append(test_abnormal_no)
 
         print("------------------------NORMAL TRAIN SEQUENCES----------------------------")
         TH, th_loss, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold_train(train_normal_results, train_num_normal,
@@ -1070,14 +1116,14 @@ class Predicter():
             print(len(test_normal_dict), len(test_abnormal_dict))
 
             start_time = time.time()
-            valid_normal_results, valid_normal_results_losses, num_valid_normal = \
+            valid_normal_results, valid_normal_results_losses, num_valid_normal, valid_normal_no = \
                 self.semi_supervised_helper(model, valid_normal_dict, vocab, 'test_normal')
-            valid_abnormal_results, valid_abnormal_results_losses, num_valid_abnormal = \
+            valid_abnormal_results, valid_abnormal_results_losses, num_valid_abnormal, valid_abnormal_no = \
                 self.semi_supervised_helper(model, valid_abnormal_dict, vocab, 'test_abnormal')
 
-            test_normal_results, test_normal_results_losses, num_test_normal = \
+            test_normal_results, test_normal_results_losses, num_test_normal, test_normal_no = \
                 self.semi_supervised_helper(model, test_normal_dict, vocab, 'test_normal')
-            test_abnormal_results, test_abnormal_results_losses, num_test_abnormal = \
+            test_abnormal_results, test_abnormal_results_losses, num_test_abnormal, test_abnormal_no = \
                 self.semi_supervised_helper(model, test_abnormal_dict, vocab, 'test_abnormal')
 
             print("--------------------------NORMAL TEST SEQUENCES------------------------------------")

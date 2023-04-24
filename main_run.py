@@ -41,6 +41,7 @@ def arg_parser():
     parser.add_argument("--sample_size", type=int, help="sample raw log")
     parser.add_argument("--sample_log_file", default=None, help="if sampling raw logs, new log file name")
     parser.add_argument("--mean_selection_activated", action='store_true')
+    parser.add_argument("--do_parse", action='store_true')
     parser.add_argument("--verbose", action='store_true')
 
     parser.add_argument("--parser_type", default=None, help="parse type drain or spell")
@@ -69,6 +70,7 @@ def arg_parser():
     parser.add_argument("--train_ratio", default=1, type=float)
     parser.add_argument("--valid_ratio", default=0.1, type=float)
     parser.add_argument("--test_ratio", default=1, type=float)
+    parser.add_argument("--anomalies_ratio", default=0.1, type=float)
 
     parser.add_argument("--max_epoch", default=200, type=int, help="epochs")
     parser.add_argument("--n_epochs_stop", default=10, type=int,
@@ -161,56 +163,77 @@ def main():
                         sample_step_size)
         args.log_file = args.sample_log_file
 
+    options = vars(args)
     # parse logs
+    structured_dir = None
     if args.parser_type is not None:
+        options["output_dir"] = options["output_dir"] + "parser_type=" + options["parser_type"] + "/"
+        structured_dir = options["output_dir"]
         args.log_format = " ".join([f"<{field}>" for field in args.log_format.split(",")])
-        parse_log(args.data_dir, args.output_dir, args.log_file, args.parser_type, args.log_format, args.regex,
+        if not os.path.exists(args.output_dir):
+           parse_log(args.data_dir, args.output_dir, args.log_file, args.parser_type, args.log_format, args.regex,
                   args.keep_para,
                   args.st, args.depth, args.max_child, args.tau)
 
-    options = vars(args)
-    if options['session_level'] == "entry":
-        options["output_dir"] = options["output_dir"] + str(int(options["window_size"])) + "/"
+    if options["window_type"] == "session":
+        options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] + "/"
+    else:
+        if options['session_level'] == "entry":
+            options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] + "/window_size=" + str(int(options["window_size"])) + "/"
+        else:
+            options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] +\
+                                                           "/window_size=" + str(int(options["window_size"])) +\
+                                                           "/step_size=" + str(int(options["step_size"])) +\
+                                                           "/random_split=" + str(options["random_sample"]) +\
+                                                           "/train_size=" + str(options["train_size"]) + "/"
+
     if args.is_process:
-        process_dataset(data_dir=args.data_dir, output_dir=options["output_dir"], log_file=args.log_file,
+        if not os.path.exists(options["output_dir"]):
+            process_dataset(data_dir=structured_dir, output_dir=options["output_dir"], log_file=args.log_file,
                         dataset_name=args.dataset_name, window_type=args.window_type,
                         window_size=args.window_size, step_size=args.step_size,
                         train_size=args.train_size, random_sample=args.random_sample, session_type=args.session_level)
 
-    # if args.is_instance:
-    #     process_instance(data_dir=args.data_dir, output_dir=args.output_dir, train_file=args.train_file,
-    #                      test_file=args.test_file)
-
     # if options['session_level'] == "entry":
-    #     options["output_dir"] = options["output_dir"] + str(options["window_size"]) + "/"
+    #     options["output_dir"] = options["output_dir"] + "window_size=" + str(int(options["window_size"])) + "/"
+    # else:
+    #     options["output_dir"] = options["output_dir"] + "session" + "/"
+
     options["model_dir"] = options["output_dir"] + options["model_name"] + "/"
     options["train_vocab"] = options["output_dir"] + "train.pkl"
     options["vocab_path"] = options["output_dir"] + options["model_name"] + "_vocab.pkl"  # pickle file
-    options["model_path"] = options["model_dir"] + options["model_name"] + ".pth"
-    options["scale_path"] = options["model_dir"] + "scale.pkl"
+    options["run_dir"] = options["model_dir"] + "runs/history_size=" + str(options["history_size"]) + \
+                                               "/anomalies_ratio=" + str(options["anomalies_ratio"]) + \
+                                               "/max_epoch=" + str(options["max_epoch"]) + \
+                                               "/n_epochs_stop=" + str(options["n_epochs_stop"]) + \
+                                               "/lr=" + str(options["lr"]) + \
+                                               "/batch_size=" + str(options["batch_size"]) + \
+                                               "/mean_selection_activated=" + str(options["mean_selection_activated"])
+    options["model_path"] = options["run_dir"] + ".pth"
+    # options["scale_path"] = options["model_dir"] + "scale.pkl"
 
     if not os.path.exists(options["model_dir"]):
-        os.mkdir(options["model_dir"])
+        os.makedirs(options["model_dir"])
 
     if not os.path.exists(os.path.join(options["run_dir"], 'Histograms')):
-        os.mkdir(os.path.join(options["run_dir"], 'Histograms'))
+        os.makedirs(os.path.join(options["run_dir"], 'Histograms'))
     if not os.path.exists(os.path.join(options["run_dir"], 'Metrics')):
-        os.mkdir(os.path.join(options["run_dir"], 'Metrics'))
+        os.makedirs(os.path.join(options["run_dir"], 'Metrics'))
     if not os.path.exists(os.path.join(options["run_dir"], 'Train_Losses')):
-        os.mkdir(os.path.join(options["run_dir"], 'Train_Losses'))
+        os.makedirs(os.path.join(options["run_dir"], 'Train_Losses'))
     if not os.path.exists(os.path.join(options["run_dir"], 'Test_Losses')):
-        os.mkdir(os.path.join(options["run_dir"], 'Test_Losses'))
+        os.makedirs(os.path.join(options["run_dir"], 'Test_Losses'))
     if not os.path.exists(os.path.join(options["run_dir"], 'Metrics', 'Unique')):
-        os.mkdir(os.path.join(options["run_dir"], 'Metrics', 'Unique'))
+        os.makedirs(os.path.join(options["run_dir"], 'Metrics', 'Unique'))
     if not os.path.exists(os.path.join(options["run_dir"], 'Metrics', 'Normal')):
-        os.mkdir(os.path.join(options["run_dir"], 'Metrics', 'Normal'))
+        os.makedirs(os.path.join(options["run_dir"], 'Metrics', 'Normal'))
     if not os.path.exists(os.path.join(options["run_dir"], 'Metrics', 'Train_Normal')):
-        os.mkdir(os.path.join(options["run_dir"], 'Metrics', 'Train_Normal'))
+        os.makedirs(os.path.join(options["run_dir"], 'Metrics', 'Train_Normal'))
     if not os.path.exists(os.path.join(options["run_dir"], 'Number_anomalies')):
-        os.mkdir(os.path.join(options["run_dir"], 'Number_anomalies'))
+        os.makedirs(os.path.join(options["run_dir"], 'Number_anomalies'))
 
     print("Save options parameters")
-    save_parameters(options, options["model_dir"] + "parameters.txt")
+    save_parameters(options, options["run_dir"] + "/parameters.txt")
 
     if args.model_name == "logbert":
         run_logbert(options)
