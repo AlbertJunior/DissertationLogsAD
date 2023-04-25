@@ -180,13 +180,19 @@ def main():
         options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] + "/"
     else:
         if options['session_level'] == "entry":
-            options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] + "/window_size=" + str(int(options["window_size"])) + "/"
+            options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] + \
+                                                            "/session_level=" + options["session_level"] + \
+                                                            "/window_size=" + str(int(options["window_size"])) + "/"
         else:
-            options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] +\
-                                                           "/window_size=" + str(int(options["window_size"])) +\
-                                                           "/step_size=" + str(int(options["step_size"])) +\
-                                                           "/random_split=" + str(options["random_sample"]) +\
-                                                           "/train_size=" + str(options["train_size"]) + "/"
+            options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] + \
+                                                            "/session_level=" + options["session_level"] + \
+                                                            "/window_size=" + str(int(options["window_size"])) +\
+                                                            "/step_size=" + str(int(options["step_size"])) + "/"
+
+        options["output_dir"] = options["output_dir"] + "random_split=" + str(options["random_sample"]) + "/"
+
+    options["output_dir"] = options["output_dir"] + "train_size=" + str(options["train_size"]) + "/"
+
 
     if args.is_process:
         if not os.path.exists(options["output_dir"]):

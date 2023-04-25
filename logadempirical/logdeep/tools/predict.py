@@ -31,7 +31,7 @@ from logadempirical.neural_log.transformers import NeuralLog
 global_cache = dict()
 
 
-def generate(output_dir, name, is_neural, anomalies_ratio):
+def generate(output_dir, name, is_neural):
     global global_cache
     if name in global_cache:
         return global_cache[name]
@@ -41,23 +41,7 @@ def generate(output_dir, name, is_neural, anomalies_ratio):
     print("Length test", len(data_iter))
     normal_iter = {}
     abnormal_iter = {}
-    anomalies = 0
-    normals = 0
-    for seq in data_iter:
-        if not isinstance(seq['Label'], int):
-            label = max(seq['Label'].tolist())
-        else:
-            label = seq['Label']
-        if is_neural:
-            key = tuple(seq['Seq'])
-        else:
-            key = tuple(seq['EventId'])
-        if label != 0:
-            anomalies += 1
-        else:
-            normals += 1
-    total_anomalies = anomalies_ratio * (anomalies + normals)
-    nr = 0
+
     for seq in data_iter:
         if not isinstance(seq['Label'], int):
             label = max(seq['Label'].tolist())
@@ -72,8 +56,7 @@ def generate(output_dir, name, is_neural, anomalies_ratio):
                 normal_iter[key] = 1
             else:
                 normal_iter[key] += 1
-        elif nr < total_anomalies:
-            nr += 1
+        else:
             if key not in abnormal_iter:
                 abnormal_iter[key] = 1
             else:
@@ -903,7 +886,7 @@ class Predicter():
         model.eval()
         print('model_path: {}'.format(self.model_path))
 
-        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural', self.anomalies_ratio)
+        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural')
         print("Nr secvente unice train: normale vs anormale")
         print(len(train_normal), len(train_abnormal))
 
@@ -968,8 +951,8 @@ class Predicter():
         model.eval()
         print('model_path: {}'.format(self.model_path))
 
-        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural', self.anomalies_ratio)
-        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural', self.anomalies_ratio)
+        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural')
+        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural')
         print("Nr secvente unice test: normale vs anormale")
         print(len(test_normal), len(test_abnormal))
 
@@ -1083,7 +1066,7 @@ class Predicter():
         model.eval()
         print('model_path: {}'.format(self.model_path))
 
-        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural', self.anomalies_ratio)
+        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural')
 
         # Test the model
 

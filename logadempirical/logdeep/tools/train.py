@@ -402,6 +402,8 @@ class Trainer():
         print("Save model checkpoint at {}".format(save_path))
 
     def save_log(self, save_dir):
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
         for key, values in self.log.items():
             pd.DataFrame(values).to_csv(save_dir + "/" + key + "_log.csv", index=False)
 
