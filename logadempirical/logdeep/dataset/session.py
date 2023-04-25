@@ -9,7 +9,7 @@ import numpy as np
 
 def session_window(raw_data, id_regex, label_dict, window_size=20):
     data_dict = {}  # defaultdict(list)
-    raw_data = raw_data.to_dict("records")
+    raw_data = raw_data[:-1].to_dict("records")
 
     for idx, row in tqdm(enumerate(raw_data)):
         blkId_list = re.findall(id_regex, row['Content'])
@@ -25,7 +25,7 @@ def session_window(raw_data, id_regex, label_dict, window_size=20):
 
     results = []
 
-    for k, v in data_dict.items()[:-1]:
+    for k, v in data_dict.items():
         # if len(v['Seq']) > window_size:
             # print(window_size)
             # v['Seq'] = v['Seq'][-window_size:]

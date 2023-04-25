@@ -107,6 +107,7 @@ class Trainer():
         self.lr_decay_ratio = options['lr_decay_ratio']
         self.accumulation_step = options['accumulation_step']
         self.batch_size = options['batch_size']
+        self.min_loss_reduction_per_epoch = options['min_loss_reduction_per_epoch']
 
         self.sequentials = options['sequentials']
         self.quantitatives = options['quantitatives']
@@ -132,7 +133,7 @@ class Trainer():
         self.dim_feedforward = options["dim_feedforward"]
         self.transformers_dropout = options["transformers_dropout"]
         self.random_sample = options["random_sample"]
-        self.anomalies_ratio = options["anomalies_ratio"]
+        self.anomalies_ratio = options["max_anomalies_ratio"]
 
         # detection model: predict the next log or classify normal/abnormal
         if self.model_name in ["cnn", "logrobust", "autoencoder", "neurallog"]:
@@ -261,15 +262,14 @@ class Trainer():
 
                 "train_statistics": {key: []
                           for key in
-                          ["total_sessions_no", "normal_sessions_no", "abnormal_sessions_no",
-                           "total_unique_sessions_no", "unique_normal_sessions_no", "unique_abnormal_sessions_no",
-                           "total_sequences_no", "normal_sequences_no", "abnormal_sequences_no"]},
+                          ["vocab_size", "total_sessions_no", "normal_sessions_no", "abnormal_sessions_no", "abnormal_sessions_per",
+                           "total_unique_sessions_no", "unique_normal_sessions_no", "unique_abnormal_sessions_no", "unique_abnormal_sessions_per",
+                           "total_sequences_no", "normal_sequences_no", "abnormal_sequences_no", "abnormal_sequences_per"]},
                 "test_statistics": {key: []
                           for key in
-                          ["total_sessions_no", "normal_sessions_no", "abnormal_sessions_no",
-                           "total_unique_sessions_no", "unique_normal_sessions_no",
-                           "unique_abnormal_sessions_no",
-                           "total_sequences_no", "normal_sequences_no", "abnormal_sequences_no"]},
+                          ["total_sessions_no", "normal_sessions_no", "abnormal_sessions_no", "abnormal_sessions_per",
+                           "total_unique_sessions_no", "unique_normal_sessions_no", "unique_abnormal_sessions_no", "unique_abnormal_sessions_per",
+                           "total_sequences_no", "normal_sequences_no", "abnormal_sequences_no", "abnormal_sequences_per"]},
 
                 "valid": {key: []
                           for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]},
@@ -318,6 +318,17 @@ class Trainer():
                           for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]},
                 "valid": {key: []
                           for key in ["epoch", "lr", "time", "loss", "acc", "kurtosis", "skewness"]},
+                "train_statistics": {key: []
+                          for key in
+                          ["vocab_size", "total_sessions_no", "normal_sessions_no", "abnormal_sessions_no", "abnormal_sessions_per",
+                           "total_unique_sessions_no", "unique_normal_sessions_no", "unique_abnormal_sessions_no", "unique_abnormal_sessions_per",
+                           "total_sequences_no", "normal_sequences_no", "abnormal_sequences_no", "abnormal_sequences_per"]},
+                "test_statistics": {key: []
+                          for key in
+                          ["total_sessions_no", "normal_sessions_no", "abnormal_sessions_no", "abnormal_sessions_per",
+                           "total_unique_sessions_no", "unique_normal_sessions_no", "unique_abnormal_sessions_no", "unique_abnormal_sessions_per",
+                           "total_sequences_no", "normal_sequences_no", "abnormal_sequences_no", "abnormal_sequences_per"]},
+
 
                 "train_metrics_both_best": {key: []
                          for key in ["epoch", "g", "th", "f1", "p", "r", "tp", "fp", "fn"]},
@@ -386,18 +397,13 @@ class Trainer():
         }
         if save_optimizer:
             checkpoint['optimizer'] = self.optimizer.state_dict()
-        save_path = self.model_dir + suffix + ".pth"
+        save_path = self.model_path
         torch.save(checkpoint, save_path)
         print("Save model checkpoint at {}".format(save_path))
 
-    def save_log(self):
-        try:
-            for key, values in self.log.items():
-                pd.DataFrame(values).to_csv(self.run_dir + "/" + key + "_log.csv",
-                                            index=False)
-            print("Log saved")
-        except:
-            print("Failed to save logs")
+    def save_log(self, save_dir):
+        for key, values in self.log.items():
+            pd.DataFrame(values).to_csv(save_dir + "/" + key + "_log.csv", index=False)
 
     def train(self, epoch):
         self.log['train']['epoch'].append(epoch)
@@ -591,7 +597,7 @@ class Trainer():
         self.log['valid']['skewness'].append(skewness)
         plot_next_token_histogram_of_probabilities("valid", epoch, probabilities_real_next_token, self.run_dir)
 
-        if total_losses / num_batch < 0.95 * self.best_loss:
+        if total_losses / num_batch < self.min_loss_reduction_per_epoch * self.best_loss:
             self.best_loss = total_losses / num_batch
             self.epochs_no_improve = 0
             self.save_checkpoint(epoch,
@@ -697,9 +703,9 @@ class Trainer():
                 self.optimizer.param_groups[0]['lr'] *= self.lr_decay_ratio
             self.train(epoch)
 
-            self.log["train_statistics"]['vocab_size'].append(vocab_size)
             n_epoch += 1
             if epoch > 0:
+                self.log["train_statistics"]["vocab_size"].append(vocab_size)
                 val_loss += self.valid(epoch)
                 self.save_checkpoint(epoch,
                                      save_optimizer=False,
@@ -711,7 +717,7 @@ class Trainer():
                 predicter.predict_semi_supervised(epoch, elbow_g, elbow_loss, self.run_dir + "/Csvs", self)
                 # print("======== My contribution ===========")
                 # predicter.predict_semi_supervised_ramona()
-            self.save_log()
+            self.save_log(self.run_dir + "/Csvs")
 
         plot_train_valid_loss(self.run_dir + "/Csvs", self.run_dir + "/Pngs", self.mean_selection_activated)
         if self.model_name == "autoencoder":

@@ -70,8 +70,9 @@ def arg_parser():
     parser.add_argument("--train_ratio", default=1, type=float)
     parser.add_argument("--valid_ratio", default=0.1, type=float)
     parser.add_argument("--test_ratio", default=1, type=float)
-    parser.add_argument("--anomalies_ratio", default=0.1, type=float)
+    parser.add_argument("--max_anomalies_ratio", default=0.1, type=float)
 
+    parser.add_argument("--min_loss_reduction_per_epoch", default=0.95, type=float)
     parser.add_argument("--max_epoch", default=200, type=int, help="epochs")
     parser.add_argument("--n_epochs_stop", default=10, type=int,
                         help="training stops after n epochs without improvement")
@@ -203,13 +204,14 @@ def main():
     options["train_vocab"] = options["output_dir"] + "train.pkl"
     options["vocab_path"] = options["output_dir"] + options["model_name"] + "_vocab.pkl"  # pickle file
     options["run_dir"] = options["model_dir"] + "runs/history_size=" + str(options["history_size"]) + \
-                                               "/anomalies_ratio=" + str(options["anomalies_ratio"]) + \
+                                               "/max_anomalies_ratio=" + str(options["max_anomalies_ratio"]) + \
                                                "/max_epoch=" + str(options["max_epoch"]) + \
                                                "/n_epochs_stop=" + str(options["n_epochs_stop"]) + \
+                                               "/min_loss_reduction_per_epoch=" + str(options["min_loss_reduction_per_epoch"]) + \
                                                "/lr=" + str(options["lr"]) + \
                                                "/batch_size=" + str(options["batch_size"]) + \
                                                "/mean_selection_activated=" + str(options["mean_selection_activated"])
-    options["model_path"] = options["run_dir"] + ".pth"
+    options["model_path"] = options["run_dir"] + "/" + options["model_name"] + ".pth"
     # options["scale_path"] = options["model_dir"] + "scale.pkl"
 
     if not os.path.exists(options["model_dir"]):

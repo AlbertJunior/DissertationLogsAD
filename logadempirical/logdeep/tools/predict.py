@@ -122,7 +122,7 @@ class Predicter():
         self.vocab_path = options["vocab_path"]
         self.model_path = options['model_path']
         self.model_name = options['model_name']
-        self.anomalies_ratio = options['anomalies_ratio']
+        self.anomalies_ratio = options['max_anomalies_ratio']
 
         self.device = options['device']
         self.window_size = options['window_size']
@@ -968,8 +968,8 @@ class Predicter():
         model.eval()
         print('model_path: {}'.format(self.model_path))
 
-        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural')
-        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural')
+        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural', self.anomalies_ratio)
+        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural', self.anomalies_ratio)
         print("Nr secvente unice test: normale vs anormale")
         print(len(test_normal), len(test_abnormal))
 
@@ -985,30 +985,35 @@ class Predicter():
         train_abnormal_results, train_abnormal_results_losses, train_num_abnormal, train_abnormal_no = \
             self.semi_supervised_helper(model, train_abnormal, vocab, 'test_abnormal')
 
-        trainer.log["train_statistics"]["total_sessions_no"].append(sum(train_normal) + sum(train_abnormal))
-        trainer.log["train_statistics"]["normal_sessions_no"].append(sum(train_normal))
-        trainer.log["train_statistics"]["abnormal_sessions_no"].append(sum(train_abnormal))
+        trainer.log["train_statistics"]["total_sessions_no"].append(sum(train_normal.values()) + sum(train_abnormal.values()))
+        trainer.log["train_statistics"]["normal_sessions_no"].append(sum(train_normal.values()))
+        trainer.log["train_statistics"]["abnormal_sessions_no"].append(sum(train_abnormal.values()))
+        trainer.log["train_statistics"]["abnormal_sessions_per"].append(sum(train_abnormal.values()) / (sum(train_normal.values()) + sum(train_abnormal.values())))
 
         trainer.log["train_statistics"]["total_unique_sessions_no"].append(len(train_normal) + len(train_abnormal))
         trainer.log["train_statistics"]["unique_normal_sessions_no"].append(len(train_normal))
         trainer.log["train_statistics"]["unique_abnormal_sessions_no"].append(len(train_abnormal))
+        trainer.log["train_statistics"]["unique_abnormal_sessions_per"].append(len(train_abnormal) / (len(train_normal) + len(train_abnormal)))
 
         trainer.log["train_statistics"]["total_sequences_no"].append(train_normal_no + train_abnormal_no)
         trainer.log["train_statistics"]["normal_sequences_no"].append(train_normal_no)
         trainer.log["train_statistics"]["abnormal_sequences_no"].append(train_abnormal_no)
+        trainer.log["train_statistics"]["abnormal_sequences_per"].append(train_abnormal_no / (train_normal_no + train_abnormal_no))
 
-
-        trainer.log["test_statistics"]["total_sessions_no"].append(sum(test_normal) + sum(test_abnormal))
-        trainer.log["test_statistics"]["normal_sessions_no"].append(sum(test_normal))
-        trainer.log["test_statistics"]["abnormal_sessions_no"].append(sum(test_abnormal))
+        trainer.log["test_statistics"]["total_sessions_no"].append(sum(test_normal.values()) + sum(test_abnormal.values()))
+        trainer.log["test_statistics"]["normal_sessions_no"].append(sum(test_normal.values()))
+        trainer.log["test_statistics"]["abnormal_sessions_no"].append(sum(test_abnormal.values()))
+        trainer.log["test_statistics"]["abnormal_sessions_per"].append(sum(test_abnormal.values()) / (sum(test_normal.values()) + sum(test_abnormal.values())))
 
         trainer.log["test_statistics"]["total_unique_sessions_no"].append(len(test_normal) + len(test_abnormal))
         trainer.log["test_statistics"]["unique_normal_sessions_no"].append(len(test_normal))
         trainer.log["test_statistics"]["unique_abnormal_sessions_no"].append(len(test_abnormal))
+        trainer.log["test_statistics"]["unique_abnormal_sessions_per"].append(len(test_abnormal) / (len(test_normal) + len(test_abnormal)))
 
         trainer.log["test_statistics"]["total_sequences_no"].append(test_normal_no + test_abnormal_no)
         trainer.log["test_statistics"]["normal_sequences_no"].append(test_normal_no)
         trainer.log["test_statistics"]["abnormal_sequences_no"].append(test_abnormal_no)
+        trainer.log["test_statistics"]["abnormal_sequences_per"].append(test_abnormal_no / (test_normal_no + test_abnormal_no))
 
         print("------------------------NORMAL TRAIN SEQUENCES----------------------------")
         TH, th_loss, TP, TN, FP, FN, P, R, F1 = self.find_best_threshold_train(train_normal_results, train_num_normal,
@@ -1078,7 +1083,7 @@ class Predicter():
         model.eval()
         print('model_path: {}'.format(self.model_path))
 
-        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural')
+        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural', self.anomalies_ratio)
 
         # Test the model
 
