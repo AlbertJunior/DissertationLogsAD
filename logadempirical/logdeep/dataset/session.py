@@ -25,7 +25,7 @@ def session_window(raw_data, id_regex, label_dict, window_size=20):
 
     results = []
 
-    for k, v in data_dict.items():
+    for k, v in data_dict.items()[:-1]:
         # if len(v['Seq']) > window_size:
             # print(window_size)
             # v['Seq'] = v['Seq'][-window_size:]
