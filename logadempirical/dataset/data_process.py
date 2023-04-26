@@ -152,7 +152,7 @@ def process_dataset(data_dir, output_dir, log_file, dataset_name, window_type, w
 
     if not os.path.exists(output_dir):
         print(f"creating {output_dir}")
-        os.mkdir(output_dir)
+        os.makedirs(output_dir)
     # save pickle file
     # print(train_window_df.head())
     # print(test_window_df.head())

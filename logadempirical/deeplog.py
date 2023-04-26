@@ -24,10 +24,9 @@ def run_deeplog(options):
     print("vocab size", len(vocab))
     print("save vocab in", options["vocab_path"])
     vocab.save_vocab(options["vocab_path"])
-
+    options["num_candidates"] = len(vocab)
     predicter = Predicter(options)
     Trainer(options).start_train(predicter, len(vocab))
-
 
     # print("=========================== Their approach ============================")
     # Predicter(options).predict_semi_supervised()

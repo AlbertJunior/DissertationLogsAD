@@ -881,7 +881,6 @@ class Predicter():
                                 vocab_size=len(vocab),
                                 embedding_dim=self.embedding_dim)
         model = model_init.to(self.device)
-
         model.load_state_dict(torch.load(self.model_path)['state_dict'])
         model.eval()
         print('model_path: {}'.format(self.model_path))

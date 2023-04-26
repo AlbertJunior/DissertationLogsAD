@@ -694,6 +694,7 @@ class Trainer():
         val_loss = 0
         n_epoch = 0
         n_val_epoch = 0
+
         for epoch in range(self.start_epoch, self.max_epoch):
             if self.early_stopping:
                 break

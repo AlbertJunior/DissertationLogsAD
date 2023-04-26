@@ -179,7 +179,7 @@ def main():
     if options["window_type"] == "session":
         options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] + "/"
     else:
-        if options['session_level'] == "entry":
+        if options["session_level"] == "entry":
             options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] + \
                                                             "/session_level=" + options["session_level"] + \
                                                             "/window_size=" + str(int(options["window_size"])) + "/"
