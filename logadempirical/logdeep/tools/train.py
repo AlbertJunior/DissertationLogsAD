@@ -599,12 +599,9 @@ class Trainer():
         self.log['valid']['skewness'].append(skewness)
         plot_next_token_histogram_of_probabilities("valid", epoch, probabilities_real_next_token, self.run_dir)
 
-        if total_losses / num_batch < self.min_loss_reduction_per_epoch * self.best_loss:
+        if total_losses / num_batch < self.min_loss_reduction_per_epoch * self.best_loss or epoch < 6:
             self.best_loss = total_losses / num_batch
             self.epochs_no_improve = 0
-            self.save_checkpoint(epoch,
-                                 save_optimizer=False,
-                                 suffix=self.model_name)
         else:
             self.epochs_no_improve += 1
 
@@ -707,7 +704,7 @@ class Trainer():
             self.train(epoch)
 
             n_epoch += 1
-            if epoch > 0:
+            if epoch > 5:
                 self.log["train_statistics"]["vocab_size"].append(vocab_size)
                 val_loss += self.valid(epoch)
                 self.save_checkpoint(epoch,
@@ -722,6 +719,6 @@ class Trainer():
                 # predicter.predict_semi_supervised_ramona()
             self.save_log(self.run_dir + "/Csvs")
 
-        plot_train_valid_loss(self.run_dir + "/Csvs", self.run_dir + "/Pngs", self.mean_selection_activated)
+        plot_train_valid_loss(self.run_dir + "/Csvs", self.run_dir + "/Pngs", self.run_dir, self.mean_selection_activated)
         if self.model_name == "autoencoder":
             return self.train_autoencoder2()  # self.model, val_loss / n_val_epoch

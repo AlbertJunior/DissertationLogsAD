@@ -157,49 +157,53 @@ def main():
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir, exist_ok=True)
 
+    options = vars(args)
+
     # sampling raw logs
     if args.sample_size is not None:
         sample_step_size = 10 ** 4
         sample_raw_data(args.data_dir + args.log_file, args.data_dir + args.sample_log_file, args.sample_size,
                         sample_step_size)
         args.log_file = args.sample_log_file
+        options["output_dir"] = options["output_dir"] + "sample_size=" + str(int(options["sample_size"])) + "/"
 
-    options = vars(args)
     # parse logs
+
     structured_dir = None
     if args.parser_type is not None:
         options["output_dir"] = options["output_dir"] + "parser_type=" + options["parser_type"] + "/"
         structured_dir = options["output_dir"]
         args.log_format = " ".join([f"<{field}>" for field in args.log_format.split(",")])
         if not os.path.exists(args.output_dir):
-           parse_log(args.data_dir, args.output_dir, args.log_file, args.parser_type, args.log_format, args.regex,
-                  args.keep_para,
-                  args.st, args.depth, args.max_child, args.tau)
+            parse_log(args.data_dir, args.output_dir, args.log_file, args.parser_type, args.log_format, args.regex,
+                      args.keep_para,
+                      args.st, args.depth, args.max_child, args.tau)
 
     if options["window_type"] == "session":
         options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] + "/"
     else:
         if options["session_level"] == "entry":
             options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] + \
-                                                            "/session_level=" + options["session_level"] + \
-                                                            "/window_size=" + str(int(options["window_size"])) + "/"
+                                    "/session_level=" + options["session_level"] + \
+                                    "/window_size=" + str(int(options["window_size"])) + \
+                                    "/step_size=" + str(int(options["step_size"])) + "/"
         else:
             options["output_dir"] = options["output_dir"] + "window_type=" + options["window_type"] + \
-                                                            "/session_level=" + options["session_level"] + \
-                                                            "/window_size=" + str(int(options["window_size"])) +\
-                                                            "/step_size=" + str(int(options["step_size"])) + "/"
+                                    "/session_level=" + options["session_level"] + \
+                                    "/window_size=" + str(int(options["window_size"])) + \
+                                    "/step_size=" + str(int(options["step_size"])) + "/"
 
         options["output_dir"] = options["output_dir"] + "random_split=" + str(options["random_sample"]) + "/"
 
     options["output_dir"] = options["output_dir"] + "train_size=" + str(options["train_size"]) + "/"
 
-
     if args.is_process:
         if not os.path.exists(options["output_dir"]):
             process_dataset(data_dir=structured_dir, output_dir=options["output_dir"], log_file=args.log_file,
-                        dataset_name=args.dataset_name, window_type=args.window_type,
-                        window_size=args.window_size, step_size=args.step_size,
-                        train_size=args.train_size, random_sample=args.random_sample, session_type=args.session_level)
+                            dataset_name=args.dataset_name, window_type=args.window_type,
+                            window_size=args.window_size, step_size=args.step_size,
+                            train_size=args.train_size, random_sample=args.random_sample,
+                            session_type=args.session_level)
 
     # if options['session_level'] == "entry":
     #     options["output_dir"] = options["output_dir"] + "window_size=" + str(int(options["window_size"])) + "/"
@@ -210,13 +214,13 @@ def main():
     options["train_vocab"] = options["output_dir"] + "train.pkl"
     options["vocab_path"] = options["output_dir"] + options["model_name"] + "_vocab.pkl"  # pickle file
     options["run_dir"] = options["model_dir"] + "runs/history_size=" + str(options["history_size"]) + \
-                                               "/max_anomalies_ratio=" + str(options["max_anomalies_ratio"]) + \
-                                               "/max_epoch=" + str(options["max_epoch"]) + \
-                                               "/n_epochs_stop=" + str(options["n_epochs_stop"]) + \
-                                               "/min_loss_reduction_per_epoch=" + str(options["min_loss_reduction_per_epoch"]) + \
-                                               "/lr=" + str(options["lr"]) + \
-                                               "/batch_size=" + str(options["batch_size"]) + \
-                                               "/mean_selection_activated=" + str(options["mean_selection_activated"])
+                         "/max_anomalies_ratio=" + str(options["max_anomalies_ratio"]) + \
+                         "/max_epoch=" + str(options["max_epoch"]) + \
+                         "/n_epochs_stop=" + str(options["n_epochs_stop"]) + \
+                         "/min_loss_reduction_per_epoch=" + str(options["min_loss_reduction_per_epoch"]) + \
+                         "/lr=" + str(options["lr"]) + \
+                         "/batch_size=" + str(options["batch_size"]) + \
+                         "/mean_selection_activated=" + str(options["mean_selection_activated"])
     options["model_path"] = options["run_dir"] + "/" + options["model_name"] + ".pth"
     # options["scale_path"] = options["model_dir"] + "scale.pkl"
 
