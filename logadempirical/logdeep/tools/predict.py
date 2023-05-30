@@ -32,7 +32,7 @@ from logadempirical.neural_log.transformers import NeuralLog
 global_cache = dict()
 
 
-def generate(output_dir, name, is_neural):
+def generate(output_dir, name, anomalies_ratio, is_neural):
     global global_cache
     if name in global_cache:
         return global_cache[name]
@@ -40,8 +40,28 @@ def generate(output_dir, name, is_neural):
     with open(output_dir + name, 'rb') as f:
         data_iter = pickle.load(f)
     print("Length test", len(data_iter))
+
+    no_abnormal = 0
+    no_normal = 0
+    for seq in data_iter:
+        if not isinstance(seq['Label'], int):
+            label = seq['Label'].tolist()
+            if max(label) > 0:
+                no_abnormal += 1
+            else:
+                no_normal += 1
+        else:
+            label = seq['Label']
+            if label > 0:
+                no_abnormal += 1
+            else:
+                no_normal += 1
+
+    num_anomalies = anomalies_ratio * (no_abnormal + no_normal)
+
     normal_iter = {}
     abnormal_iter = {}
+    nr = 0
 
     for seq in data_iter:
         if not isinstance(seq['Label'], int):
@@ -52,16 +72,19 @@ def generate(output_dir, name, is_neural):
             key = tuple(seq['Seq'])
         else:
             key = tuple(seq['EventId'])
-        if label == 0:
+
+        if label > 0:
+            nr += 1
+            if nr <= num_anomalies:
+                if key not in abnormal_iter:
+                    abnormal_iter[key] = 1
+                else:
+                    abnormal_iter[key] += 1
+        else:
             if key not in normal_iter:
                 normal_iter[key] = 1
             else:
                 normal_iter[key] += 1
-        else:
-            if key not in abnormal_iter:
-                abnormal_iter[key] = 1
-            else:
-                abnormal_iter[key] += 1
 
     global_cache[name] = (normal_iter, abnormal_iter)
 
@@ -986,7 +1009,7 @@ class Predicter():
         # self.create_plot("Metrics/Train_Elbow/FN", fns, x, y, epoch, 0)
         return no_anomalies_predicted, x
 
-    def compute_elbow(self, epoch, info_dir):
+    def compute_elbow(self, epoch, info_dir, anomalies_ratio):
         global global_cache
         with open(self.vocab_path, 'rb') as f:
             vocab = pickle.load(f)
@@ -1005,7 +1028,7 @@ class Predicter():
         model.eval()
         print('model_path: {}'.format(self.model_path))
 
-        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural')
+        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', 1, self.embeddings == 'neural')
         print("Nr secvente unice train: normale vs anormale")
         print(len(train_normal), len(train_abnormal))
 
@@ -1042,7 +1065,11 @@ class Predicter():
                 mx_g = diff_g
                 elbow_g = x_values[x_i]
 
-        elbow_loss = mean_selection_IQR(torch.cat((train_normal_results_losses, train_abnormal_results_losses)))
+        if anomalies_ratio < 1:
+            elbow_loss = mean_selection_IQR(train_normal_results_losses)
+        else:
+            elbow_loss = mean_selection_IQR(torch.cat((train_normal_results_losses, train_abnormal_results_losses)))
+
         print("1. G: diff ", mx_g, " at g ", elbow_g)
         print("2. Loss: diff ", mx_loss, " at loss ", elbow_loss)
         self.create_plot("Number_anomalies/Epoch", anomalies_per_thresold, x, epoch, elbow_g)
@@ -1054,7 +1081,7 @@ class Predicter():
         print('elapsed_time: {}'.format(elapsed_time))
         return elbow_g, elbow_loss
 
-    def predict_semi_supervised(self, epoch, elbow_g, elbow_loss, info_dir, trainer):
+    def predict_semi_supervised(self, epoch, elbow_g, elbow_loss, info_dir, anomalies_ratio, trainer):
         global global_cache
         with open(self.vocab_path, 'rb') as f:
             vocab = pickle.load(f)
@@ -1074,8 +1101,8 @@ class Predicter():
         model.eval()
         print('model_path: {}'.format(self.model_path))
 
-        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural')
-        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', self.embeddings == 'neural')
+        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', 1, self.embeddings == 'neural')
+        train_normal, train_abnormal = generate(self.output_dir, 'train.pkl', 1, self.embeddings == 'neural')
         print("Nr secvente unice test: normale vs anormale")
         print(len(test_normal), len(test_abnormal))
 
@@ -1207,7 +1234,7 @@ class Predicter():
         model.eval()
         print('model_path: {}'.format(self.model_path))
 
-        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', self.embeddings == 'neural')
+        test_normal, test_abnormal = generate(self.output_dir, 'test.pkl', 1, self.embeddings == 'neural')
 
         # Test the model
 
@@ -1321,7 +1348,7 @@ class Predicter():
         model.eval()
         print('model_path: {}'.format(self.model_path))
 
-        test_normal_loader, test_abnormal_loader = generate(self.output_dir, 'test.pkl',
+        test_normal_loader, test_abnormal_loader = generate(self.output_dir, 'test.pkl', 1,
                                                             is_neural=self.embeddings == 'neural')
         print(len(test_normal_loader), len(test_abnormal_loader))
         start_time = time.time()
@@ -1409,7 +1436,7 @@ class Predicter():
         model.eval()
         print('model_path: {}'.format(self.model_path))
 
-        test_normal_loader, test_abnormal_loader = generate(self.output_dir, 'test.pkl',
+        test_normal_loader, test_abnormal_loader = generate(self.output_dir, 'test.pkl', 1,
                                                             is_neural=self.embeddings == 'neural')
         start_time = time.time()
         data = [(k, v, list(k)) for k, v in test_normal_loader.items()]
@@ -1488,7 +1515,7 @@ class Predicter():
         model.eval()
         # print('model_path: {}'.format(self.model_path))
 
-        test_normal_loader, test_abnormal_loader = generate(self.output_dir, 'test.pkl')
+        test_normal_loader, test_abnormal_loader = generate(self.output_dir, 'test.pkl', 1)
         print(len(test_normal_loader), len(test_abnormal_loader))
         start_time = time.time()
         test_normal_results = [[] for _ in range(len(test_normal_loader))]

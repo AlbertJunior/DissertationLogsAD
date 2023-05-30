@@ -712,9 +712,9 @@ class Trainer():
                                      suffix=self.model_name)
                 n_val_epoch += 1
                 print("======== My contribution ===========")
-                elbow_g, elbow_loss = predicter.compute_elbow(epoch, self.run_dir + "/Csvs")
+                elbow_g, elbow_loss = predicter.compute_elbow(epoch, self.run_dir + "/Csvs", self.anomalies_ratio)
                 print("======== Their approach ===========")
-                predicter.predict_semi_supervised(epoch, elbow_g, elbow_loss, self.run_dir + "/Csvs", self)
+                predicter.predict_semi_supervised(epoch, elbow_g, elbow_loss, self.run_dir + "/Csvs", self.anomalies_ratio, self)
                 # print("======== My contribution ===========")
                 # predicter.predict_semi_supervised_ramona()
             self.save_log(self.run_dir + "/Csvs")
