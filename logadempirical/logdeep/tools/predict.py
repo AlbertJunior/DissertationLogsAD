@@ -165,10 +165,13 @@ def prepare_compute_anomaly_losses(v):
 
 
 def mean_selection_IQR(losses):
+    print("Mean", torch.quantile(losses, 0.5))
+    print("Q3", torch.quantile(losses, 0.75))
     Q1 = torch.quantile(losses, 0.25)
     Q3 = torch.quantile(losses, 0.75)
 
     IQR = Q3 - Q1
+    print("IQR", IQR)
     ul = Q3 + 1.5 * IQR
     ll = Q1 - 1.5 * IQR
 
@@ -225,9 +228,10 @@ class Predicter():
 
     def create_plot(self, title, anomalies_per_thresold, x, epoch, elbow_g):
         x_no = range(len(x))
-        plt.plot(x_no, anomalies_per_thresold, 'r-', label='Number anomalies')
+        plt.plot(x_no, anomalies_per_thresold, 'r-')
         plt.plot([elbow_g], [0], marker='o', color="green")
-        plt.legend()
+        plt.xlabel("G threshold")
+        plt.ylabel("Anomalies No.")
         plt.title("elbow " + str(epoch))
         plt.savefig(self.run_dir + f"/{title}_{epoch}.png")
         plt.close()

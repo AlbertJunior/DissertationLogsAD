@@ -103,7 +103,7 @@ def arg_parser():
     parser.add_argument("--layers", default=4, type=int, help="number of layers in bert")
     parser.add_argument("--attn_heads", default=4, type=int, help="number of attention heads")
 
-    parser.add_argument("--num_workers", default=5, type=int)
+    parser.add_argument("--num_workers", default=0, type=int)
     parser.add_argument("--adam_beta1", default=0.9, type=float)
     parser.add_argument("--adam_beta2", default=0.999, type=float)
     parser.add_argument("--adam_weight_decay", default=0.00, type=float)
