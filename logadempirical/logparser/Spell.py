@@ -5,8 +5,8 @@ License     : MIT
 """
 
 import sys
-# import re
-import regex as re
+import re
+# import regex as re
 import os
 import numpy as np
 import pandas as pd
