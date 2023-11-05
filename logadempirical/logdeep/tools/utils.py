@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from torch import nn
+import csv
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -67,6 +68,10 @@ def plot_losses(losses_normal, losses_anomalies, epoch, save_dir, elbow_loss):
 
     plt.hist(losses_normal.tolist(), stacked=True, density = True, color='green')
     plt.hist(losses_anomalies.tolist(), stacked=True, density = True, color='red')
+    with open(save_dir +f"Losses_{epoch}.csv", 'w') as f:
+        writer = csv.writer(f)
+        writer.writerows(zip(losses_normal.tolist(), ["Normal"] * len(losses_normal.tolist())))
+        writer.writerows(zip(losses_anomalies.tolist(), ["Abnormal"] * len(losses_anomalies.tolist())))
     plt.axvline(elbow_loss, linestyle="dashed", color="blue")
     plt.xlabel("Loss value")
     plt.ylabel("Sequence no.")
@@ -450,7 +455,20 @@ def plot_sequence_len(save_dir):
     plt.close()
 
 if __name__ == "__main__":
-    plot_train_valid_loss("./../../../dataset/bgl/parser_type=drain/window_type=session/train_size=0.8/deeplog/runs/history_size=60/max_anomalies_ratio=0.0/max_epoch=50/n_epochs_stop=3/min_loss_reduction_per_epoch=0.95/lr=0.0001/batch_size=4096/mean_selection_activated=False/Csvs", \
-                          "./../../../dataset/bgl/parser_type=drain/window_type=session/train_size=0.8/deeplog/runs/history_size=60/max_anomalies_ratio=0.0/max_epoch=50/n_epochs_stop=3/min_loss_reduction_per_epoch=0.95/lr=0.0001/batch_size=4096/mean_selection_activated=False/Pngs",\
-                          "./../../../dataset/bgl/parser_type=drain/window_type=session/train_size=0.8/deeplog/runs/history_size=60/max_anomalies_ratio=0.0/max_epoch=50/n_epochs_stop=3/min_loss_reduction_per_epoch=0.95/lr=0.0001/batch_size=4096/mean_selection_activated=False/",\
-                          False)
+    # plot_train_valid_loss("./../../../dataset/bgl/parser_type=drain/window_type=session/train_size=0.8/deeplog/runs/history_size=60/max_anomalies_ratio=0.0/max_epoch=50/n_epochs_stop=3/min_loss_reduction_per_epoch=0.95/lr=0.0001/batch_size=4096/mean_selection_activated=False/Csvs", \
+    #                       "./../../../dataset/bgl/parser_type=drain/window_type=session/train_size=0.8/deeplog/runs/history_size=60/max_anomalies_ratio=0.0/max_epoch=50/n_epochs_stop=3/min_loss_reduction_per_epoch=0.95/lr=0.0001/batch_size=4096/mean_selection_activated=False/Pngs",\
+    #                       "./../../../dataset/bgl/parser_type=drain/window_type=session/train_size=0.8/deeplog/runs/history_size=60/max_anomalies_ratio=0.0/max_epoch=50/n_epochs_stop=3/min_loss_reduction_per_epoch=0.95/lr=0.0001/batch_size=4096/mean_selection_activated=False/",\
+    #                       False)
+    # plot_train_valid_loss("./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=True/Csvs", \
+    #                   "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=True/PngsToday",\
+    #                   "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=True/",\
+    #                   True)
+    plot_train_valid_loss("./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/Csvs", \
+                          "./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/PngsToday",\
+                          "./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/",\
+                      True)
+    # plot_train_valid_loss(
+    #     "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=False/Csvs", \
+    #     "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=False/PngsToday", \
+    #     "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=False/", \
+    #     False)

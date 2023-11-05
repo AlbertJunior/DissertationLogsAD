@@ -28,7 +28,7 @@ from logadempirical.logdeep.models.autoencoder import AutoEncoder
 from logadempirical.logdeep.tools.train import mean_selection
 from logadempirical.logdeep.tools.utils import plot_losses
 from logadempirical.neural_log.transformers import NeuralLog
-
+import csv
 global_cache = dict()
 
 
@@ -227,7 +227,11 @@ class Predicter():
         self.upper_bound = 3
 
     def create_plot(self, title, anomalies_per_thresold, x, epoch, elbow_g):
+        print("Been there")
         x_no = range(len(x))
+        with open(self.run_dir + f"/{title}_{epoch}.csv", 'w') as f:
+            writer = csv.writer(f)
+            writer.writerows(zip(x_no, anomalies_per_thresold))
         plt.plot(x_no, anomalies_per_thresold, 'r-')
         plt.plot([elbow_g], [0], marker='o', color="green")
         plt.xlabel("G threshold")
@@ -1027,6 +1031,7 @@ class Predicter():
                                 num_layers=self.num_layers,
                                 vocab_size=len(vocab),
                                 embedding_dim=self.embedding_dim)
+        self.num_candidates = len(vocab)
         model = model_init.to(self.device)
         model.load_state_dict(torch.load(self.model_path)['state_dict'])
         model.eval()

@@ -269,3 +269,21 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # splitLen = 100_000  # 20 lines per file
+    # outputBase = 'HDFS'  # output.1.txt, output.2.txt, etc.
+    #
+    # input = open('./dataset/hdfs/HDFS.log', 'r')
+    #
+    # count = 0
+    # at = 0
+    # string_list = "["
+    # dest = None
+    # for line in input:
+    #     if count % splitLen == 0:
+    #         # if dest: dest.close()
+    #         string_list += "'" + outputBase + str(at) + '.txt' + "',"
+    #         # dest = open(outputBase + str(at) + '.txt', 'w')
+    #         at += 1
+    #     # dest.write(line)
+    #     count += 1
+    # print(string_list)

@@ -704,7 +704,7 @@ class Trainer():
             self.train(epoch)
 
             n_epoch += 1
-            if epoch > 5:
+            if epoch > -1:
                 self.log["train_statistics"]["vocab_size"].append(vocab_size)
                 val_loss += self.valid(epoch)
                 self.save_checkpoint(epoch,
