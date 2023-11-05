@@ -438,7 +438,7 @@ class Trainer():
         for i, (log, label, anomaly_label) in enumerate(tbar):
             del log['idx']
             features = [x.to(self.device) for x in log['features']]
-            output, _ = self.model(features=features, device=self.device)
+            output, _ = self.model(features=features)
             probab_output = self.softmax_function(output)
 
             if isinstance(output, dict):
@@ -521,6 +521,8 @@ class Trainer():
                 tbar.set_description(
                     "Train loss: {0:.8f} - Train acc: {1:.2f} - Train kurtosis: {2:.2f} - Train skewness: {3:.2f}".format(
                         total_losses / (i + 1), acc / total_log, kurtosis, skewness))
+
+        torch.cuda.empty_cache()
         plot_next_token_histogram_of_probabilities("train", epoch, probabilities_real_next_token, self.run_dir)
         self.log['train']['loss'].append(total_losses / num_batch)
         self.log['train']['acc'].append(acc / total_log)
@@ -566,7 +568,7 @@ class Trainer():
             with torch.no_grad():
                 del log['idx']
                 features = [x.to(self.device) for x in log['features']]
-                output, _ = self.model(features=features, device=self.device)
+                output, _ = self.model(features=features)
                 probab_output = self.softmax_function(output)
                 if isinstance(output, dict):
                     loss = output['loss']
@@ -621,7 +623,7 @@ class Trainer():
                 embs = log['features'][2].numpy()
                 del log['idx']
                 features = [x.to(self.device) for x in log['features']]
-                output, _ = self.model(features=features, device=self.device)
+                output, _ = self.model(features=features)
                 repr = output['repr'].clone().detach().cpu().numpy()
                 for j in range(len(repr)):
                     logs.append((embs[j], repr[j]))

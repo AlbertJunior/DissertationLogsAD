@@ -115,19 +115,32 @@ def generate(output_dir, name, anomalies_ratio, is_neural):
 #     return torch.Tensor(v_new)
 
 
-def prepare_compute_anomaly(v):
-    v_new = []
+def prepare_compute_anomaly(v, line_threshold=5):
+    v_new_minus_one = []
+    # v_new = []
+    # v_new_plus_one = []
     tbar = tqdm(v, desc="\r")
     for line in tbar:
-        maxi = 0
+        maxi_minus_one = 0
+        # maxi = 0
+        # maxi_plus_one = 0
         for window, target in line:
-            window = torch.cat((window, torch.Tensor([target])))
-            value = torch.where(window == window[-1])[0][0]
-            if value > maxi:
-                maxi = value
-        v_new.append(maxi)
+            # window = torch.cat((window, torch.Tensor([target - 1, target, target + 1])))
+            window = torch.cat((window, torch.Tensor([target - 1])))
+            value_minus_one = torch.where(window == target - 1)[0][0]
+            # value = torch.where(window == target)[0][0]
+            # value_plus_one = torch.where(window == target + 1)[0][0]
+            if value_minus_one > maxi_minus_one:
+                maxi_minus_one = value_minus_one
+            # if value > maxi:
+            #     maxi = value
+            # if value_plus_one > maxi_plus_one:
+            #     maxi_plus_one = value_plus_one
+        v_new_minus_one.append(maxi_minus_one)
+        # v_new.append(maxi)
+        # v_new_plus_one.append(maxi_plus_one)
 
-    return torch.Tensor(v_new)
+    return torch.Tensor(v_new_minus_one)
 
 
 # def prepare_compute_anomaly(v):
@@ -919,10 +932,10 @@ class Predicter():
         tbar = tqdm(data_loader, desc="\r")
         with torch.no_grad():
             for _, (log, label, anomaly) in enumerate(tbar):
-                seq_idx = log['idx'].clone().detach().cpu().numpy()
+                seq_idx = log['idx'].cpu().numpy()
                 del log['idx']
                 features = [x.to(self.device) for x in log['features']]
-                output, _ = model(features=features, device=self.device)
+                output, _ = model(features=features)
                 # output = output.softmax(dim=-1)
 
                 label_for_loss = torch.tensor(label).view(-1).to(self.device)
@@ -932,18 +945,12 @@ class Predicter():
                 if self.is_logkey:
                     for i in range(len(seq_idx)):
                         test_results[seq_idx[i]].append(
-                            (torch.argsort(output[i], descending=True)[:self.num_candidates].clone().detach().cpu(),
+                            (torch.argsort(output[i], descending=True)[:self.num_candidates].cpu(),
                              label[i]))
-                        #                         test_results[seq_idx[i]].append(
-                        #                                     torch.cat(
-                        #                         (
-                        #                         torch.argsort(output[i], descending=True)[:self.num_candidates].clone().detach().cpu(), torch.Tensor([label[i]])
-                        #                         ) # cat arguments
-                        #                         )  # cat
-                        #                         ) # append
                         test_results_losses[seq_idx[i]].append(
-                            loss[i].clone().detach().cpu())
+                            loss[i].cpu())
 
+        torch.cuda.empty_cache()
         return test_results, test_results_losses, torch.Tensor(num_sess), len(labels)
 
     def find_elbow(self, test_normal_results, num_normal_session_logs, train_normal_results_losses,
