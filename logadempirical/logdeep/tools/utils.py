@@ -4,8 +4,12 @@ import random
 import numpy as np
 import torch
 import torch.nn.functional as F
+from matplotlib import ticker
+from matplotlib.ticker import MaxNLocator
 from torch import nn
 import csv
+from kneed import KneeLocator
+
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -57,6 +61,11 @@ def train_val_split(logs_meta, labels, val_ratio=0.1):
 
 def plot_next_token_histogram_of_probabilities(phase, epoch, probabilities, save_dir):
     plt.hist(probabilities)
+
+    with open(save_dir + "/Histograms/" + str(epoch) + "_Histogram_next_token_probabilities_" + phase + ".csv", 'w') as f:
+        writer = csv.writer(f)
+        writer.writerows(probabilities.tolist())
+
     plt.title(str(epoch) + " Histogram of next token probailities " + phase)
     plt.xlabel("Next token probability")
     plt.ylabel("Train sequences no.")
@@ -110,115 +119,165 @@ def plot_train_valid_loss(save_dir, save_dir_photos, root_save_dir, mean_selecti
     test_unique_metrics_loss = pd.read_csv(save_dir + "/test_unique_metrics_loss_log.csv")
     test_unique_metrics_both = pd.read_csv(save_dir + "/test_unique_metrics_both_log.csv")
 
-    colors = [0, '#b5179e', '#b5179e', '#b5179e', '#560bad', '#560bad', '#560bad', '#4361ee', '#4361ee', '#4361ee']
+    colors = [0, 'darkred', 'darkred', 'darkred', 'royalblue', 'royalblue', 'royalblue', 'orange', 'orange', 'orange']
+    sns.set_context("notebook", font_scale=1.1, rc={"lines.linewidth": 2.5})
 
     # G
-    sns.lineplot(x="epoch", y="g", data=train_metrics_both_best, label="Train Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
-    sns.lineplot(x="epoch", y="g", data=train_metrics_g_best, label="Train G Best", linewidth='2', color=colors[4], linestyle='--')
-    sns.lineplot(x="epoch", y="g", data=train_metrics_loss_best, label="Train Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="g", data=train_metrics_both, label="Train Both", linewidth='2', color=colors[2], alpha=0.7)
-    sns.lineplot(x="epoch", y="g", data=train_metrics_g, label="Train G", linewidth='2', color=colors[5])
-    sns.lineplot(x="epoch", y="g", data=train_metrics_loss, label="Train Loss", linewidth='2', color=colors[8])
-    plt.title("Train G")
-    plt.savefig(root_save_dir + "/Metrics/Train_Normal/Train_G.png")
-    plt.close()
+    with sns.axes_style("whitegrid"):
+        sns.lineplot(x="epoch", y="g", data=train_metrics_both_best, label="Train Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
+        sns.lineplot(x="epoch", y="g", data=train_metrics_g_best, label="Train G Best", linewidth='2', color=colors[4], linestyle='--')
+        sns.lineplot(x="epoch", y="g", data=train_metrics_loss_best, label="Train Loss Best", linewidth='2', color=colors[7], linestyle='--')
+        sns.lineplot(x="epoch", y="g", data=train_metrics_both, label="Train Both", linewidth='3', color=colors[2], alpha=0.7)
+        sns.lineplot(x="epoch", y="g", data=train_metrics_g, label="Train G", linewidth='2', color=colors[5])
+        sns.lineplot(x="epoch", y="g", data=train_metrics_loss, label="Train Loss", linewidth='2', color=colors[8])
+        plt.title("Train G")
+        plt.savefig(root_save_dir + "/Metrics/Train_Normal/Train_G.png")
+        plt.close()
 
-    sns.lineplot(x="epoch", y="g", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
-    sns.lineplot(x="epoch", y="g", data=test_normal_metrics_g_best, label="Test Normal G Best", linewidth='2', color=colors[4], linestyle='--')
-    sns.lineplot(x="epoch", y="g", data=test_normal_metrics_loss_best, label="Test Normal Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="g", data=test_normal_metrics_both, label="Test Normal Both", linewidth='2', color=colors[2], alpha=0.7)
-    sns.lineplot(x="epoch", y="g", data=test_normal_metrics_g, label="Test Normal G", linewidth='2', color=colors[5])
-    sns.lineplot(x="epoch", y="g", data=test_normal_metrics_loss, label="Test Normal Loss", linewidth='2', color=colors[8])
-    plt.title("Test Normal G")
-    plt.savefig(root_save_dir + "/Metrics/Normal/Test_Normal_G.png")
-    plt.close()
+    with sns.axes_style("whitegrid"):
+        ax = plt.figure().gca()
+        ax.yaxis.get_major_locator().set_params(integer=True)
+        sns.lineplot(x="epoch", y="g", data=test_normal_metrics_both_best, label="Best Mixed", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
+        sns.lineplot(x="epoch", y="g", data=test_normal_metrics_g_best, label="Best Extreme", linewidth='2', color=colors[4], linestyle='--')
+        sns.lineplot(x="epoch", y="g", data=test_normal_metrics_loss_best, label="Best Global", linewidth='2', color=colors[7], linestyle='--')
+        sns.lineplot(x="epoch", y="g", data=test_normal_metrics_both, label="Mixed", linewidth='3', color=colors[2], alpha=0.7)
+        sns.lineplot(x="epoch", y="g", data=test_normal_metrics_g, label="Extreme", linewidth='2', color=colors[5])
+        sns.lineplot(x="epoch", y="g", data=test_normal_metrics_loss, label="Global", linewidth='2', color=colors[8])
+        plt.xlabel("Epoch")
+        plt.ylabel("G threshold")
 
-    sns.lineplot(x="epoch", y="g", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
-    sns.lineplot(x="epoch", y="g", data=test_unique_metrics_g_best, label="Test Unique G Best", linewidth='2', color=colors[4], linestyle='--')
-    sns.lineplot(x="epoch", y="g", data=test_unique_metrics_loss_best, label="Test Unique Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="g", data=test_unique_metrics_both, label="Test Unique Both", linewidth='2', color=colors[2], alpha=0.7)
-    sns.lineplot(x="epoch", y="g", data=test_unique_metrics_g, label="Test Unique G", linewidth='2', color=colors[5])
-    sns.lineplot(x="epoch", y="g", data=test_unique_metrics_loss, label="Test Unique Loss", linewidth='2', color=colors[8])
-    plt.title("Test Unique G")
-    plt.savefig(root_save_dir + "/Metrics/Unique/Test_Unique_G.png")
-    plt.close()
+        # plt.title("Only normal, non-unique; G threshold")
+        plt.title("Unlabeled w/o Mean selection, non-unique; G threshold")
+        # plt.title("Unlabeled w/ Mean selection, non-unique; G threshold")
+        plt.savefig(root_save_dir + "/Metrics/Normal/Test_Normal_G.png")
+        plt.close()
+
+    with sns.axes_style("whitegrid"):
+        ax = plt.figure().gca()
+        ax.yaxis.get_major_locator().set_params(integer=True)
+        sns.lineplot(x="epoch", y="g", data=test_unique_metrics_both_best, label="Best Mixed", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
+        sns.lineplot(x="epoch", y="g", data=test_unique_metrics_g_best, label="Best Extreme", linewidth='2', color=colors[4], linestyle='--')
+        sns.lineplot(x="epoch", y="g", data=test_unique_metrics_loss_best, label="Best Global", linewidth='2', color=colors[7], linestyle='--')
+        sns.lineplot(x="epoch", y="g", data=test_unique_metrics_both, label="Mixed", linewidth='3', color=colors[2], alpha=0.7)
+        sns.lineplot(x="epoch", y="g", data=test_unique_metrics_g, label="Extreme", linewidth='2', color=colors[5])
+        sns.lineplot(x="epoch", y="g", data=test_unique_metrics_loss, label="Global", linewidth='2', color=colors[8])
+        plt.xlabel("Epoch")
+        plt.ylabel("G threshold")
+
+        # plt.title("Only normal, unique; G threshold")
+        plt.title("Unlabeled w/o Mean selection, unique; G threshold")
+        # plt.title("Unlabeled w/ Mean selection, unique; G threshold")
+        plt.savefig(root_save_dir + "/Metrics/Unique/Test_Unique_G.png")
+        plt.close()
 
     # Loss
-    sns.lineplot(x="epoch", y="th", data=train_metrics_both_best, label="Train Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="th", data=train_metrics_both_best, label="Train Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="th", data=train_metrics_g_best, label="Train G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="th", data=train_metrics_loss_best, label="Train Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="th", data=train_metrics_both, label="Train Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="th", data=train_metrics_both, label="Train Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="th", data=train_metrics_g, label="Train G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="th", data=train_metrics_loss, label="Train Loss", linewidth='2', color=colors[8])
     plt.title("Train Loss")
     plt.savefig(root_save_dir + "/Metrics/Train_Normal/Train_Loss.png")
     plt.close()
 
-    sns.lineplot(x="epoch", y="th", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
-    sns.lineplot(x="epoch", y="th", data=test_normal_metrics_g_best, label="Test Normal G Best", linewidth='2', color=colors[4], linestyle='--')
-    sns.lineplot(x="epoch", y="th", data=test_normal_metrics_loss_best, label="Test Normal Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="th", data=test_normal_metrics_both, label="Test Normal Both", linewidth='2', color=colors[2], alpha=0.7)
-    sns.lineplot(x="epoch", y="th", data=test_normal_metrics_g, label="Test Normal G", linewidth='2', color=colors[5])
-    sns.lineplot(x="epoch", y="th", data=test_normal_metrics_loss, label="Test Normal Loss", linewidth='2', color=colors[8])
-    plt.title("Test Normal Loss")
-    plt.savefig(root_save_dir + "/Metrics/Normal/Test_Normal_Loss.png")
-    plt.close()
+    with sns.axes_style("whitegrid"):
+        sns.lineplot(x="epoch", y="th", data=test_normal_metrics_both_best, label="Best Mixed", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
+        sns.lineplot(x="epoch", y="th", data=test_normal_metrics_g_best, label="Best Extreme", linewidth='2', color=colors[4], linestyle='--')
+        sns.lineplot(x="epoch", y="th", data=test_normal_metrics_loss_best, label="Best Global", linewidth='2', color=colors[7], linestyle='--')
+        sns.lineplot(x="epoch", y="th", data=test_normal_metrics_both, label="Mixed", linewidth='3', color=colors[2], alpha=0.7)
+        sns.lineplot(x="epoch", y="th", data=test_normal_metrics_g, label="Extreme", linewidth='2', color=colors[5])
+        sns.lineplot(x="epoch", y="th", data=test_normal_metrics_loss, label="Global", linewidth='2', color=colors[8])
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss threshold")
+        # plt.title("Only normal, non-unique; Loss threshold")
+        # plt.title("Unlabeled w/o Mean selection, unique; Loss threshold")
+        plt.title("Unlabeled w/ Mean selection, unique; Loss threshold")
 
-    sns.lineplot(x="epoch", y="th", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
-    sns.lineplot(x="epoch", y="th", data=test_unique_metrics_g_best, label="Test Unique G Best", linewidth='2', color=colors[4], linestyle='--')
-    sns.lineplot(x="epoch", y="th", data=test_unique_metrics_loss_best, label="Test Unique Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="th", data=test_unique_metrics_both, label="Test Unique Both", linewidth='2', color=colors[2], alpha=0.7)
-    sns.lineplot(x="epoch", y="th", data=test_unique_metrics_g, label="Test Unique G", linewidth='2', color=colors[5])
-    sns.lineplot(x="epoch", y="th", data=test_unique_metrics_loss, label="Test Unique Loss", linewidth='2', color=colors[8])
-    plt.title("Test Unique Loss")
-    plt.savefig(root_save_dir + "/Metrics/Unique/Test_Unique_Loss.png")
-    plt.close()
+        plt.savefig(root_save_dir + "/Metrics/Normal/Test_Normal_Loss.png")
+        plt.close()
+
+    with sns.axes_style("whitegrid"):
+        sns.lineplot(x="epoch", y="th", data=test_unique_metrics_both_best, label="Best Mixed", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
+        sns.lineplot(x="epoch", y="th", data=test_unique_metrics_g_best, label="Best Extreme", linewidth='2', color=colors[4], linestyle='--')
+        sns.lineplot(x="epoch", y="th", data=test_unique_metrics_loss_best, label="Best Global", linewidth='2', color=colors[7], linestyle='--')
+        sns.lineplot(x="epoch", y="th", data=test_unique_metrics_both, label="Mixed", linewidth='3', color=colors[2], alpha=0.7)
+        sns.lineplot(x="epoch", y="th", data=test_unique_metrics_g, label="Extreme", linewidth='2', color=colors[5])
+        sns.lineplot(x="epoch", y="th", data=test_unique_metrics_loss, label="Global", linewidth='2', color=colors[8])
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss threshold")
+        # plt.title("Only normal, unique; Loss threshold")
+        # plt.title("Unlabeled w/o Mean selection, non-unique; Loss threshold")
+        plt.title("Unlabeled w/ Mean selection, non-unique; Loss threshold")
+        plt.savefig(root_save_dir + "/Metrics/Unique/Test_Unique_Loss.png")
+        plt.close()
 
     # F1
-    sns.lineplot(x="epoch", y="f1", data=train_metrics_both_best, label="Train Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
-    sns.lineplot(x="epoch", y="f1", data=train_metrics_g_best, label="Train G Best", linewidth='2', color=colors[4], linestyle='--')
-    sns.lineplot(x="epoch", y="f1", data=train_metrics_loss_best, label="Train Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="f1", data=train_metrics_both, label="Train Both", linewidth='2', color=colors[2], alpha=0.7)
-    sns.lineplot(x="epoch", y="f1", data=train_metrics_g, label="Train G", linewidth='2', color=colors[5])
-    sns.lineplot(x="epoch", y="f1", data=train_metrics_loss, label="Train Loss", linewidth='2', color=colors[8])
-    plt.ylim(0, 100)
-    plt.xlabel("Epoch")
-    plt.ylabel("F1 Score")
-    plt.title("Train F1")
-    plt.savefig(root_save_dir + "/Metrics/Train_Normal/Train_F1.png")
-    plt.close()
+    with sns.axes_style("whitegrid"):
+        sns.lineplot(x="epoch", y="f1", data=train_metrics_both_best, label="Train Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
+        sns.lineplot(x="epoch", y="f1", data=train_metrics_g_best, label="Train G Best", linewidth='2', color=colors[4], linestyle='--')
+        sns.lineplot(x="epoch", y="f1", data=train_metrics_loss_best, label="Train Loss Best", linewidth='2', color=colors[7], linestyle='--')
+        sns.lineplot(x="epoch", y="f1", data=train_metrics_both, label="Train Both", linewidth='3', color=colors[2], alpha=0.7)
+        sns.lineplot(x="epoch", y="f1", data=train_metrics_g, label="Train G", linewidth='2', color=colors[5])
+        sns.lineplot(x="epoch", y="f1", data=train_metrics_loss, label="Train Loss", linewidth='2', color=colors[8])
+        plt.ylim(0, 100)
+        plt.xlabel("Epoch")
+        plt.ylabel("F1 Score")
+        plt.title("Train F1")
+        plt.savefig(root_save_dir + "/Metrics/Train_Normal/Train_F1.png")
+        plt.close()
 
-    sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
-    sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_g_best, label="Test Normal G Best", linewidth='2', color=colors[4], linestyle='--')
-    sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_loss_best, label="Test Normal Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_both, label="Test Normal Both", linewidth='2', color=colors[2], alpha=0.7)
-    sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_g, label="Test Normal G", linewidth='2', color=colors[5])
-    sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_loss, label="Test Normal Loss", linewidth='2', color=colors[8])
-    plt.ylim(0, 100)
-    plt.xlabel("Epoch")
-    plt.ylabel("F1 Score")
-    plt.title("Test Normal F1")
-    plt.savefig(root_save_dir + "/Metrics/Normal/Test_Normal_F1.png")
-    plt.close()
+    with sns.axes_style("whitegrid"):
+        train_metrics_both_best['f1'] = train_metrics_both_best['f1'] / 100
+        test_normal_metrics_g_best['f1'] = test_normal_metrics_g_best['f1'] / 100
+        test_normal_metrics_loss_best['f1'] = test_normal_metrics_loss_best['f1'] / 100
+        test_normal_metrics_both['f1'] = test_normal_metrics_both['f1'] / 100
+        test_normal_metrics_g['f1'] = test_normal_metrics_g['f1'] / 100
+        test_normal_metrics_loss['f1'] = test_normal_metrics_loss['f1'] / 100
 
-    sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
-    sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_g_best, label="Test Unique G Best", linewidth='2', color=colors[4], linestyle='--')
-    sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_loss_best, label="Test Unique Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_both, label="Test Unique Both", linewidth='2', color=colors[2], alpha=0.7)
-    sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_g, label="Test Unique G", linewidth='2', color=colors[5])
-    sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_loss, label="Test Unique Loss", linewidth='2', color=colors[8])
-    plt.ylim(0, 100)
-    plt.xlabel("Epoch")
-    plt.ylabel("F1 Score")
-    plt.title("Test Unique F1")
-    plt.savefig(root_save_dir + "/Metrics/Unique/Test_Unique_F1.png")
-    plt.close()
+        sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_both_best, label="Best Mixed", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
+        sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_g_best, label="Best Extreme", linewidth='2', color=colors[4], linestyle='--')
+        sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_loss_best, label="Best Global", linewidth='2', color=colors[7], linestyle='--')
+        sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_both, label="Mixed", linewidth='3', color=colors[2], alpha=0.7)
+        sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_g, label="Extreme", linewidth='2', color=colors[5])
+        sns.lineplot(x="epoch", y="f1", data=test_normal_metrics_loss, label="Global", linewidth='2', color=colors[8])
+        plt.ylim(0, 1)
+        plt.xlabel("Epoch")
+        plt.ylabel("F1 Score")
+        # plt.title("Only normal, non-unique; F1 score")
+        # plt.title("Unlabeled w/o Mean selection, non-unique; F1 score")
+        plt.title("Unlabeled w/ Mean selection, non-unique; F1 score")
+        plt.savefig(root_save_dir + "/Metrics/Normal/Test_Normal_F1.png")
+        plt.close()
+
+    with sns.axes_style("whitegrid"):
+        test_unique_metrics_both_best['f1'] = test_unique_metrics_both_best['f1'] / 100
+        test_unique_metrics_g_best['f1'] = test_unique_metrics_g_best['f1'] / 100
+        test_unique_metrics_loss_best['f1'] = test_unique_metrics_loss_best['f1'] / 100
+        test_unique_metrics_both['f1'] = test_unique_metrics_both['f1'] / 100
+        test_unique_metrics_g['f1'] = test_unique_metrics_g['f1'] / 100
+        test_unique_metrics_loss['f1'] = test_unique_metrics_loss['f1'] / 100
+
+        sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_both_best, label="Best Mixed", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
+        sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_g_best, label="Best Extreme", linewidth='2', color=colors[4], linestyle='--')
+        sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_loss_best, label="Best Global", linewidth='2', color=colors[7], linestyle='--')
+        sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_both, label="Mixed", linewidth='3', color=colors[2], alpha=0.7)
+        sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_g, label="Extreme", linewidth='2', color=colors[5])
+        sns.lineplot(x="epoch", y="f1", data=test_unique_metrics_loss, label="Global", linewidth='2', color=colors[8])
+        plt.ylim(0, 1)
+        plt.xlabel("Epoch")
+        plt.ylabel("F1 Score")
+        # plt.title("Only normal, unique; F1 score")
+        # plt.title("Unlabeled w/o Mean selection, unique; F1 score")
+        plt.title("Unlabeled w/ Mean selection, unique; F1 score")
+        plt.savefig(root_save_dir + "/Metrics/Unique/Test_Unique_F1.png")
+        plt.close()
 
     # P
-    sns.lineplot(x="epoch", y="p", data=train_metrics_both_best, label="Train Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="p", data=train_metrics_both_best, label="Train Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="p", data=train_metrics_g_best, label="Train G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="p", data=train_metrics_loss_best, label="Train Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="p", data=train_metrics_both, label="Train Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="p", data=train_metrics_both, label="Train Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="p", data=train_metrics_g, label="Train G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="p", data=train_metrics_loss, label="Train Loss", linewidth='2', color=colors[8])
     plt.ylim(0, 100)
@@ -228,10 +287,10 @@ def plot_train_valid_loss(save_dir, save_dir_photos, root_save_dir, mean_selecti
     plt.savefig(root_save_dir + "/Metrics/Train_Normal/Train_P.png")
     plt.close()
 
-    sns.lineplot(x="epoch", y="p", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="p", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="p", data=test_normal_metrics_g_best, label="Test Normal G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="p", data=test_normal_metrics_loss_best, label="Test Normal Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="p", data=test_normal_metrics_both, label="Test Normal Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="p", data=test_normal_metrics_both, label="Test Normal Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="p", data=test_normal_metrics_g, label="Test Normal G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="p", data=test_normal_metrics_loss, label="Test Normal Loss", linewidth='2', color=colors[8])
     plt.ylim(0, 100)
@@ -241,7 +300,7 @@ def plot_train_valid_loss(save_dir, save_dir_photos, root_save_dir, mean_selecti
     plt.savefig(root_save_dir + "/Metrics/Normal/Test_Normal_P.png")
     plt.close()
 
-    sns.lineplot(x="epoch", y="p", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="p", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="p", data=test_unique_metrics_g_best, label="Test Unique G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="p", data=test_unique_metrics_loss_best, label="Test Unique Loss Best", linewidth='2', color=colors[7], linestyle='--')
     sns.lineplot(x="epoch", y="p", data=test_unique_metrics_both, label="Test Unique Both", linewidth='2',color=colors[2], alpha=0.7)
@@ -255,10 +314,10 @@ def plot_train_valid_loss(save_dir, save_dir_photos, root_save_dir, mean_selecti
     plt.close()
 
     # R
-    sns.lineplot(x="epoch", y="r", data=train_metrics_both_best, label="Train Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="r", data=train_metrics_both_best, label="Train Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="r", data=train_metrics_g_best, label="Train G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="r", data=train_metrics_loss_best, label="Train Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="r", data=train_metrics_both, label="Train Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="r", data=train_metrics_both, label="Train Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="r", data=train_metrics_g, label="Train G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="r", data=train_metrics_loss, label="Train Loss", linewidth='2', color=colors[8])
     plt.ylim(0, 100)
@@ -268,10 +327,10 @@ def plot_train_valid_loss(save_dir, save_dir_photos, root_save_dir, mean_selecti
     plt.savefig(root_save_dir + "/Metrics/Train_Normal/Train_R.png")
     plt.close()
 
-    sns.lineplot(x="epoch", y="r", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="r", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="r", data=test_normal_metrics_g_best, label="Test Normal G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="r", data=test_normal_metrics_loss_best, label="Test Normal Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="r", data=test_normal_metrics_both, label="Test Normal Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="r", data=test_normal_metrics_both, label="Test Normal Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="r", data=test_normal_metrics_g, label="Test Normal G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="r", data=test_normal_metrics_loss, label="Test Normal Loss", linewidth='2', color=colors[8])
     plt.ylim(0, 100)
@@ -281,10 +340,10 @@ def plot_train_valid_loss(save_dir, save_dir_photos, root_save_dir, mean_selecti
     plt.savefig(root_save_dir + "/Metrics/Normal/Test_Normal_R.png")
     plt.close()
 
-    sns.lineplot(x="epoch", y="r", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="r", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="r", data=test_unique_metrics_g_best, label="Test Unique G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="r", data=test_unique_metrics_loss_best, label="Test Unique Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="r", data=test_unique_metrics_both, label="Test Unique Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="r", data=test_unique_metrics_both, label="Test Unique Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="r", data=test_unique_metrics_g, label="Test Unique G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="r", data=test_unique_metrics_loss, label="Test Unique Loss", linewidth='2', color=colors[8])
     plt.ylim(0, 100)
@@ -295,30 +354,30 @@ def plot_train_valid_loss(save_dir, save_dir_photos, root_save_dir, mean_selecti
     plt.close()
 
     # TP
-    sns.lineplot(x="epoch", y="tp", data=train_metrics_both_best, label="Train Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="tp", data=train_metrics_both_best, label="Train Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="tp", data=train_metrics_g_best, label="Train G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="tp", data=train_metrics_loss_best, label="Train Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="tp", data=train_metrics_both, label="Train Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="tp", data=train_metrics_both, label="Train Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="tp", data=train_metrics_g, label="Train G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="tp", data=train_metrics_loss, label="Train Loss", linewidth='2', color=colors[8])
     plt.title("Train TP")
     plt.savefig(root_save_dir + "/Metrics/Train_Normal/Train_TP.png")
     plt.close()
 
-    sns.lineplot(x="epoch", y="tp", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="tp", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="tp", data=test_normal_metrics_g_best, label="Test Normal G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="tp", data=test_normal_metrics_loss_best, label="Test Normal Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="tp", data=test_normal_metrics_both, label="Test Normal Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="tp", data=test_normal_metrics_both, label="Test Normal Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="tp", data=test_normal_metrics_g, label="Test Normal G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="tp", data=test_normal_metrics_loss, label="Test Normal Loss", linewidth='2', color=colors[8])
     plt.title("Test Normal TP")
     plt.savefig(root_save_dir + "/Metrics/Normal/Test_Normal_TP.png")
     plt.close()
 
-    sns.lineplot(x="epoch", y="tp", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="tp", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="tp", data=test_unique_metrics_g_best, label="Test Unique G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="tp", data=test_unique_metrics_loss_best, label="Test Unique Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="tp", data=test_unique_metrics_both, label="Test Unique Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="tp", data=test_unique_metrics_both, label="Test Unique Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="tp", data=test_unique_metrics_g, label="Test Unique G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="tp", data=test_unique_metrics_loss, label="Test Unique Loss", linewidth='2', color=colors[8])
     plt.title("Test Unique TP")
@@ -326,30 +385,30 @@ def plot_train_valid_loss(save_dir, save_dir_photos, root_save_dir, mean_selecti
     plt.close()
 
     # FP
-    sns.lineplot(x="epoch", y="fp", data=train_metrics_both_best, label="Train Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="fp", data=train_metrics_both_best, label="Train Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="fp", data=train_metrics_g_best, label="Train G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="fp", data=train_metrics_loss_best, label="Train Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="fp", data=train_metrics_both, label="Train Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="fp", data=train_metrics_both, label="Train Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="fp", data=train_metrics_g, label="Train G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="fp", data=train_metrics_loss, label="Train Loss", linewidth='2', color=colors[8])
     plt.title("Train FP")
     plt.savefig(root_save_dir + "/Metrics/Train_Normal/Train_FP.png")
     plt.close()
 
-    sns.lineplot(x="epoch", y="fp", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="fp", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="fp", data=test_normal_metrics_g_best, label="Test Normal G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="fp", data=test_normal_metrics_loss_best, label="Test Normal Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="fp", data=test_normal_metrics_both, label="Test Normal Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="fp", data=test_normal_metrics_both, label="Test Normal Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="fp", data=test_normal_metrics_g, label="Test Normal G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="fp", data=test_normal_metrics_loss, label="Test Normal Loss", linewidth='2', color=colors[8])
     plt.title("Test Normal FP")
     plt.savefig(root_save_dir + "/Metrics/Normal/Test_Normal_FP.png")
     plt.close()
 
-    sns.lineplot(x="epoch", y="fp", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="fp", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="fp", data=test_unique_metrics_g_best, label="Test Unique G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="fp", data=test_unique_metrics_loss_best, label="Test Unique Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="fp", data=test_unique_metrics_both, label="Test Unique Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="fp", data=test_unique_metrics_both, label="Test Unique Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="fp", data=test_unique_metrics_g, label="Test Unique G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="fp", data=test_unique_metrics_loss, label="Test Unique Loss", linewidth='2', color=colors[8])
     plt.title("Test Unique FP")
@@ -357,30 +416,30 @@ def plot_train_valid_loss(save_dir, save_dir_photos, root_save_dir, mean_selecti
     plt.close()
 
     # FN
-    sns.lineplot(x="epoch", y="fn", data=train_metrics_both_best, label="Train Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="fn", data=train_metrics_both_best, label="Train Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="fn", data=train_metrics_g_best, label="Train G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="fn", data=train_metrics_loss_best, label="Train Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="fn", data=train_metrics_both, label="Train Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="fn", data=train_metrics_both, label="Train Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="fn", data=train_metrics_g, label="Train G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="fn", data=train_metrics_loss, label="Train Loss", linewidth='2', color=colors[8])
     plt.title("Train FN")
     plt.savefig(root_save_dir + "/Metrics/Train_Normal/Train_FN.png")
     plt.close()
 
-    sns.lineplot(x="epoch", y="fn", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="fn", data=test_normal_metrics_both_best, label="Test Normal Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="fn", data=test_normal_metrics_g_best, label="Test Normal G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="fn", data=test_normal_metrics_loss_best, label="Test Normal Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="fn", data=test_normal_metrics_both, label="Test Normal Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="fn", data=test_normal_metrics_both, label="Test Normal Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="fn", data=test_normal_metrics_g, label="Test Normal G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="fn", data=test_normal_metrics_loss, label="Test Normal Loss", linewidth='2', color=colors[8])
     plt.title("Test Normal FN")
     plt.savefig(root_save_dir + "/Metrics/Normal/Test_Normal_FN.png")
     plt.close()
 
-    sns.lineplot(x="epoch", y="fn", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='2', color=colors[1], linestyle='--', alpha=0.7)
+    sns.lineplot(x="epoch", y="fn", data=test_unique_metrics_both_best, label="Test Unique Both Best", linewidth='3', color=colors[1], linestyle='--', alpha=0.7)
     sns.lineplot(x="epoch", y="fn", data=test_unique_metrics_g_best, label="Test Unique G Best", linewidth='2', color=colors[4], linestyle='--')
     sns.lineplot(x="epoch", y="fn", data=test_unique_metrics_loss_best, label="Test Unique Loss Best", linewidth='2', color=colors[7], linestyle='--')
-    sns.lineplot(x="epoch", y="fn", data=test_unique_metrics_both, label="Test Unique Both", linewidth='2', color=colors[2], alpha=0.7)
+    sns.lineplot(x="epoch", y="fn", data=test_unique_metrics_both, label="Test Unique Both", linewidth='3', color=colors[2], alpha=0.7)
     sns.lineplot(x="epoch", y="fn", data=test_unique_metrics_g, label="Test Unique G", linewidth='2', color=colors[5])
     sns.lineplot(x="epoch", y="fn", data=test_unique_metrics_loss, label="Test Unique Loss", linewidth='2', color=colors[8])
     plt.title("Test Unique FN")
@@ -433,6 +492,7 @@ def plot_train_valid_loss(save_dir, save_dir_photos, root_save_dir, mean_selecti
         plt.close()
 
 
+
 def plot_sequence_len(save_dir):
     normal_seq_len = []
     with open(save_dir+"train", "r") as f:
@@ -454,7 +514,116 @@ def plot_sequence_len(save_dir):
     plt.show()
     plt.close()
 
+
+def plot_train_percentage(csv_path, file_name):
+    train_loss = pd.read_csv(csv_path + "/" + file_name)
+    colors = [0, 'darkred', 'darkred', 'darkred', 'royalblue', 'royalblue', 'royalblue', 'orange', 'orange', 'orange']
+    sns.set_context("notebook", font_scale=1.1, rc={"lines.linewidth": 2.5})
+
+    with sns.axes_style("whitegrid"):
+        sns.lineplot(x="epoch", y="elim_no", data=train_loss, label="train eliminated number", linewidth='2', color=colors[4])
+        sns.lineplot(x="epoch", y="an_elim_no", data=train_loss, label="train anomalies eliminated number", linewidth='2', color=colors[1])
+        plt.xlabel("Epoch")
+        plt.ylabel("Eliminated")
+
+        plt.title("epoch vs eliminated number vs anomalies eliminated number")
+        plt.savefig(csv_path + "/train_valid_eliminated_no.png")
+        plt.close()
+
+    with sns.axes_style("whitegrid"):
+        sns.lineplot(x="epoch", y="elim_per", data=train_loss, label="Total eliminated %", linewidth='2', color=colors[4])
+        sns.lineplot(x="epoch", y="an_elim_per", data=train_loss, label="Anomalies eliminated %", linewidth='2', color=colors[7])
+        plt.xlabel("Epoch")
+        plt.ylabel("Eliminated %")
+        plt.ylim(0, 1)
+        plt.title("Total eliminated % vs. anomalies eliminated %")
+        plt.savefig(csv_path + "/train_valid_eliminated_percentage.png")
+
+        print("plot done")
+        plt.close()
+
+
+def plot_anomalies(csv_path, file_name, epoch):
+    dataset = pd.read_csv(csv_path + "/" + file_name + ".csv")
+    dataset.columns = ['x', 'y']
+
+    colors = [0, 'darkred', 'darkred', 'darkred', 'royalblue', 'royalblue', 'royalblue', 'orange', 'orange', 'orange']
+    sns.set_context("notebook", font_scale=1.1, rc={"lines.linewidth": 1.5})
+
+    with sns.axes_style("whitegrid"):
+        kn = KneeLocator(dataset['x'], dataset['y'], curve='convex', direction='decreasing', online=True)
+        kn.plot_knee()
+        elbow = kn.knee
+
+        fig, ax = plt.subplots(figsize=(6.2, 5))
+        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x / 1000) + 'K'))
+        sns.lineplot(x="x", y="y", data=dataset, linewidth='2', color=colors[4])
+        # plt.hist(losses_normal.tolist(), stacked=True, density=True, color='green')
+        # plt.hist(losses_anomalies.tolist(), stacked=True, density=True, color='red')
+        plt.axvline(elbow, linestyle="dashed", color=colors[1], linewidth='1.1')
+        plt.text(elbow + 0.6, 15000, 'G threshold', rotation=90)
+
+
+        plt.xlabel("G candidates")
+        plt.ylabel("Candidate anomalies")
+        # plt.ylim(0, 35000)
+        plt.title("G chosen by Extreme heuristic. Epoch " + str(epoch))
+        plt.savefig(csv_path + "/" + file_name + ".png")
+        plt.close()
+
+def plot_losses(csv_path, file_name, elbow_loss, epoch=None):
+    dataset = pd.read_csv(csv_path + "/" + file_name + ".csv")
+    dataset.columns = ['Loss', 'Sequence type']
+
+    colors = [0, 'darkred', 'darkred', 'darkred', 'royalblue', 'royalblue', 'royalblue', 'orange', 'orange', 'orange']
+    sns.set_context("notebook", font_scale=1.1, rc={"lines.linewidth": 1.5})
+
+    with sns.axes_style("whitegrid"):
+        sns.histplot(data=dataset, x="Loss", hue="Sequence type", palette=[colors[4], colors[7]])
+        plt.axvline(elbow_loss, linestyle="dashed", color=colors[1], label="Loss threshold")
+        plt.text(elbow_loss + 0.1, 250, 'Loss threshold', rotation=90)
+
+        plt.xlabel("Loss value")
+        plt.ylabel("Sequence no.")
+        plt.xlim(0, 11)
+        if epoch is not None:
+            plt.title("Loss values histogram. Epoch " + str(epoch))
+        else:
+            plt.title("Loss values histogram")
+        plt.savefig(csv_path + "/" + file_name + ".png")
+        plt.close()
+
+
 if __name__ == "__main__":
+    # plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses", 'Losses_60', 1.6)
+    # plot_train_percentage("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Train_percentage", "TRAIN_1.CSV")
+    # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number", "Epoch_16", 9)
+    # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number", "BGL_Epoch_35", 9)
+    # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number/Progress",
+    #                "Epoch_1", 1)
+    # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number/Progress",
+    #                "Epoch_2", 2)
+    # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number/Progress",
+    #                "Epoch_3", 3)
+    # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number/Progress",
+    #                "Epoch_78",78)
+    # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number/Progress",
+    #                "Epoch_66", 66)
+    # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number/Progress",
+    #                "Epoch_67", 67)
+    # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number/Progress",
+    #                "Epoch_68", 68)
+
+    # plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_2', 3.78, 2)
+    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_17', 4.05, 17)
+    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_18', 3.9, 18)
+    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_19', 3.4, 19)
+
+    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_40', 1.85, 40)
+    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_41', 1.80, 41)
+    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_42', 1.85, 42)
+
+
     # plot_train_valid_loss("./../../../dataset/bgl/parser_type=drain/window_type=session/train_size=0.8/deeplog/runs/history_size=60/max_anomalies_ratio=0.0/max_epoch=50/n_epochs_stop=3/min_loss_reduction_per_epoch=0.95/lr=0.0001/batch_size=4096/mean_selection_activated=False/Csvs", \
     #                       "./../../../dataset/bgl/parser_type=drain/window_type=session/train_size=0.8/deeplog/runs/history_size=60/max_anomalies_ratio=0.0/max_epoch=50/n_epochs_stop=3/min_loss_reduction_per_epoch=0.95/lr=0.0001/batch_size=4096/mean_selection_activated=False/Pngs",\
     #                       "./../../../dataset/bgl/parser_type=drain/window_type=session/train_size=0.8/deeplog/runs/history_size=60/max_anomalies_ratio=0.0/max_epoch=50/n_epochs_stop=3/min_loss_reduction_per_epoch=0.95/lr=0.0001/batch_size=4096/mean_selection_activated=False/",\
@@ -463,12 +632,26 @@ if __name__ == "__main__":
     #                   "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=True/PngsToday",\
     #                   "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=True/",\
     #                   True)
-    plot_train_valid_loss("./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/Csvs", \
-                          "./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/PngsToday",\
-                          "./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/",\
-                      True)
     # plot_train_valid_loss(
     #     "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=False/Csvs", \
     #     "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=False/PngsToday", \
     #     "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=False/", \
     #     False)
+
+    # plot_train_valid_loss(
+    #     "./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/Csvs", \
+    #     "./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/PngsToday", \
+    #     "./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/", \
+    #     True)
+
+    # plot_train_valid_loss(
+    #     "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=False/Csvs", \
+    #     "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=False/PngsToday", \
+    #     "./../../../dataset/hdfs/parser_type=drain/window_type=session/train_size=0.1/deeplog/runs/history_size=10/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.001/batch_size=4096/mean_selection_activated=False/", \
+    #     True)
+
+    # plot_train_valid_loss(
+    #     "./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/Csvs", \
+    #     "./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/PngsToday", \
+    #     "./../../../dataset/bgl/deeplog/runs/history_size=60/max_anomalies_ratio=1.0/max_epoch=100/n_epochs_stop=10/min_loss_reduction_per_epoch=0.99/lr=0.01/batch_size=4096/mean_selection_activated=True/", \
+    #     True)
