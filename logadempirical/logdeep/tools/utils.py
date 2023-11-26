@@ -64,7 +64,7 @@ def plot_next_token_histogram_of_probabilities(phase, epoch, probabilities, save
 
     with open(save_dir + "/Histograms/" + str(epoch) + "_Histogram_next_token_probabilities_" + phase + ".csv", 'w') as f:
         writer = csv.writer(f)
-        writer.writerows(probabilities.tolist())
+        writer.writerows(zip(probabilities))
 
     plt.title(str(epoch) + " Histogram of next token probailities " + phase)
     plt.xlabel("Next token probability")
@@ -571,7 +571,7 @@ def plot_anomalies(csv_path, file_name, epoch):
         plt.savefig(csv_path + "/" + file_name + ".png")
         plt.close()
 
-def plot_losses(csv_path, file_name, elbow_loss, epoch=None):
+def plot_losses_2(csv_path, file_name, elbow_loss, epoch=None):
     dataset = pd.read_csv(csv_path + "/" + file_name + ".csv")
     dataset.columns = ['Loss', 'Sequence type']
 
@@ -595,7 +595,7 @@ def plot_losses(csv_path, file_name, elbow_loss, epoch=None):
 
 
 if __name__ == "__main__":
-    # plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses", 'Losses_60', 1.6)
+    # plot_losses_2("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses", 'Losses_60', 1.6)
     # plot_train_percentage("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Train_percentage", "TRAIN_1.CSV")
     # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number", "Epoch_16", 9)
     # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number", "BGL_Epoch_35", 9)
@@ -614,14 +614,14 @@ if __name__ == "__main__":
     # plot_anomalies("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Anomalies_number/Progress",
     #                "Epoch_68", 68)
 
-    # plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_2', 3.78, 2)
-    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_17', 4.05, 17)
-    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_18', 3.9, 18)
-    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_19', 3.4, 19)
+    # plot_losses_2("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_2', 3.78, 2)
+    plot_losses_2("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_17', 4.05, 17)
+    plot_losses_2("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_18', 3.9, 18)
+    plot_losses_2("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_19', 3.4, 19)
 
-    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_40', 1.85, 40)
-    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_41', 1.80, 41)
-    plot_losses("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_42', 1.85, 42)
+    plot_losses_2("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_40', 1.85, 40)
+    plot_losses_2("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_41', 1.80, 41)
+    plot_losses_2("/Volumes/workplace/disertatie/LogADEmpirical/dataset/create_images/Losses/Progress", 'Losses_42', 1.85, 42)
 
 
     # plot_train_valid_loss("./../../../dataset/bgl/parser_type=drain/window_type=session/train_size=0.8/deeplog/runs/history_size=60/max_anomalies_ratio=0.0/max_epoch=50/n_epochs_stop=3/min_loss_reduction_per_epoch=0.95/lr=0.0001/batch_size=4096/mean_selection_activated=False/Csvs", \
